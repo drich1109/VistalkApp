@@ -1,12 +1,4 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import type { SampleType } from './type';
-    import { getSampleItems } from './repo';
-    let data:SampleType[] = [];
-
-    onMount(async () => {
-        data = await getSampleItems();
-    });
     function scrollToSection(sectionId: string) {
             const section = document.getElementById(sectionId);
             if (section) {

@@ -56,9 +56,3 @@ export async function initAuth(cookies?: Cookies, refreshIfExpired: boolean = tr
 	}
 }
 
-export const catchAllRole = 'admin';
-
-export function userIsInRole(user: LoggedInUser | undefined | null, role: string) {
-	if (!user) return false;
-	return user.role.includes(role) || user.role.includes(catchAllRole);
-}

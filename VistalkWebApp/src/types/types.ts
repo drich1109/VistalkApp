@@ -1,12 +1,8 @@
 // types.ts
 
 export interface LoggedInUser {
-	uid: string;
 	name: string;
-	preferred_username: string;
-	scope: string[];
-	role: string[];
-	userTypeId: string; 
+	token: string;
 }
 
 export type DateInput = string | number | Date;
