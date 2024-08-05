@@ -408,3 +408,50 @@ build/
 
 # Environment variables files
 .env
+
+# React Native
+
+# Android
+/android/.gradle
+/android/app/build
+/android/build
+/android/.idea
+/android/local.properties
+/android/app/*.iml
+/android/*/generated/
+*.keystore
+
+# iOS
+/ios/Pods/
+/ios/build/
+/ios/DerivedData/
+/ios/*.workspace
+/ios/*.xcodeproj
+/ios/*.xcworkspace
+/ios/*.xcuserdata
+/ios/*.xcodeproj/*
+!ios/*.xcodeproj/project.pbxproj
+
+# Node.js
+/node_modules
+/.pnp
+.pnp.js
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+expo-error.log*
+
+# Metro
+*.metro.*
+
+# Miscellaneous
+.expo/
+/.expo-shared
+*.swp
+*.swo
+*.DS_Store
+
+# Testing
+/coverage
