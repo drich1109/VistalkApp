@@ -2,12 +2,15 @@
     import { getLoggedInUser } from '$lib/auth/oidcService';
     import { onMount } from 'svelte';
     import type { LoggedInUser } from '../types/types';
+    import LoginModal from './Login.svelte';
+    import { loggedInUser } from '$lib/store';
     
     let user: LoggedInUser | null = null;
-
+    
     async function getUser()
     {
         user = await getLoggedInUser();
+        loggedInUser.set(user);
     }
 
     onMount(() => {
@@ -20,7 +23,7 @@
                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
-    import LoginModal from './Login.svelte';
+ 
     let showModal = false;
 
     const openModal = () => {
@@ -31,14 +34,9 @@
     }
 
     async function handleLogin(event: CustomEvent) {
-        user = event.detail.user;
+        loggedInUser.set(event.detail.user);
     }
 
-    export function logout(): void {
-        user=null;
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('userData');
-    }
 </script>
 {#if showModal}
 <LoginModal on:close={closeModal} on:login={handleLogin}/>
@@ -167,7 +165,6 @@
 
 {:else}
 <p>Welcome, {user.name}!</p>
-<button on:click={logout}>Logout</button>
 {/if}
 <style>
     .bg-main-color {

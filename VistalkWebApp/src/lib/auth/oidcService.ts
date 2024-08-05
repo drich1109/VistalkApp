@@ -33,9 +33,13 @@ export async function getLoggedInUser(): Promise<LoggedInUser | null> {
     const token = getTokenFromLocalStorage();
     if (!token) return null;
     try {
-        const decodedToken = jwtDecode<LoggedInUser>(token);
-        return decodedToken;
-    } catch {
+		const decodedToken: any = jwtDecode(token);
+		const user: LoggedInUser = {
+            name: decodedToken.sub,
+            token
+        };
+        return user;  
+	} catch {
         clearLocalStorage();
         return null;
     }
