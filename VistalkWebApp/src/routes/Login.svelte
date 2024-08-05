@@ -2,6 +2,7 @@
     import { createEventDispatcher } from "svelte";
     import { login } from "./repo";
     import type { LoggedInUser } from "../types/types";
+    import { saveTokenToLocalStorage,saveUserToLocalStorage } from "$lib/auth/oidcService";
     const dispatch = createEventDispatcher();
 
     const handleClose = () => {
@@ -12,10 +13,16 @@
     let password:string = "";
     let user:LoggedInUser;
 
-    async function clickLogIn()
-    {
-        user = await login(userName, password);
-        console.log(user);
+    async function clickLogIn() {
+        try {
+            user = await login(userName, password);
+            saveTokenToLocalStorage(user.token);
+            saveUserToLocalStorage(user);
+            dispatch('login', { user });
+            handleClose();
+        } catch (error) {
+            console.error("Login failed:", error);
+        }
     }
 </script>
 

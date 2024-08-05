@@ -1,4 +1,19 @@
 <script lang="ts">
+    import { getLoggedInUser } from '$lib/auth/oidcService';
+    import { onMount } from 'svelte';
+    import type { LoggedInUser } from '../types/types';
+    
+    let user: LoggedInUser | null = null;
+
+    async function getUser()
+    {
+        user = await getLoggedInUser();
+    }
+
+    onMount(() => {
+        getUser();
+    });
+
     function scrollToSection(sectionId: string) {
             const section = document.getElementById(sectionId);
             if (section) {
@@ -14,10 +29,21 @@
     const closeModal = () => {
     showModal = false;
     }
+
+    async function handleLogin(event: CustomEvent) {
+        user = event.detail.user;
+    }
+
+    export function logout(): void {
+        user=null;
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('userData');
+    }
 </script>
 {#if showModal}
-<LoginModal on:close={closeModal}/>
+<LoginModal on:close={closeModal} on:login={handleLogin}/>
 {/if}
+{#if user == null}
 <header class="fixed top-0 w-full bg-white z-50">
     <nav class="text-black py-0 px-80 flex justify-between items-center shadow-lg">
         <ul class="flex">
@@ -138,6 +164,11 @@
     <div class="max-w-4xl mx-auto text-center">
     </div>
 </section>
+
+{:else}
+<p>Welcome, {user.name}!</p>
+<button on:click={logout}>Logout</button>
+{/if}
 <style>
     .bg-main-color {
         background-color: #D4E7C5;

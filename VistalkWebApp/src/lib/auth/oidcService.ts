@@ -8,6 +8,8 @@ import { loggedInUser } from '$lib/store';
 import type {LoggedInUser} from'../../types/types';
 
 export type CustomJwtPayload = JwtPayload & LoggedInUser;
+const TOKEN_KEY = 'authToken';
+const USER_KEY = 'loggedInUser';
 
 const oidcClient = new UserManager(oidcConfig);
 
@@ -27,17 +29,16 @@ export async function getUser(): Promise<User | null> {
 	return user;
 }
 
-export async function getLoggedInUser(): Promise<CustomJwtPayload | null> {
-	const user = await oidcClient.getUser();
-	if (!user?.access_token) return null;
-	try {
-		const decodedToken = jwtDecode(user.access_token) as CustomJwtPayload;
-		// Update the store with the decoded token details including userTypeId
-		return decodedToken;
-	} catch {
-		oidcClient.revokeTokens();
-		return null;
-	}
+export async function getLoggedInUser(): Promise<LoggedInUser | null> {
+    const token = getTokenFromLocalStorage();
+    if (!token) return null;
+    try {
+        const decodedToken = jwtDecode<LoggedInUser>(token);
+        return decodedToken;
+    } catch {
+        clearLocalStorage();
+        return null;
+    }
 }
 
 export async function handleCallback(): Promise<void> {
@@ -58,3 +59,26 @@ export async function handleCallback(): Promise<void> {
 }
 
 export { oidcConfig, oidcClient };
+
+
+export function saveTokenToLocalStorage(token: string): void {
+    localStorage.setItem(TOKEN_KEY, token);
+}
+
+export function saveUserToLocalStorage(user: LoggedInUser): void {
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
+export function getTokenFromLocalStorage(): string | null {
+    return localStorage.getItem(TOKEN_KEY);
+}
+
+export function getUserFromLocalStorage(): LoggedInUser | null {
+    const user = localStorage.getItem(USER_KEY);
+    return user ? JSON.parse(user) : null;
+}
+
+export function clearLocalStorage(): void {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+}
