@@ -22,17 +22,20 @@
     <div class="sidebar-content">
         <div class="sidebar-header">
             {#if isExpanded}
-                <span class="title">Vistalk</span>
+                <span class="title text-white text-4xl text-center font-bold mt-8">Vistalk</span>
             {/if}
             <button class="toggle-button" on:click={toggleSidebar}>
                 {#if isExpanded}
-                    &times; <!-- Close icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 50 50"><path fill="white" d="M25 42c-9.4 0-17-7.6-17-17S15.6 8 25 8s17 7.6 17 17s-7.6 17-17 17m0-32c-8.3 0-15 6.7-15 15s6.7 15 15 15s15-6.7 15-15s-6.7-15-15-15"/><path fill="white" d="M25.3 34.7L15.6 25l9.7-9.7l1.4 1.4l-8.3 8.3l8.3 8.3z"/><path fill="white" d="M17 24h17v2H17z"/></svg>
                 {:else}
-                    &#9776; <!-- Menu icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 50 50"><path fill="white" d="M25 42c-9.4 0-17-7.6-17-17S15.6 8 25 8s17 7.6 17 17s-7.6 17-17 17m0-32c-8.3 0-15 6.7-15 15s6.7 15 15 15s15-6.7 15-15s-6.7-15-15-15"/><path fill="white" d="M25.3 34.7L15.6 25l9.7-9.7l1.4 1.4l-8.3 8.3l8.3 8.3z"/><path fill="white" d="M17 24h17v2H17z"/></svg>
                 {/if}
             </button>
         </div>
 
+        <!-- svelte-ignore a11y-no-static-element-interactions -->
+        <!-- svelte-ignore a11y-missing-attribute -->
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <nav class="navigation">
             <a class="nav-link" on:click={() => goto('/dashboard')}>
                 <i class="fas fa-tachometer-alt"></i>
@@ -89,7 +92,7 @@
         top: 0;
         left: 0;
         background-color: #99BC85;
-        overflow: hidden;
+        overflow: visible;
         z-index: 1000;
         transition: width 0.3s ease, padding 0.3s ease;
     }
@@ -127,17 +130,34 @@
     }
 
     .toggle-button {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 1.5em;
-        cursor: pointer;
-        transition: color 0.3s ease;
-    }
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    position: absolute;
+    right: -15px; /* Adjust based on how much you want to hang */
+    top: 7%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background-color: #99BC85; /* Match with sidebar color */
+    border-radius: 50%;
+    z-index: 9999;
+}
 
-    .toggle-button:hover {
-        color: #e0e0e0;
-    }
+.toggle-button:hover {
+    color: #e0e0e0;
+}
+
+.toggle-button svg {
+    width: 1.5em;
+    height: 1.5em;
+}
 
     .navigation {
         display: flex;

@@ -27,10 +27,11 @@
     let showModal = false;
 
     const openModal = () => {
-    showModal = true;
-    }
+        showModal = true;
+    };
+
     const closeModal = () => {
-    showModal = false;
+        showModal = false;
     }
 
     async function handleLogin(event: CustomEvent) {
@@ -85,7 +86,7 @@
         <div class="relative">
             <div class="bg-main-2 h-72 w-72 rounded-lg absolute top-32 right-4"></div>
             <!-- svelte-ignore a11y-img-redundant-alt -->
-            <img src="9 (1).png" alt="Image" class="w-[72em] h-[36em] mr-36 mt-24 relative z-10">
+            <img src="9 (1).png" alt="Image" class="w-[72em] h-[36em] mr-36 mt-24 relative">
         </div>
         <div class="ml-9">
             <h2 class="text-3xl font-bold mb-6 mt-24">About Us</h2>
@@ -127,7 +128,7 @@
         <div class="relative">
             <div class="bg-main-2 h-80 w-80 rounded-lg absolute top-56 left-44"></div>
             <!-- svelte-ignore a11y-img-redundant-alt -->
-            <img src="8 (1).png" alt="Image" class="w-[40em] h-[40em] ml-24 mt-44 relative z-10">
+            <img src="8 (1).png" alt="Image" class="w-[40em] h-[40em] ml-24 mt-44 relative">
         </div>
     </div>
 </section>
@@ -175,5 +176,11 @@
     }
     .bg-main-2{
         background-color: #E1F0DA;
-    }  
+    } 
+    .no-scroll {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
+
 </style>

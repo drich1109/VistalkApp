@@ -1,9 +1,7 @@
 import { get } from "$lib/api/baseRepo";
-import type { LoggedInUser } from "../types/types";
+import { type CallResultDto, type LoggedInUser } from "../types/types";
 import { jwtDecode, type JwtPayload } from 'jwt-decode';
 
 export async function login(email:string, password:string) {
-	const  response =  await get<LoggedInUser>(`/login`, {email,password});
-	const token = response.token;
-    return { name: response.name, token };
+	return  await get<CallResultDto<LoggedInUser>>(`/login`, {email,password});
 }

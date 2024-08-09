@@ -18,7 +18,13 @@ def login():
     password = request.args.get('password')
 
     if not email or not password:
-        return jsonify({'error': 'Email and password are required'}), 400
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Email and password are required',
+            'data': None,
+            'data2': None,
+            'totalCount': None
+        }), 200
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -30,11 +36,23 @@ def login():
         if user and hash_password(password) == user['encryptedpassword']:
             token = generate_token(user['name'])
             return jsonify({
-                'name': user['name'],
-                'token': token
+                'isSuccess': True,
+                'message': 'Login successful',
+                'data': {
+                    'name': user['name'],
+                    'token': token
+                },
+                'data2': None,
+                'totalCount': None 
             }), 200
         else:
-            return jsonify({'error': 'Invalid credentials'}), 401
+            return jsonify({
+                'isSuccess': False,
+                'message': 'Invalid credentials',
+                'data': None,
+                'data2': None,
+                'totalCount': None
+            }), 200
     finally:
         cursor.close()
         conn.close()

@@ -24,3 +24,10 @@ export type CallResultDto<T> = {
 	data2: T;
 	totalCount:number | null;
 };
+
+export type Message = 
+{
+	isDanger:boolean;
+	message:string;
+	title:string;
+}

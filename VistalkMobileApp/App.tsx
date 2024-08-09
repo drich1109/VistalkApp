@@ -14,7 +14,7 @@ const LoginPage = () => {
     console.log(payload);  // Log the payload
     const queryString = new URLSearchParams(payload).toString();  
     try {
-      const response = await fetch(`http://192.168.1.8:5000/login?${queryString}`, {
+      const response = await fetch(`http://192.168.1.18:5000/login?${queryString}`, {
         method: 'GET',  // Use GET method
         headers: {
           'Content-Type': 'application/json',
