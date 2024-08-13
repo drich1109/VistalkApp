@@ -7,9 +7,13 @@
     import type { LoggedInUser } from '../types/types';
 
     let user: LoggedInUser | null = null;
+    let isLoading = true;
+    let isSidebarExpanded = true;
 
     async function getUser() {
         user = await getLoggedInUser();
+        loggedInUser.set(user);
+        isLoading = false;
     }
 
     onMount(() => {
@@ -22,22 +26,24 @@
         localStorage.removeItem('userData');
     }
 
-    let isSidebarExpanded = true;
-
     // Function to handle sidebar toggle
     function handleSidebarToggle() {
         isSidebarExpanded = !isSidebarExpanded;
     }
 </script>
-{#if $loggedInUser}
-<div class="layout">
-    <SideBar on:logout={logout} on:toggleSidebar={handleSidebarToggle} />
-    <main class="content" class:collapsed={!isSidebarExpanded} class:expanded={isSidebarExpanded}>
-        <slot />
-    </main>
-</div>
+
+{#if isLoading}
+    <!-- Show a loader or placeholder until the user is fetched -->
+    <div>Loading...</div>
+{:else if $loggedInUser}
+    <div class="layout">
+        <SideBar on:logout={logout} on:toggleSidebar={handleSidebarToggle} />
+        <main class="content" class:collapsed={!isSidebarExpanded} class:expanded={isSidebarExpanded}>
+            <slot />
+        </main>
+    </div>
 {:else}
-<slot />
+    <slot />
 {/if}
 <style>
     .layout {
