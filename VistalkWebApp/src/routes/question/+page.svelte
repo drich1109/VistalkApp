@@ -8,7 +8,7 @@
 </script>
 
 <div class="flex justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
-    <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Content List</p>
+    <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Question List</p>
     <div class="flex-grow flex justify-center">
         <div class="flex items-center border border-[#B9B9B9] rounded-xl px-12 py-1 bg-white">
             <input type="text" placeholder="Search" class="outline-none text-gray-600 placeholder-[#99BC85]">
