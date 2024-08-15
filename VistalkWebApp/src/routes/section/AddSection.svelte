@@ -70,17 +70,17 @@
   
           <form class="mt-5">
             <div>
-                <label for="email" class="block text-sm text-gray-700 capitalize dark:text-gray-200">Section Number</label>
+                <label for="email" class="block text-sm text-black capitalize dark:text-black">Section Number</label>
                 <input bind:value={section.sectionNumber} id="email" placeholder="arthurmelo@example.app" type="number" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
               </div>
 
               <div class="mt-4">
-                <label for="username" class="block text-sm text-gray-700 capitalize dark:text-gray-200">Title</label>
+                <label for="username" class="block text-sm text-black capitalize dark:text-black">Title</label>
               <input bind:value={section.title} id="username" placeholder="Section Title" type="text" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
             </div>
   
             <div class="mt-4">
-              <label for="email" class="block text-sm text-gray-700 capitalize dark:text-gray-200">Description</label>
+              <label for="email" class="block text-sm text-black capitalize dark:text-black">Description</label>
               <textarea 
                 id="email" 
                 placeholder="This section is for..." 
@@ -92,13 +92,13 @@
             <div class="mt-4">  
                 <label class="inline-flex items-center cursor-pointer">
                     <input type="checkbox" bind:checked={section.isPremium} class="sr-only peer">
-                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Premium Section</span>
+                    <div class="relative w-11 h-6 bg-gray-200  rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-lime-800"></div>
+                    <span class="ms-3 text-sm font-medium text-black dark:text-black">Premium Section</span>
                   </label>
             </div>
             
             <div class="flex justify-end mt-6">
-              <button on:click={addSection} type="button" class="px-3 py-2 text-sm tracking-wide text-white capitalize transition-colors duration-200 transform bg-indigo-500 rounded-md dark:bg-indigo-600 dark:hover:bg-indigo-700 dark:focus:bg-indigo-700 hover:bg-indigo-600 focus:outline-none focus:bg-indigo-500 focus:ring focus:ring-indigo-300 focus:ring-opacity-50">
+              <button on:click={addSection} type="button" class="px-3 py-2 text-sm tracking-wide text-white capitalize transition-colors duration-200 transform bg-black rounded-md dark:bg-black dark:hover:bg-black dark:focus:bg-black hover:bg-black focus:outline-none focus:bg-indigo-500 focus:ring focus:ring-indigo-300 focus:ring-opacity-50">
                 Save Section
               </button>
             </div>
