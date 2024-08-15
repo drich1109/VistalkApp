@@ -70,7 +70,7 @@ function goBackToSection()
 {#if showModal == true}
     <AddUnit modelOpen = {showModal} {unit} {isAdd} on:close={closeModal} on:refresh={refresh}></AddUnit>
 {/if}
-<button on:click={goBackToSection}>Back to Section</button>
+<button class="bg-[#99BC85] rounded-lg p-1" on:click={goBackToSection}><svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 512 512"><path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M244 400L100 256l144-144M120 256h292"/></svg></button>
 <div class="flex justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
     <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Unit List</p>
     <div class="flex-grow flex justify-center">
@@ -109,24 +109,31 @@ function goBackToSection()
                 <td class="px-4 py-2">{u.title}</td>
                 <td class="px-4 py-2">{u.description}</td>
                 <td class="px-4 py-2">{u.totalItems}</td>
-                <td class="px-4 py-2"><button on:click={() => toggleModal(false,u)}>Edit</button></td>
+                <td class="px-4 py-2"><button on:click={() => toggleModal(false,u)}><svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 16 16"><path fill="black" d="M15.49 7.3h-1.16v6.35H1.67V3.28H8V2H1.67A1.21 1.21 0 0 0 .5 3.28v10.37a1.21 1.21 0 0 0 1.17 1.25h12.66a1.21 1.21 0 0 0 1.17-1.25z"/><path fill="black" d="M10.56 2.87L6.22 7.22l-.44.44l-.08.08l-1.52 3.16a1.08 1.08 0 0 0 1.45 1.45l3.14-1.53l.53-.53l.43-.43l4.34-4.36l.45-.44l.25-.25a2.18 2.18 0 0 0 0-3.08a2.17 2.17 0 0 0-1.53-.63a2.2 2.2 0 0 0-1.54.63l-.7.69l-.45.44zM5.51 11l1.18-2.43l1.25 1.26zm2-3.36l3.9-3.91l1.3 1.31L8.85 9zm5.68-5.31a.9.9 0 0 1 .65.27a.93.93 0 0 1 0 1.31l-.25.24l-1.3-1.3l.25-.25a.88.88 0 0 1 .69-.25z"/></svg></button></td>
                 {/each}
                 {:else}
                     <td class="px-4 py-2">No Units Found on Section</td>
                 {/if}
             </tr>
         </div>
-        <div class=" mt-2  flex justify-center items-center bg-white rounded-xl py-2 px-4 shadow-lg">
-            <button class="bg-[#99BC85] text-white p-2 rounded-lg shadow-sm hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="#fff" stroke-width="2" d="M17 2L7 12l10 10"/></svg>
-            </button>
-            <p class="text-[#99BC85] text-center text-sm mx-4">
-                Page 1 of 2
-            </p>
-            <button class="bg-[#99BC85] text-white p-2 rounded-lg shadow-sm hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="none" stroke="#fff" stroke-width="2" d="m7 2l10 10L7 22"/></svg>
-            </button>
+        <div class="fixed bottom-0 right-0 flex justify-center items-center bg-white rounded-xl py-2 px-4 shadow-lg ml-4 mr-4 mb-4" style="left: 80px;">
+            <div class="flex items-center">
+                <button class="bg-[#99BC85] text-white p-2 rounded-lg shadow-sm hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                        <path fill="none" stroke="#fff" stroke-width="2" d="M17 2L7 12l10 10"/>
+                    </svg>
+                </button>
+                <p class="text-[#99BC85] text-center text-sm mx-4">
+                    Page 1 of 2
+                </p>
+                <button class="bg-[#99BC85] text-white p-2 rounded-lg shadow-sm hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
+                        <path fill="none" stroke="#fff" stroke-width="2" d="m7 2l10 10L7 22"/>
+                    </svg>
+                </button>
+            </div>
         </div>
+        
         
         
     <style>

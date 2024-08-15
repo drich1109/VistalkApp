@@ -95,6 +95,12 @@
                     <span class="nav-text">Question</span>
                 {/if}
             </a>
+            <a class="nav-link {activePage === '/shop' ? 'active' : ''}"  on:click={() => goto('/shop')}>
+                <i class="fas fa-shop"></i>
+                {#if isExpanded}
+                    <span class="nav-text">Shop</span>
+                {/if}
+            </a>
         </nav>
 
         <button class="button is-light logout-button" on:click={handleLogout}>
