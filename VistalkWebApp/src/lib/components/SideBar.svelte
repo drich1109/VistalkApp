@@ -83,22 +83,16 @@
                     <span class="nav-text">Contents</span>
                 {/if}
             </a>
-            <a class="nav-link" on:click={() => goto('/section')}>
-                <i class="fas fa-section"></i>
-                {#if isExpanded}
-                    <span class="nav-text">Section and Units</span>
-                {/if}
-            </a>
-            <a class="nav-link" on:click={() => goto('/section')}>
+            <a class="nav-link {activePage === '/section' ? 'active' : ''}" on:click={() => goto('/section')}>
                 <i class="fas fa-list"></i>
                 {#if isExpanded}
                     <span class="nav-text">Section</span>
                 {/if}
             </a>
-            <a class="nav-link" on:click={() => goto('/units')}>
-                <i class="fas fa-th"></i>
+            <a class="nav-link {activePage === '/question' ? 'active' : ''}"  on:click={() => goto('/question')}>
+                <i class="fas fa-question"></i>
                 {#if isExpanded}
-                    <span class="nav-text">Units</span>
+                    <span class="nav-text">Question</span>
                 {/if}
             </a>
         </nav>
