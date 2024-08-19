@@ -15,7 +15,7 @@ export async function saveUnit(unit:Unit) {
 	return await post<CallResultDto<object>>(`/saveUnit`, {}, unit);
 }
 
-export async function getUnits(sectionID:number) {
-	let result =  await get<CallResultDto<Unit[]>>(`/getUnits`, {sectionID});
+export async function getUnits(sectionID:number, pageNo:number, searchString :string | null) {
+	let result =  await get<CallResultDto<Unit[]>>(`/getUnits`, {sectionID, pageNo, searchString});
     return result;
 }

@@ -133,12 +133,41 @@ def save_units():
 
 def get_Units():
     sectionID = request.args.get('sectionID')
+    searchString = request.args.get('searchString')
+    print(searchString)
+    pageNo = int(request.args.get('pageNo', 1))
+    pageSize = 15
+    offset = (pageNo - 1) * pageSize
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    query = "SELECT * FROM unit WHERE sectionID = %s"
-    values = (sectionID,)
-    cursor.execute(query, values)
+    query = """
+        SELECT * FROM unit
+        WHERE sectionID = %s
+    """
+    values = [sectionID]
+
+    if searchString:
+        query += "AND (title LIKE %s OR description LIKE %s)"
+        likePattern = f"%{searchString}%"
+        values.extend([likePattern, likePattern])
+    
+    query += """
+        ORDER BY unitNumber
+        LIMIT %s OFFSET %s
+    """
+    values.extend([pageSize, offset])
+
+    cursor.execute(query, tuple(values))
     units = cursor.fetchall()
+    count_query = "SELECT COUNT(*) as total FROM unit WHERE sectionID = %s"
+    countvalues = [sectionID]
+    if searchString:
+        count_query += " AND (title LIKE %s OR  description LIKE %s)"
+        likePattern = f"%{searchString}%"
+        countvalues.extend([likePattern, likePattern])
+
+    cursor.execute(count_query, tuple(countvalues))
+    total_count = cursor.fetchone()['total']
 
     if not units:
         return jsonify({
@@ -153,5 +182,5 @@ def get_Units():
                 'message': 'Successfully Retrieved',
                 'data': units,
                 'data2': None,
-                'totalCount': len(units) 
+                'totalCount': total_count
             }), 200
