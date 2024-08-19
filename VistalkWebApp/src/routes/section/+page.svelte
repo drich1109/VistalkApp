@@ -97,7 +97,7 @@
     <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Sections</p>
 
     <div class="flex gap-4">
-        <select bind:value={currentValue} on:change={getSectionDisplay} class="font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
+        <select bind:value={currentValue} on:change={getSectionDisplay} class="font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg ">
             {#each languages as lang}
             <option class="py-2" value={lang.languageID}>{lang.name}</option>
             {/each}

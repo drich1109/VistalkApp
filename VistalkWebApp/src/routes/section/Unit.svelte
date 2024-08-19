@@ -5,12 +5,15 @@
     import type { Unit } from './type';
     import { getUnits } from './repo';
     import AddUnit from './AddUnit.svelte';
+    import { page } from '$app/stores';
+    import Pagination from '$lib/components/Pagination.svelte';
 
     export let sectionId:number;
 
     let showModal : boolean = false;
     let isAdd:boolean = false;
     let unit: Unit;
+    let searchString:string | null = null;
     const dispatch = createEventDispatcher();
 
     let unitCallResult:CallResultDto<Unit[]> = 
@@ -22,6 +25,7 @@
         totalCount: 0
     };
     let units:Unit[]=[];
+    let pageNo:number =1;
 
     onMount(async () => {
         await redirectIfLoggedIn('');
@@ -30,7 +34,7 @@
 
     async function refresh()
     {
-        unitCallResult = await getUnits(sectionId);
+        unitCallResult = await getUnits(sectionId, pageNo, searchString);
         units = unitCallResult.data;
     }
 
@@ -62,10 +66,22 @@
         initalizeUnit();
     }
 
-function goBackToSection()
-{
-    dispatch("back");
-}
+    function goBackToSection()
+    {
+        dispatch("back");
+    }
+
+    function handlePageChange(event:CustomEvent) {
+        const selectElement = event.detail as HTMLSelectElement;
+        pageNo = parseInt(selectElement.toString());
+        refresh();
+    }
+
+    $: {
+        if(searchString != null)
+            refresh();
+    }
+
 </script>
 {#if showModal == true}
     <AddUnit modelOpen = {showModal} {unit} {isAdd} on:close={closeModal} on:refresh={refresh}></AddUnit>
@@ -75,7 +91,7 @@ function goBackToSection()
     <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Unit List</p>
     <div class="flex-grow flex justify-center">
         <div class="flex items-center border border-[#B9B9B9] rounded-xl px-12 py-1 bg-white">
-            <input type="text" placeholder="Search" class="outline-none text-gray-600 placeholder-[#99BC85]">
+            <input type="text" bind:value={searchString} placeholder="Search" class="outline-none text-gray-600 placeholder-[#99BC85]">
             <button>
                 <svg xmlns="http://www.w3.org/2000/svg" class="text-[#99BC85]" width="1.5em" height="1.5em" viewBox="0 0 12 12" fill="none">
                     <path d="M8.46342 8.52L10.2 10.2M5.69999 3.6C6.6941 3.6 7.49999 4.40589 7.49999 5.4M9.63999 5.72C9.63999 7.88496 7.88494 9.64 5.71999 9.64C3.55503 9.64 1.79999 7.88496 1.79999 5.72C1.79999 3.55505 3.55503 1.8 5.71999 1.8C7.88494 1.8 9.63999 3.55505 9.63999 5.72Z" stroke="#99BC85" stroke-linecap="round"/>
@@ -102,39 +118,25 @@ function goBackToSection()
             </tr>
         </thead>
         <tbody class="text-center text-sm">
-            <tr class="border-t-2 mx-4">
                 {#if unitCallResult.totalCount != null && unitCallResult.totalCount > 0}
                 {#each units as u}
-                <td class="px-4 py-2">{u.unitNumber}</td>
-                <td class="px-4 py-2">{u.title}</td>
-                <td class="px-4 py-2">{u.description}</td>
-                <td class="px-4 py-2">{u.totalItems}</td>
-                <td class="px-4 py-2"><button on:click={() => toggleModal(false,u)}><svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 16 16"><path fill="black" d="M15.49 7.3h-1.16v6.35H1.67V3.28H8V2H1.67A1.21 1.21 0 0 0 .5 3.28v10.37a1.21 1.21 0 0 0 1.17 1.25h12.66a1.21 1.21 0 0 0 1.17-1.25z"/><path fill="black" d="M10.56 2.87L6.22 7.22l-.44.44l-.08.08l-1.52 3.16a1.08 1.08 0 0 0 1.45 1.45l3.14-1.53l.53-.53l.43-.43l4.34-4.36l.45-.44l.25-.25a2.18 2.18 0 0 0 0-3.08a2.17 2.17 0 0 0-1.53-.63a2.2 2.2 0 0 0-1.54.63l-.7.69l-.45.44zM5.51 11l1.18-2.43l1.25 1.26zm2-3.36l3.9-3.91l1.3 1.31L8.85 9zm5.68-5.31a.9.9 0 0 1 .65.27a.93.93 0 0 1 0 1.31l-.25.24l-1.3-1.3l.25-.25a.88.88 0 0 1 .69-.25z"/></svg></button></td>
+                <tr class="border-t-2 mx-4">
+                    <td class="px-4 py-2">{u.unitNumber}</td>
+                    <td class="px-4 py-2">{u.title}</td>
+                    <td class="px-4 py-2">{u.description}</td>
+                    <td class="px-4 py-2">{u.totalItems}</td>
+                    <td class="px-4 py-2"><button on:click={() => toggleModal(false,u)}><svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 16 16"><path fill="black" d="M15.49 7.3h-1.16v6.35H1.67V3.28H8V2H1.67A1.21 1.21 0 0 0 .5 3.28v10.37a1.21 1.21 0 0 0 1.17 1.25h12.66a1.21 1.21 0 0 0 1.17-1.25z"/><path fill="black" d="M10.56 2.87L6.22 7.22l-.44.44l-.08.08l-1.52 3.16a1.08 1.08 0 0 0 1.45 1.45l3.14-1.53l.53-.53l.43-.43l4.34-4.36l.45-.44l.25-.25a2.18 2.18 0 0 0 0-3.08a2.17 2.17 0 0 0-1.53-.63a2.2 2.2 0 0 0-1.54.63l-.7.69l-.45.44zM5.51 11l1.18-2.43l1.25 1.26zm2-3.36l3.9-3.91l1.3 1.31L8.85 9zm5.68-5.31a.9.9 0 0 1 .65.27a.93.93 0 0 1 0 1.31l-.25.24l-1.3-1.3l.25-.25a.88.88 0 0 1 .69-.25z"/></svg></button></td>
+                </tr>
                 {/each}
                 {:else}
-                    <td class="px-4 py-2">No Units Found on Section</td>
-                {/if}
-            </tr>
+                <tr class="border-t-2 mx-4">
+                    <td class="px-4 py-2" colspan="5">No Units Found on Section</td>
+                </tr>
+                {/if}  
         </div>
-        <div class="fixed bottom-0 right-0 flex justify-center items-center bg-white rounded-xl py-2 px-4 shadow-lg ml-4 mr-4 mb-4" style="left: 80px;">
-            <div class="flex items-center">
-                <button class="bg-[#99BC85] text-white p-2 rounded-lg shadow-sm hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
-                        <path fill="none" stroke="#fff" stroke-width="2" d="M17 2L7 12l10 10"/>
-                    </svg>
-                </button>
-                <p class="text-[#99BC85] text-center text-sm mx-4">
-                    Page 1 of 2
-                </p>
-                <button class="bg-[#99BC85] text-white p-2 rounded-lg shadow-sm hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24">
-                        <path fill="none" stroke="#fff" stroke-width="2" d="m7 2l10 10L7 22"/>
-                    </svg>
-                </button>
-            </div>
-        </div>
-        
-        
+            {#if unitCallResult.totalCount}
+            <Pagination totalCount = {unitCallResult.totalCount} {pageNo} on:handlePageChange={handlePageChange}></Pagination>
+            {/if}
         
     <style>
         tbody tr:hover{
