@@ -134,7 +134,6 @@ def save_units():
 def get_Units():
     sectionID = request.args.get('sectionID')
     searchString = request.args.get('searchString')
-    print(searchString)
     pageNo = int(request.args.get('pageNo', 1))
     pageSize = 15
     offset = (pageNo - 1) * pageSize
