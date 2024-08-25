@@ -1,14 +1,13 @@
 # user.py
 from db import get_db_connection
-from flask import request, jsonify
+from flask import request, jsonify, send_from_directory
 import os
-import json
 
-UPLOAD_FOLDER = 'C://VistalkApp//VistalkApp//Vistalk Pronunciation Audio'
+PronunciationFolder = 'C:\\VistalkApp\\VistalkApp\\Vistalk Pronunciation Audio'
+Syllables =  'C:\\VistalkApp\\VistalkApp\\Vistalk Pronunciation Audio\\Syllables'
 
-# Ensure the directory exists
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
+if not os.path.exists(Syllables):
+    os.makedirs(Syllables)
 
 def get_ContentTypes():
     conn = get_db_connection()
@@ -33,29 +32,76 @@ def get_ContentTypes():
             }), 200
 
 def save_content():
-    content_data = request.form.get('content')
-    
-    # Debug: Check if the content_data is None
-    if content_data is None:
-        print("No content data found in form")
-        return jsonify({'isSuccess': False, 'message': 'Content data is missing'}), 400
+    content_id = int(request.form.get('contentId', 0))
+    content_text = request.form.get('contentText')
+    english_translation = request.form.get('englishTranslation')
+    language_id = int(request.form.get('languageId'))
+    content_type_id = int(request.form.get('contentTypeId'))
+    safe_filename = f"{content_text.replace(' ', '_')}.mp3"
 
-    content_data = json.loads(content_data)
+    audio_path = safe_filename
 
-    syllables_data = content_data['syllables']
-    definitions_data = content_data['definitions']
-    examples_data = content_data['examples']
-
-    audio_file = request.files.get('audioFile')
-
-    # Save the audio file
+    audio_file = request.files.get('contentAudioFile')
     audio_file_path = None
     if audio_file:
-        save_directory = 'C://VistalkApp//VistalkApp//Vistalk Pronunciation Audio'
-        if not os.path.exists(save_directory):
-            os.makedirs(save_directory)
-        audio_file_path = os.path.join(save_directory, audio_file.filename)
+        if not os.path.exists(PronunciationFolder):
+            os.makedirs(PronunciationFolder)
+        audio_file_path = os.path.join(PronunciationFolder, safe_filename)
         audio_file.save(audio_file_path)
+
+    syllables_data = []
+    index = 0
+    while True:
+        syllable_content_id = request.form.get(f'syllables[{index}].contentId')
+        if syllable_content_id is None:
+            break
+        syllable = {
+            'contentId': int(syllable_content_id),
+            'syllableText': request.form.get(f'syllables[{index}].syllableText'),
+            'audioPath': request.form.get(f'syllables[{index}].syllableText'),
+            'orderNumber': int(request.form.get(f'syllables[{index}].orderNumber')),
+        }
+
+        syllable_audio_file = request.files.get(f'syllables[{index}].audioFile')
+        print(syllable_audio_file)
+        if syllable_audio_file:
+            safe_filename = f"{syllable['syllableText'].replace(' ', '_')}.mp3"
+            syllable['audioPath'] = safe_filename
+            syllable_audio_path = os.path.join(Syllables, safe_filename)
+            syllable_audio_file.save(syllable_audio_path)
+
+        syllables_data.append(syllable)
+        index += 1
+
+    definitions_data = []
+    index = 0
+    while True:
+        definition_content_id = request.form.get(f'definitions[{index}].contentId')
+        if definition_content_id is None:
+            break
+        definition = {
+            'contentId': int(definition_content_id),
+            'nativeDefinition': request.form.get(f'definitions[{index}].nativeDefinition'),
+            'englishDefinition': request.form.get(f'definitions[{index}].englishDefinition'),
+            'orderNumber': int(request.form.get(f'definitions[{index}].orderNumber')),
+        }
+        definitions_data.append(definition)
+        index += 1
+
+    examples_data = []
+    index = 0
+    while True:
+        example_content_id = request.form.get(f'examples[{index}].contentId')
+        if example_content_id is None:
+            break
+        example = {
+            'contentId': int(example_content_id),
+            'nativeExample': request.form.get(f'examples[{index}].nativeExample'),
+            'englishExample': request.form.get(f'examples[{index}].englishExample'),
+            'orderNumber': int(request.form.get(f'examples[{index}].orderNumber')),
+        }
+        examples_data.append(example)
+        index += 1
 
     conn = None
     cursor = None
@@ -63,22 +109,17 @@ def save_content():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        if content_data['contentId'] == 0:
-            if audio_file:
-                audio_path = os.path.join(UPLOAD_FOLDER, audio_file.filename)
-                audio_file.save(audio_path)
-                content_data['audioPath'] = audio_path
-                print(audio_path)
+        if content_id == 0:
             sql_content = """
                 INSERT INTO content (contentText, englishTranslation, audioPath, languageId, contentTypeId)
                 VALUES (%s, %s, %s, %s, %s)
             """
             cursor.execute(sql_content, (
-                content_data['contentText'],
-                content_data['englishTranslation'],
-                content_data['audioPath'],
-                content_data['languageId'],
-                content_data['contentTypeId']
+                content_text,
+                english_translation,
+                audio_path,
+                language_id,
+                content_type_id
             ))
             conn.commit()
             content_id = cursor.lastrowid
@@ -94,7 +135,6 @@ def save_content():
                     syllable['audioPath'],
                     syllable['orderNumber']
                 ))
-                
                 conn.commit()
 
             for definition in definitions_data:
@@ -109,6 +149,7 @@ def save_content():
                     definition['orderNumber']
                 ))
                 conn.commit()
+
             for example in examples_data:
                 sql_example = """
                     INSERT INTO contentExample (contentId, nativeExample, englishExample, orderNumber)
@@ -123,21 +164,21 @@ def save_content():
                 conn.commit()
 
         else:
-            content_id = content_data['contentId']
             sql_update_content = """
                 UPDATE content
                 SET contentText = %s, englishTranslation = %s, audioPath = %s, languageId = %s, contentTypeId = %s
                 WHERE contentId = %s
             """
             cursor.execute(sql_update_content, (
-                content_data['contentText'],
-                content_data['englishTranslation'],
-                content_data['audioPath'],
-                content_data['languageId'],
-                content_data['contentTypeId'],
+                content_text,
+                english_translation,
+                audio_path,
+                language_id,
+                content_type_id,
                 content_id
             ))
-        conn.commit()
+            conn.commit()
+
         return jsonify({'isSuccess': True, "message": "Content saved successfully"}), 201
 
     except Exception as e:
@@ -181,7 +222,7 @@ def get_Contents():
     values.extend([pageSize, offset])
 
     cursor.execute(query, tuple(values))
-    units = cursor.fetchall()
+    contents = cursor.fetchall()
     count_query = "SELECT COUNT(*) as total FROM content WHERE languageID = %s"
     countvalues = [langID]
     if searchString:
@@ -196,7 +237,7 @@ def get_Contents():
     cursor.execute(count_query, tuple(countvalues))
     total_count = cursor.fetchone()['total']
 
-    if not units:
+    if not contents:
         return jsonify({
             'isSuccess': True,
             'message': 'No contents found',
@@ -207,7 +248,132 @@ def get_Contents():
     return jsonify({
                 'isSuccess': True,
                 'message': 'Successfully Retrieved',
-                'data': units,
+                'data': contents,
                 'data2': None,
                 'totalCount': total_count
             }), 200
+
+
+def getContentById():
+    contentId = request.args.get('contentId')
+    print(contentId)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        SELECT * FROM content where contentID = %s
+    """
+    values = [contentId,]
+
+    cursor.execute(query, tuple(values))
+    contents = cursor.fetchone()
+    if not contents:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No contents found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+    return jsonify({
+                'isSuccess': True,
+                'message': 'Successfully Retrieved',
+                'data': contents,
+                'data2': None,
+                'totalCount': 1
+            }), 200
+
+def getSyllablesByContentId():
+    contentId = request.args.get('contentId')
+    print(contentId)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        SELECT * FROM contentSyllable where contentID = %s
+    """
+    values = [contentId,]
+
+    cursor.execute(query, tuple(values))
+    syllables = cursor.fetchall()
+    if not syllables:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No syllables found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+    return jsonify({
+                'isSuccess': True,
+                'message': 'Successfully Retrieved',
+                'data': syllables,
+                'data2': None,
+                'totalCount': 0
+            }), 200
+
+def getDefinitionByContentId():
+    contentId = request.args.get('contentId')
+    print(contentId)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        SELECT * FROM contentDefinition where contentID = %s
+    """
+    values = [contentId,]
+
+    cursor.execute(query, tuple(values))
+    definitions = cursor.fetchall()
+    if not definitions:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No definitions found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+    return jsonify({
+                'isSuccess': True,
+                'message': 'Successfully Retrieved',
+                'data': definitions,
+                'data2': None,
+                'totalCount': 0
+            }), 200
+
+def getExamplesByContentId():
+    contentId = request.args.get('contentId')
+    print(contentId)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        SELECT * FROM contentExample where contentID = %s
+    """
+    values = [contentId,]
+
+    cursor.execute(query, tuple(values))
+    examples = cursor.fetchall()
+    if not examples:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No examples found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+    return jsonify({
+                'isSuccess': True,
+                'message': 'Successfully Retrieved',
+                'data': examples,
+                'data2': None,
+                'totalCount': 0
+            }), 200
+
+def getFileByFileName():
+    fileName = request.args.get('fileName') 
+    isSyllable = request.args.get('isSyllable')
+    print(fileName)
+
+    print(isSyllable)
+    if isSyllable == 'true':
+        return send_from_directory(Syllables, fileName)
+    elif isSyllable == 'false':
+        return send_from_directory(PronunciationFolder, fileName)
+

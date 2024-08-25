@@ -6,16 +6,19 @@ export type ContentType =
 
 export type SyllableDto = 
 {
+    id:number,
     contentId:number;
     syllableText:string;
     audioPath:string;
     orderNumber:number;
     isPlaying:boolean;
     audio:HTMLAudioElement | null;
+    file:File | null;
 }
 
 export type DefinitionDto = 
 {
+    id:number,
     contentId:number;
     nativeDefinition:string;
     englishDefinition:string;
@@ -24,6 +27,7 @@ export type DefinitionDto =
 
 export type ExampleDto = 
 {
+    id:number,
     contentId:number;
     nativeExample:string;
     englishExample:string;
@@ -32,14 +36,15 @@ export type ExampleDto =
 
 export type Content = 
 {
-    contentId:number;
+    contentID:number;
     contentText:string;
     englishTranslation:string;
     audioPath:string;
-    languageId:number;
+    languageID:number;
     contentTypeId:number;
     audio:HTMLAudioElement | null;
     file:File | null;
+    isPlaying:boolean
 }
 
 export type ContentDto = 

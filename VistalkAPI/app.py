@@ -42,5 +42,25 @@ def saveContent():
 def getcontent():
     return content.get_Contents()
 
+@app.route('/getContentById', methods=['GET'])
+def getcontentById():
+    return content.getContentById()
+
+@app.route('/getSyllablesByContentId', methods=['GET'])
+def getSyllablesByContentId():
+    return content.getSyllablesByContentId()
+
+@app.route('/getDefinitionByContentId', methods=['GET'])
+def getDefinitionByContentId():
+    return content.getDefinitionByContentId()
+
+@app.route('/getExamplesByContentId', methods=['GET'])
+def getExamplesByContentId():
+    return content.getExamplesByContentId()
+
+@app.route('/getFileByFileName', methods=['GET'])
+def getFileByFileName():
+    return content.getFileByFileName()
+
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
