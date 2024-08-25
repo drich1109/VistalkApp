@@ -138,3 +138,18 @@ export async function postMultipart<TResponse, TParams = unknown, TBody = unknow
 		data
 	});
 }
+
+export async function getFile<TResponse, TParams = unknown>(
+	url: string,
+	params?: TParams,
+	baseURL?: string
+): Promise<TResponse> {
+	return await authenticatedRequest({
+		method: 'get',
+		baseURL,
+		url,
+		headers: {	'Content-Type': 'application/octet-stream'
+		},
+		params
+	});
+}

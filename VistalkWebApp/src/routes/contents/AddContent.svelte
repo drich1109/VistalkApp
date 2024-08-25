@@ -1,7 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher, onMount } from 'svelte';
     import { writable } from 'svelte/store';
-    import type { ContentDto, ContentType, DefinitionDto, ExampleDto, SyllableDto } from './type';
+    import type { Content, ContentDto, ContentType, DefinitionDto, ExampleDto, SyllableDto } from './type';
     import { getContentTypes, saveMainContent } from './repo';
   
     export let modelOpen: boolean;
@@ -10,11 +10,11 @@
     export let content:ContentDto;
   
     let contentTypes: ContentType[] = [];
-    let syllables: SyllableDto[] = [];
+    let syllables = content.syllables;
     let syllableOrderNumber: number = 1;
-    let definitions:DefinitionDto[] =[];
+    let definitions = content.definitions
     let definitionOrderNumber:number = 1;
-    let examples:ExampleDto[]=[];
+    let examples = content.examples
     let exampleOrderNumber:number = 1;
   
     const dispatch = createEventDispatcher();
@@ -37,6 +37,7 @@
         if (syllable) {
           syllable.audioPath = file.name;
           syllable.audio = new Audio(url);
+          syllable.file = file
         } else {
           fileInfo.set(`${file.name}`);
           content.content.audioPath = file.name;
@@ -96,17 +97,20 @@
   
     function initializeSyllable() {
       return {
+        id:0,
         contentId: 0,
         syllableText: "",
         audioPath: "",
         orderNumber: syllableOrderNumber,
         isPlaying: false,
         audio: null,
+        file:null
       };
     }
 
     function initializeDefinition() {
       return {
+        id:0,
         contentId: 0,
         nativeDefinition:"",
         englishDefinition:"",
@@ -116,6 +120,7 @@
   
     function intiializeExample() {
       return {
+        id:0,
         contentId: 0,
         nativeExample:"",
         englishExample:"",
@@ -149,14 +154,8 @@
     content.examples = examples;
     content.definitions = definitions;
 
-    const formData = new FormData();
-    formData.append('content', JSON.stringify(content));
-    
-    if (content.content.file) {
-        formData.append('audioFile', content.content.file);
-    }
+    await saveMainContent(content);
 
-    await saveMainContent(formData);
     dispatch('refresh');
     dispatch('close');
 }
