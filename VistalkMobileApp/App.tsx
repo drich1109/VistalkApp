@@ -1,68 +1,22 @@
-import React, { useState } from 'react';
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View, StyleSheet, Alert } from 'react-native';
+import React from 'react';
+import { SafeAreaView, Text, TouchableOpacity, View, StyleSheet, Image, Alert } from 'react-native';
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParamList } from './types'; // Adjust the import path
 
-const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+type Props = StackScreenProps<RootStackParamList, 'Home'>;
 
-  const handleLogin = async () => {
-    const payload = {
-      email: email,
-      password: password,
-    };
-
-    console.log(payload);  // Log the payload
-    const queryString = new URLSearchParams(payload).toString();  
-    try {
-      const response = await fetch(`http://192.168.1.18:5000/login?${queryString}`, {
-        method: 'GET',  // Use GET method
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      console.log(response)
-      if (!response.ok && response.status !== 401) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      console.log(data);  // Log the response data
-
-      if (data.token) {
-        Alert.alert('Login Successful', `Welcome ${data.name}!`);
-        // Store the token in local storage or context
-        // For example:
-        // await AsyncStorage.setItem('userToken', data.token);
-        // Navigate to another screen or perform other actions
-      } else {
-        Alert.alert('Login Failed', data.error);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      Alert.alert('An error occurred. Please try again.');
-    }
-  };
-
+const HomeScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.inner}>
-        <Text style={styles.title}>Login</Text>
-        <TextInput
-          style={[styles.input, { color: '#000' }]}
-          placeholder="Email"
-          placeholderTextColor="#666"
-          onChangeText={(text) => setEmail(text)}
-          value={email}
-        />
-        <TextInput
-          style={[styles.input, { color: '#000' }]}
-          placeholder="Password"
-          placeholderTextColor="#666"
-          secureTextEntry
-          onChangeText={(text) => setPassword(text)}
-          value={password}
-        />
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
+      <View style={styles.logoContainer}>
+        <Image source={require('./assets/logo.png')} style={styles.logo} />
+      </View>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('LogIn')}>
           <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Create Account pressed')}>
+          <Text style={styles.buttonText}>Create an Account</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -75,30 +29,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 16,
   },
-  inner: {
-    padding: 24,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    elevation: 5,
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 40,
   },
-  title: {
-    fontSize: 32,
-    marginBottom: 48,
-    textAlign: 'center',
+  logo: {
+    width: 150,
+    height: 150,
   },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderBottomWidth: 1,
-    marginBottom: 20,
-    fontSize: 16,
-    paddingHorizontal: 8,
+  buttonContainer: {
+    marginTop: 20,
   },
   button: {
     backgroundColor: '#0066cc',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
+    marginBottom: 10,
   },
   buttonText: {
     color: '#fff',
@@ -106,4 +53,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginPage;
+export default HomeScreen;
