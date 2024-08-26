@@ -2,18 +2,21 @@
     import { redirectIfLoggedIn } from '$lib/shortcuts';
     import { createEventDispatcher, onMount } from 'svelte';
     import type { CallResultDto } from '../../types/types';
-    import type { Unit } from './type';
-    import { getUnits } from './repo';
+    import type { QuestionType, Unit } from './type';
+    import { getQuestionTypes, getUnits } from './repo';
     import AddUnit from './AddUnit.svelte';
     import { page } from '$app/stores';
     import Pagination from '$lib/components/Pagination.svelte';
+    import QuestionList from './QuestionList.svelte';
 
     export let sectionId:number;
+    export let languageId:number;
 
     let showModal : boolean = false;
     let isAdd:boolean = false;
     let unit: Unit;
     let searchString:string | null = null;
+    let showQuestion:boolean = false;
     const dispatch = createEventDispatcher();
 
     let unitCallResult:CallResultDto<Unit[]> = 
@@ -26,6 +29,8 @@
     };
     let units:Unit[]=[];
     let pageNo:number =1;
+    let questionTypes:QuestionType[]=[];
+    let unitId:number = 0
 
     onMount(async () => {
         await redirectIfLoggedIn('');
@@ -77,6 +82,12 @@
         refresh();
     }
 
+    async function openQuestionList(id:number)
+    {
+        showQuestion = true;
+        unitId = id;
+    }
+
     $: {
         if(searchString != null)
             refresh();
@@ -86,6 +97,9 @@
 {#if showModal == true}
     <AddUnit modelOpen = {showModal} {unit} {isAdd} on:close={closeModal} on:refresh={refresh}></AddUnit>
 {/if}
+{#if showQuestion}
+    <QuestionList {languageId} {unitId}></QuestionList>
+{:else}
 <button class="bg-[#99BC85] rounded-lg p-1" on:click={goBackToSection}><svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 512 512"><path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M244 400L100 256l144-144M120 256h292"/></svg></button>
 <div class="flex justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
     <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Unit List</p>
@@ -120,7 +134,7 @@
         <tbody class="text-center text-sm">
                 {#if unitCallResult.totalCount != null && unitCallResult.totalCount > 0}
                 {#each units as u}
-                <tr class="border-t-2 mx-4">
+                <tr class="border-t-2 mx-4" on:click={() => openQuestionList(u.unitID)}>
                     <td class="px-4 py-2">{u.unitNumber}</td>
                     <td class="px-4 py-2">{u.title}</td>
                     <td class="px-4 py-2">{u.description}</td>
@@ -137,7 +151,7 @@
             {#if unitCallResult.totalCount}
             <Pagination totalCount = {unitCallResult.totalCount} {pageNo} on:handlePageChange={handlePageChange}></Pagination>
             {/if}
-        
+{/if}
     <style>
         tbody tr:hover{
             background-color: #e0e0e0;

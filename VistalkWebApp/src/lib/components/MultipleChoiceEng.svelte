@@ -1,8 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
     
-    export let modelOpen: boolean = false;
-    export let isAdd: boolean = false;
+    export let modelOpen: boolean;
     
     const dispatch = createEventDispatcher();
   
@@ -33,7 +32,7 @@
         >
           <div class="flex items-center justify-between space-x-4">
             <h1 class="text-xl font-medium text-gray-800">
-              {isAdd ? "Create Section" : "MultipleChoice | English"}
+              Multiple Choice English
             </h1>
   
             <button 
@@ -46,7 +45,6 @@
             </button>
           </div>
   
-          <form class="mt-5">
             
             <div class="mt-5">
               <label for="question" class="block text-sm text-black capitalize dark:text-black">Question</label>
@@ -105,7 +103,6 @@
                 Save Section
               </button>
             </div>
-          </form>
         </div>
       </div>
     </div>

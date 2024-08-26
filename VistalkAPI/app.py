@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import db
 from flask_cors import CORS
-from Services import user, section, content
+from Services import user, section, content, question
 
 app = Flask(__name__)
 CORS(app)
@@ -61,6 +61,18 @@ def getExamplesByContentId():
 @app.route('/getFileByFileName', methods=['GET'])
 def getFileByFileName():
     return content.getFileByFileName()
+
+@app.route('/getQuestionTypes', methods=['GET'])
+def get_QuestionTypes():
+    return question.get_QuestionTypes()
+
+@app.route('/getChoices', methods=['GET'])
+def get_choices():
+    return question.get_choices()
+
+@app.route('/saveQuestionMultiple', methods=['POST'])
+def save_questionMultiple():
+    return question.save_questionMultiple()
 
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

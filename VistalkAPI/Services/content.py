@@ -197,6 +197,7 @@ def get_Contents():
     contentTypeId = request.args.get('contentTypeID')
     searchString = request.args.get('searchString')
     pageNo = int(request.args.get('pageNo', 1))
+    print(pageNo)
     pageSize = 15
     offset = (pageNo - 1) * pageSize
     conn = get_db_connection()

@@ -113,9 +113,9 @@
         }
     }
 
-    function handlePageChange(event: CustomEvent) {
+    function handlePageChange(event:CustomEvent) {
         const selectElement = event.detail as HTMLSelectElement;
-        pageNo = parseInt(selectElement.value);
+        pageNo = parseInt(selectElement.toString());
         refresh();
     }
 
@@ -124,7 +124,8 @@
         const syllableListCallResult = await getSyllablesByContentId(id);
         const definitionListCallResult = await getDefinitionByContentId(id);
         const exampleListCallResult = await getExamplesByContentId(id);
-
+        let contentMain = contentMainCallResult.data;
+        //create here an await getfilebyfilename passing the content audio path , then false
         let syllables = syllableListCallResult.data;
         let definitions = definitionListCallResult.data;
         let examples = exampleListCallResult.data;
@@ -158,7 +159,7 @@
         syllables = [...syllables]
 
         content = {
-            content: contentMainCallResult.data,
+            content: contentMain,
             syllables,
             definitions,
             examples

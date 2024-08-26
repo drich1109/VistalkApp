@@ -91,7 +91,7 @@
     <AddSection modelOpen = {showModal} {isAdd} {section} languageID={currentValue} on:close={closeModal} on:refresh={getSectionDisplay}></AddSection>
 {/if}
 {#if showUnits}
-     <Unit {sectionId} on:back={closeUnit}></Unit>
+     <Unit {sectionId} languageId={currentValue} on:back={closeUnit}></Unit>
  {:else}
 <div class="flex justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
     <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Sections</p>
