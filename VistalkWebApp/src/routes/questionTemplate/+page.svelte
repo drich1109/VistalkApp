@@ -72,15 +72,3 @@
       <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Matching Type</p>
     </button>
 </div>
-
-{#if showMulEngModal}
-    <MultipleChoiceEnglish modelOpen={showMulEngModal} on:close={closeMulEngModal} />
-{/if}
-
-{#if showMulNatModal}
-    <MultipleChoiceNative modelOpen={showMulNatModal} on:close={closeMulNatModal} />
-{/if}
-
-{#if showMatchingType}
-    <MatchingType modelOpen={showMatchingType} on:close={closeMatchType} />
-{/if}

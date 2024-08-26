@@ -95,7 +95,7 @@
 </script>
 
 {#if showEnglishMultiple}
-<MultipleChoiceEnglish modelOpen={showEnglishMultiple} on:close={closeModal} />
+<MultipleChoiceEnglish modelOpen={showEnglishMultiple} choices={contents} mainQuestion={mainQuestion} on:close={closeModal} />
 {/if}
 
 {#if showNativeMultiple}
@@ -103,7 +103,7 @@
 {/if}
 
 {#if showMatchingType}
-<MatchingType modelOpen={showMatchingType} on:close={closeModal} />
+<MatchingType modelOpen={showMatchingType} choices={contents} mainQuestion={mainQuestion} on:close={closeModal} />
 {/if}
 
 {#if showModal}
@@ -113,7 +113,7 @@
     role="dialog" 
     aria-modal="true">
     
-    <div class="flex items-end justify-center min-h-screen px-4 text-center md:items-center sm:block sm:p-0">
+    <div class="flex items-center justify-center min-h-screen px-4 text-center">
       
         <div 
             on:click={handleClose}
@@ -122,10 +122,10 @@
         ></div>
     
         <div 
-            class="inline-block w-full max-w-xl p-8 my-20 overflow-hidden text-left transition-all transform bg-white rounded-lg shadow-xl 2xl:max-w-2xl"
+            class="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-center transition-all transform bg-white rounded-lg shadow-xl"
             style="opacity: {showModal ? 1 : 0}; transform: {showModal ? 'translateY(0)' : 'translateY(4rem)'};"
         >
-            <div class="flex items-center justify-between space-x-4">
+            <div class="flex items-center justify-between space-x-4 mb-4">
                 <h1 class="text-xl font-medium text-gray-800">Select Type of Question</h1>
         
                 <button 
@@ -136,20 +136,27 @@
                     </svg>
                 </button>
             </div>
-            <div class="field mt-2">
+            
+            <div class="field mb-4">
                 <div class="control">
-                    <div class="select">
-                        <select bind:value={typeValue}>
-                            <option value={0}>--SELECT--</option>
+                    <div class="select w-full">
+                        <select class="w-full text-center p-2 border border-gray-300 rounded-md" bind:value={typeValue}>
+                            <option value={0} class="text-left">--SELECT--</option>
                             {#each questionTypes as qt}
-                                <option value={qt.typeID}>{qt.typeName}</option>
+                                <option value={qt.typeID} class="text-left" >{qt.typeName}</option>
                             {/each}
                         </select>
                     </div>
                 </div>
             </div>
-            <button on:click={clickContinue} class="mt-4 bg-black text-white p-2 rounded">Continue</button>
+            
+            <button 
+                on:click={clickContinue} 
+                class="mt-4 bg-black text-white p-2 rounded">
+                Continue
+            </button>
         </div>
     </div>
 </div>
+
 {/if}
