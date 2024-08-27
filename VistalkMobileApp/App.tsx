@@ -1,5 +1,5 @@
 import React from 'react';
-import { SafeAreaView, Text, TouchableOpacity, View, StyleSheet, Image, Alert } from 'react-native';
+import { SafeAreaView, Text, TouchableOpacity, View, StyleSheet, Image, Alert,ImageBackground } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from './types'; // Adjust the import path
 
@@ -7,6 +7,7 @@ type Props = StackScreenProps<RootStackParamList, 'Home'>;
 
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
   return (
+    <ImageBackground source={require('./assets/bg.png')} style={styles.background}>
     <SafeAreaView style={styles.container}>
       <View style={styles.logoContainer}>
         <Image source={require('./assets/logo.png')} style={styles.logo} />
@@ -20,10 +21,15 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+    </ImageBackground>
   );
 };
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -41,15 +47,16 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
-    backgroundColor: '#0066cc',
+    backgroundColor: '#fff',
     padding: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginBottom: 10,
   },
   buttonText: {
-    color: '#fff',
+    color: '#99BC85',
     fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
