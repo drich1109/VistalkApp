@@ -74,5 +74,9 @@ def get_choices():
 def save_questionMultiple():
     return question.save_questionMultiple()
 
+@app.route('/save_questionMatch', methods=['POST'])
+def save_questionMatch():
+    return question.save_question_match()
+
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

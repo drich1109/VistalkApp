@@ -1,6 +1,6 @@
 import type { CallResultDto } from "../../types/types";
-import { postForm } from "./baseRepo";
-import type { QuestionMultipleDto } from "./componentType";
+import { post, postForm } from "./baseRepo";
+import type { QuestionMatchingTypeDto, QuestionMultipleDto } from "./componentType";
 
 export async function saveQuestionMultipleChoice(question: QuestionMultipleDto) {
     const formData = new FormData();
@@ -26,3 +26,9 @@ export async function saveQuestionMultipleChoice(question: QuestionMultipleDto) 
 
     return await postForm<CallResultDto<object>>(`/saveQuestionMultiple`, formData);
 }
+
+export async function save_questionMatch(question: QuestionMatchingTypeDto) {
+    console.log(question)
+    return await post<CallResultDto<object>>(`/save_questionMatch`, {}, question);
+}
+

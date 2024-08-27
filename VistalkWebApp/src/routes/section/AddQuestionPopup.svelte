@@ -5,7 +5,7 @@
     import MultipleChoiceNative from '$lib/components/MultipleChoiceNat.svelte'; 
     import MatchingType from "$lib/components/MatchingType.svelte";
     import { getQuestionTypes, getChoices } from './repo';
-    import type { QuestionMultipleDto } from "$lib/api/componentType";
+    import type { QuestionMatchingTypeDto, QuestionMultipleDto } from "$lib/api/componentType";
 
     export let questionTypes: QuestionType[];
     export let showModal: boolean;
@@ -34,6 +34,22 @@
         correctChoice: 0,
     };
 
+    let matchQuestion: QuestionMatchingTypeDto = 
+    {
+        questionID: 0,
+        questionText:"",
+        questionTypeID:0,
+        unitId:unitId,
+        choice1: 0,
+        choice2: 0,
+        choice3: 0,
+        choice4: 0,
+        match1: 0,
+        match2: 0,
+        match3: 0,
+        match4: 0
+    }
+
 
     const dispatch = createEventDispatcher();
 
@@ -47,6 +63,7 @@
 
         if (typeValue !== 0) {
             mainQuestion.questionTypeID = typeValue;
+            matchQuestion.questionTypeID = typeValue;
             switch (typeValue) {
                 case 2:
                     showNativeMultiple = true;
@@ -103,7 +120,7 @@
 {/if}
 
 {#if showMatchingType}
-<MatchingType modelOpen={showMatchingType} choices={contents} mainQuestion={mainQuestion} on:close={closeModal} />
+<MatchingType modelOpen={showMatchingType} choices={contents} mainQuestion={matchQuestion} on:close={closeModal} />
 {/if}
 
 {#if showModal}
