@@ -4,7 +4,7 @@
     import {type Section} from './type'
     import AddSection from './AddSection.svelte';
     import type { CallResultDto } from '../../types/types';
-    import { getSections } from './repo';
+    import { getSections, sectionInactive } from './repo';
     import Unit from './Unit.svelte';
     import type { Language } from '../type';
     import { getLanguages } from '../repo';
@@ -85,6 +85,8 @@
         sectionCallResult = await getSections(currentValue);
         sections = sectionCallResult.data;
     }
+
+    async function setInactive(id:number){ await sectionInactive(id); getSectionDisplay();}
 </script>
 
 {#if showModal}
@@ -123,7 +125,13 @@
                     <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/>
                 </g>
             </svg>
+            
+            <span on:click={(event) => { event.stopPropagation() ; setInactive(section.sectionId);}}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h4a1 1 0 1 1 0 2h-1.069l-.867 12.142A2 2 0 0 1 17.069 22H6.93a2 2 0 0 1-1.995-1.858L4.07 8H3a1 1 0 0 1 0-2h4zm2 2h6V4H9zM6.074 8l.857 12H17.07l.857-12zM10 10a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1m4 0a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1"/></svg>
+            </span>
+
         </span>
+        
         <p class="text-4xl font-bold text-center">{section.title}</p>
         <p class="text-sm text-left">{section.description}</p>
     </button>

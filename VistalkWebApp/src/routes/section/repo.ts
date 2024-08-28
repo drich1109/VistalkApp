@@ -1,4 +1,4 @@
-import { post, get } from "$lib/api/baseRepo";
+import { post, get, put } from "$lib/api/baseRepo";
 import type { CallResultDto } from "../../types/types";
 import type { Content, QuestionType, Section, Unit } from "./type";
 
@@ -28,4 +28,12 @@ export async function getQuestionTypes() {
 export async function getChoices(languageID:number) {
 	let result =  await get<CallResultDto<Content[]>>(`/getChoices`,{languageID});
     return result;
+}
+
+export async function sectionInactive(sectionID:number) {
+	return await put<CallResultDto<object>>(`/sectionInactive`, {sectionID});
+}
+
+export async function unitInactive(unitID:number) {
+	return await put<CallResultDto<object>>(`/unitInactive`, {unitID});
 }
