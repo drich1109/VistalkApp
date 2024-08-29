@@ -16,6 +16,8 @@
     let pageNo: number = 1;
     let searchString: string | null = null;
     let contentTypes: ContentType[] = [];
+    let fileName: string = '';
+    let isSyllable: boolean;
     let languageCallResult: CallResultDto<Language[]> = {
         message: "",
         data: [],
@@ -129,6 +131,25 @@
         let syllables = syllableListCallResult.data;
         let definitions = definitionListCallResult.data;
         let examples = exampleListCallResult.data;
+        let contentMain = contentMainCallResult.data;
+
+        if (contentMain.audioPath && contentMain.audioPath.toLowerCase().endsWith('.mp3')) {
+            const pronunciationFile = await getFileByFileName(contentMain.audioPath, false);
+            
+            if (pronunciationFile) {
+                const url = URL.createObjectURL(pronunciationFile);
+                contentMain.audio = new Audio(url);
+
+                // Setting up event listener for when audio ends
+                contentMain.audio.addEventListener('ended', () => {
+                    contentMain.isPlaying = false;
+                });
+            } else {
+                contentMain.audio = null;
+            }
+        } else {
+            contentMain.audio = null; // Handle cases where the audioPath is invalid or null
+        }
         for (const c of syllables) {
             if (c.audioPath && c.audioPath.toLowerCase().endsWith('.mp3')) {
                 try {
@@ -147,6 +168,7 @@
                     } else {
                         c.audio = null;
                     }
+                    
                 } catch (error) {
                     console.error(`Failed to fetch file for ${c.audioPath}:`, error);
                     c.audio = null;
@@ -254,9 +276,9 @@
                         {#if c.audio != null}
                             <button on:click={() => togglePlay(c)} class="bg-[#99BC85] text-white py-1 px-2 rounded-xl">
                                 {#if c.isPlaying}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 24 24"><path fill="black" d="M6 19h4V5H6zm8-14v14h4V5z"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 24 24"><path fill="white" d="M6 19h4V5H6zm8-14v14h4V5z"/></svg>
                                 {:else}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 256 256"><g fill="black"><path d="M228.23 134.69L84.15 222.81A8 8 0 0 1 72 216.12V39.88a8 8 0 0 1 12.15-6.69l144.08 88.12a7.82 7.82 0 0 1 0 13.38" opacity="0.2"/><path d="M232.4 114.49L88.32 26.35a16 16 0 0 0-16.2-.3A15.86 15.86 0 0 0 64 39.87v176.26A15.94 15.94 0 0 0 80 232a16.07 16.07 0 0 0 8.36-2.35l144.04-88.14a15.81 15.81 0 0 0 0-27ZM80 215.94V40l143.83 88Z"/></g></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 256 256"><g fill="white"><path d="M228.23 134.69L84.15 222.81A8 8 0 0 1 72 216.12V39.88a8 8 0 0 1 12.15-6.69l144.08 88.12a7.82 7.82 0 0 1 0 13.38" opacity="0.2"/><path d="M232.4 114.49L88.32 26.35a16 16 0 0 0-16.2-.3A15.86 15.86 0 0 0 64 39.87v176.26A15.94 15.94 0 0 0 80 232a16.07 16.07 0 0 0 8.36-2.35l144.04-88.14a15.81 15.81 0 0 0 0-27ZM80 215.94V40l143.83 88Z"/></g></svg>
                                 {/if}
                             </button>
                         {/if}

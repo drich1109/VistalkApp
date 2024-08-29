@@ -3,6 +3,7 @@ from db import get_db_connection
 from flask import request, jsonify
 
 def save_section():
+    print("yes")
     data = request.get_json()
 
     section_id = data.get('sectionId')

@@ -12,18 +12,18 @@ export async function getContentTypes() {
 export async function saveMainContent(content: ContentDto) {
     const formData = new FormData();
 
-    formData.append('contentId', String(content.content.contentID));
+    formData.append('contentId', content.content.contentID.toString());
     formData.append('contentText', content.content.contentText);
     formData.append('englishTranslation', content.content.englishTranslation);
     formData.append('languageId', content.content.languageID.toString());
     formData.append('contentTypeId', content.content.contentTypeId.toString());
     formData.append('audioPath', content.content.audioPath.toString());
-    
     if (content.content.file) {
         const file = new File([content.content.file], 'audio.mp3', { type: 'audio/mp3' });
         formData.append('contentAudioFile', file);
     }
     content.syllables.forEach((syllable, index) => {
+        formData.append(`syllables[${index}].id`, syllable.id.toString());
         formData.append(`syllables[${index}].contentId`, syllable.contentId.toString());
         formData.append(`syllables[${index}].syllableText`, syllable.syllableText);
         formData.append(`syllables[${index}].audioPath`, syllable.audioPath);
@@ -34,15 +34,16 @@ export async function saveMainContent(content: ContentDto) {
             formData.append(`syllables[${index}].audioFile`, file);
         }
     });
-
     content.definitions.forEach((definition, index) => {
-        formData.append(`definitions[${index}].contentId`, definition.contentId.toString());
+        formData.append(`definitions[${index}].id`, definition.id.toString());
+        formData.append(`definitions[${index}].contentId`, definition.contentID.toString());
         formData.append(`definitions[${index}].nativeDefinition`, definition.nativeDefinition);
         formData.append(`definitions[${index}].englishDefinition`, definition.englishDefinition);
         formData.append(`definitions[${index}].orderNumber`, definition.orderNumber.toString());
     });
 
     content.examples.forEach((example, index) => {
+        formData.append(`examples[${index}].id`, example.id.toString());
         formData.append(`examples[${index}].contentId`, example.contentId.toString());
         formData.append(`examples[${index}].nativeExample`, example.nativeExample);
         formData.append(`examples[${index}].englishExample`, example.englishExample);
@@ -51,6 +52,7 @@ export async function saveMainContent(content: ContentDto) {
     for (let [key, value] of formData.entries()) {
         console.log(`${key}:`, value);
     }
+
     return await postForm<CallResultDto<object>>(`/saveContent`, formData);
 }
 
@@ -86,7 +88,7 @@ export async function getFileByFileName(fileName: string, isSyllable:boolean): P
             return await response.blob();
         } else {
             console.error(`Failed to fetch file: ${response.statusText}`);
-            return null;
+            return null;    
         }
     } catch (error) {
         console.error(`Failed to fetch file:`, error);

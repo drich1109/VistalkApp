@@ -1,11 +1,10 @@
 # user.py
-from db import get_db_connection
+from db import get_db_connection, PronunciationDirectory, SyllableDirectory
 from flask import request, jsonify, send_from_directory
 import os
 
-PronunciationFolder = 'C:\\VistalkApp\\VistalkApp\\Vistalk Pronunciation Audio'
-Syllables =  'C:\\VistalkApp\\VistalkApp\\Vistalk Pronunciation Audio\\Syllables'
-
+PronunciationFolder = PronunciationDirectory
+Syllables =  SyllableDirectory
 if not os.path.exists(Syllables):
     os.makedirs(Syllables)
 
@@ -56,6 +55,7 @@ def save_content():
         if syllable_content_id is None:
             break
         syllable = {
+            'id': int(request.form.get(f'syllables[{index}].id')),
             'contentId': int(syllable_content_id),
             'syllableText': request.form.get(f'syllables[{index}].syllableText'),
             'audioPath': request.form.get(f'syllables[{index}].syllableText'),
@@ -63,7 +63,6 @@ def save_content():
         }
 
         syllable_audio_file = request.files.get(f'syllables[{index}].audioFile')
-        print(syllable_audio_file)
         if syllable_audio_file:
             safe_filename = f"{syllable['syllableText'].replace(' ', '_')}.mp3"
             syllable['audioPath'] = safe_filename
@@ -80,6 +79,7 @@ def save_content():
         if definition_content_id is None:
             break
         definition = {
+            'id': int(request.form.get(f'definitions[{index}].id')),
             'contentId': int(definition_content_id),
             'nativeDefinition': request.form.get(f'definitions[{index}].nativeDefinition'),
             'englishDefinition': request.form.get(f'definitions[{index}].englishDefinition'),
@@ -95,6 +95,7 @@ def save_content():
         if example_content_id is None:
             break
         example = {
+            'id': int(request.form.get(f'examples[{index}].id')),
             'contentId': int(example_content_id),
             'nativeExample': request.form.get(f'examples[{index}].nativeExample'),
             'englishExample': request.form.get(f'examples[{index}].englishExample'),
@@ -110,6 +111,7 @@ def save_content():
         cursor = conn.cursor()
         
         if content_id == 0:
+            # Insert new content
             sql_content = """
                 INSERT INTO content (contentText, englishTranslation, audioPath, languageId, contentTypeId)
                 VALUES (%s, %s, %s, %s, %s)
@@ -124,6 +126,7 @@ def save_content():
             conn.commit()
             content_id = cursor.lastrowid
 
+            # Insert syllables
             for syllable in syllables_data:
                 sql_syllable = """
                     INSERT INTO contentsyllable (contentId, syllableText, audioPath, orderNumber)
@@ -137,6 +140,7 @@ def save_content():
                 ))
                 conn.commit()
 
+            # Insert definitions
             for definition in definitions_data:
                 sql_definition = """
                     INSERT INTO contentDefinition (contentId, nativeDefinition, englishDefinition, orderNumber)
@@ -150,6 +154,7 @@ def save_content():
                 ))
                 conn.commit()
 
+            # Insert examples
             for example in examples_data:
                 sql_example = """
                     INSERT INTO contentExample (contentId, nativeExample, englishExample, orderNumber)
@@ -169,6 +174,7 @@ def save_content():
                 SET contentText = %s, englishTranslation = %s, audioPath = %s, languageId = %s, contentTypeId = %s
                 WHERE contentId = %s
             """
+            
             cursor.execute(sql_update_content, (
                 content_text,
                 english_translation,
@@ -177,6 +183,133 @@ def save_content():
                 content_type_id,
                 content_id
             ))
+            
+            conn.commit()
+
+            # Handle syllables: delete missing, update existing, add new
+            existing_syllables = {syllable['id'] for syllable in syllables_data}
+            cursor.execute("SELECT * FROM contentsyllable WHERE contentId = %s", (content_id,))
+            
+            stored_syllables = set()
+            rows = cursor.fetchall()
+            for row in rows:
+                try:
+                    stored_syllables.add(row[0])                
+                except Exception as e:
+                    print(f"Error adding row to stored_syllables: {e}")
+
+            for syllable in syllables_data:
+                if syllable['id'] in stored_syllables:
+                    sql_update_syllable = """
+                        UPDATE contentsyllable
+                        SET syllableText = %s, audioPath = %s, orderNumber = %s
+                        WHERE contentId = %s
+                    """
+                    cursor.execute(sql_update_syllable, (
+                        syllable['syllableText'],
+                        syllable['audioPath'],
+                        syllable['orderNumber'],
+                        syllable['contentId']
+                    ))
+                else:
+                    sql_insert_syllable = """
+                        INSERT INTO contentsyllable (contentId, syllableText, audioPath, orderNumber)
+                        VALUES (%s, %s, %s, %s)
+                    """
+                    cursor.execute(sql_insert_syllable, (
+                        content_id,
+                        syllable['syllableText'],
+                        syllable['audioPath'],
+                        syllable['orderNumber']
+                    ))
+
+            for id in stored_syllables - existing_syllables:
+                cursor.execute("DELETE FROM contentsyllable WHERE id = %s", (id,))
+
+            conn.commit()
+           
+            # Handle definitions: delete missing, update existing, add new
+            existing_definitions = {definition['id'] for definition in definitions_data}
+            cursor.execute("SELECT * FROM contentDefinition WHERE contentId = %s", (content_id,))
+
+            stored_definitions = set()
+            rows = cursor.fetchall()
+            for row in rows:
+                try:
+                    stored_definitions.add(row[0])
+                except Exception as e:
+                    print(f"Error adding row to stored_definitions: {e}")
+
+            for definition in definitions_data:
+                if definition['id'] in stored_definitions:
+                    sql_update_definition = """
+                        UPDATE contentDefinition
+                        SET nativeDefinition = %s, englishDefinition = %s, orderNumber = %s
+                        WHERE contentId = %s
+                    """
+                    cursor.execute(sql_update_definition, (
+                        definition['nativeDefinition'],
+                        definition['englishDefinition'],
+                        definition['orderNumber'],
+                        definition['contentId']
+                    ))
+                else:
+                    sql_insert_definition = """
+                        INSERT INTO contentDefinition (contentId, nativeDefinition, englishDefinition, orderNumber)
+                        VALUES (%s, %s, %s, %s)
+                    """
+                    cursor.execute(sql_insert_definition, (
+                        content_id,
+                        definition['nativeDefinition'],
+                        definition['englishDefinition'],
+                        definition['orderNumber']
+                    ))
+
+            for id in stored_definitions - existing_definitions:
+                cursor.execute("DELETE FROM contentDefinition WHERE id = %s", (id,))
+
+            conn.commit()
+
+            # Handle examples: delete missing, update existing, add new
+            existing_examples = {example['id'] for example in examples_data}
+            cursor.execute("SELECT * FROM contentExample WHERE contentId = %s", (content_id,))
+
+            stored_examples = set()
+            rows = cursor.fetchall()
+            for row in rows:
+                try:
+                    stored_examples.add(row[0])                
+                except Exception as e:
+                    print(f"Error adding row to stored_examples: {e}")
+
+            for example in examples_data:
+                if example['id'] in stored_examples:
+                    sql_update_example = """
+                        UPDATE contentExample
+                        SET nativeExample = %s, englishExample = %s, orderNumber = %s
+                        WHERE contentId = %s
+                    """
+                    cursor.execute(sql_update_example, (
+                        example['nativeExample'],
+                        example['englishExample'],
+                        example['orderNumber'],
+                        example['contentId']
+                    ))
+                else:
+                    sql_insert_example = """
+                        INSERT INTO contentExample (contentId, nativeExample, englishExample, orderNumber)
+                        VALUES (%s, %s, %s, %s)
+                    """
+                    cursor.execute(sql_insert_example, (
+                        content_id,
+                        example['nativeExample'],
+                        example['englishExample'],
+                        example['orderNumber']
+                    ))
+
+            for id in stored_examples - existing_examples:
+                cursor.execute("DELETE FROM contentExample WHERE id = %s", (id,))
+
             conn.commit()
 
         return jsonify({'isSuccess': True, "message": "Content saved successfully"}), 201
@@ -191,6 +324,7 @@ def save_content():
             cursor.close()
         if conn:
             conn.close()
+
 
 def get_Contents():
     langID = request.args.get('languageID')
@@ -257,7 +391,6 @@ def get_Contents():
 
 def getContentById():
     contentId = request.args.get('contentId')
-    print(contentId)
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     query = """
@@ -285,7 +418,6 @@ def getContentById():
 
 def getSyllablesByContentId():
     contentId = request.args.get('contentId')
-    print(contentId)
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     query = """
@@ -313,7 +445,6 @@ def getSyllablesByContentId():
 
 def getDefinitionByContentId():
     contentId = request.args.get('contentId')
-    print(contentId)
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     query = """
@@ -341,7 +472,6 @@ def getDefinitionByContentId():
 
 def getExamplesByContentId():
     contentId = request.args.get('contentId')
-    print(contentId)
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     query = """
@@ -370,9 +500,7 @@ def getExamplesByContentId():
 def getFileByFileName():
     fileName = request.args.get('fileName') 
     isSyllable = request.args.get('isSyllable')
-    print(fileName)
 
-    print(isSyllable)
     if isSyllable == 'true':
         return send_from_directory(Syllables, fileName)
     elif isSyllable == 'false':
