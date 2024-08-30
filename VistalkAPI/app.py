@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import db
 from flask_cors import CORS
-from Services import user, section, content, question
+from Services import user, section, content, question, shop
 
 app = Flask(__name__)
 CORS(app)
@@ -77,6 +77,14 @@ def save_questionMultiple():
 @app.route('/save_questionMatch', methods=['POST'])
 def save_questionMatch():
     return question.save_question_match()
+
+@app.route('/getItemType', methods=['GET'])
+def getItemTypes():
+    return shop.getItemType()
+
+@app.route('/saveItemShop', methods=['POST'])
+def saveItem():
+    return shop.save_item()
 
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
