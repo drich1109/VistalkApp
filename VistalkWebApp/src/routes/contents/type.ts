@@ -19,7 +19,7 @@ export type SyllableDto =
 export type DefinitionDto = 
 {
     id:number,
-    contentId:number;
+    contentID:number;
     nativeDefinition:string;
     englishDefinition:string;
     orderNumber:number;

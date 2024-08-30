@@ -6,6 +6,7 @@
     import MatchingType from "$lib/components/MatchingType.svelte";
     import { getQuestionTypes, getChoices } from './repo';
     import type { QuestionMatchingTypeDto, QuestionMultipleDto } from "$lib/api/componentType";
+  import MatchingTypeEng from "$lib/components/MatchingTypeEng.svelte";
 
     export let questionTypes: QuestionType[];
     export let showModal: boolean;
@@ -17,6 +18,7 @@
     let showEnglishMultiple: boolean = false;
     let showAudioType: boolean = false;
     let showMatchingType: boolean = false;
+    let showMatchingTypeEng: boolean = false;
     let contents: Content[] = [];
 
     let mainQuestion: QuestionMultipleDto = {
@@ -80,7 +82,7 @@
                 case 4:
                     showNativeMultiple = false;
                     showEnglishMultiple = false;
-                    showAudioType = true;
+                    showMatchingTypeEng = true;
                     showMatchingType = false;
                     break;
                 case 3:
@@ -121,6 +123,10 @@
 
 {#if showMatchingType}
 <MatchingType modelOpen={showMatchingType} choices={contents} mainQuestion={matchQuestion} on:close={closeModal} />
+{/if}
+
+{#if showMatchingTypeEng == true}
+<MatchingTypeEng modelOpen={showMatchingTypeEng} choices={contents} mainQuestion={matchQuestion} on:close={closeModal} />
 {/if}
 
 {#if showModal}
