@@ -8,6 +8,7 @@
     import { getLanguages } from '../repo';
     import { contentInactived, getContentById, getContents, getContentTypes, getDefinitionByContentId, getExamplesByContentId, getFileByFileName, getSyllablesByContentId } from './repo';
     import Pagination from '$lib/components/Pagination.svelte';
+  import Loader from '$lib/components/Loader.svelte';
 
     let isAdd: boolean = false;
     let modelOpen: boolean = false;
@@ -35,7 +36,7 @@
     };
     let contents: Content[] = [];
     let currentType: number | null = null;
-    let isPlaying:boolean = false;
+    let isloading:boolean = false;
 
     onMount(async () => {
         await redirectIfLoggedIn('');
@@ -53,12 +54,13 @@
     }
 
     async function refresh() {
+        try{
+        isloading = true;
         contentListCallResult = await getContents(currentValue, currentType, searchString, pageNo);
         contents = contentListCallResult.data;
         
         for (const c of contents) {
             if (c.audioPath && c.audioPath.toLowerCase().endsWith('.mp3')) {
-                try {
                     const file = await getFileByFileName(c.audioPath,false);
                     if (file) {
                         const url = URL.createObjectURL(file);
@@ -74,10 +76,7 @@
                     } else {
                         c.audio = null;
                     }
-                } catch (error) {
-                    console.error(`Failed to fetch file for ${c.audioPath}:`, error);
-                    c.audio = null;
-                }
+                
             } else {
                 console.warn(`Skipping ${c.audioPath}: Not a valid MP3 file or audioPath is null.`);
                 c.audio = null;
@@ -85,6 +84,15 @@
         }
         contents = [...contents];
         console.log(contents);
+    }
+    catch
+    {
+        console.log("Error")
+    }
+    finally
+    {
+        isloading = false;
+    }
     }
 
     function closeModal() {
@@ -224,6 +232,9 @@
 
 </script>
 
+{#if isloading == true}
+    <Loader isLoading = {isloading}></Loader>
+{/if}
 {#if modelOpen}
     <AddContent modelOpen={modelOpen} {isAdd} languageId={currentValue} {content} on:close={closeModal} on:refresh={refresh}></AddContent>
 {/if}
