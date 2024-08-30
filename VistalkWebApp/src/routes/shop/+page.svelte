@@ -1,12 +1,60 @@
 <script lang="ts">
     import { redirectIfLoggedIn } from '$lib/shortcuts';
     import { onMount } from 'svelte';
+    import AddItem from './AddItem.svelte';
+    import type { BackgroundMusic, CoinBag, PowerUp } from './type';
+
+    let openModal:boolean = false;
+    let isAdd:boolean = false;
+
+    let powerUp: PowerUp = {
+        itemID: 0,
+        itemTypeID: 0,
+        vcoinPrice: 0,
+        isPremium: false,
+        name: '',
+        description: '',
+        filePath: '',
+        file: null
+    };
+
+    let backgroundMusic: BackgroundMusic = {
+        itemID: 0,
+        itemTypeID: 0,
+        vcoinPrice: 0,
+        isPremium: false,
+        musicTitle: '',
+        musicGenre: '',
+        filePath: '',
+        file: null
+    };
+
+    let coinBag: CoinBag = {
+        coinBagId: 0,
+        quantity: 0,
+        moneyPrice: 0,
+        coinBagName: ''
+    };
+
 
     onMount(async () => {
         await redirectIfLoggedIn(''); // Redirect to login if not logged in
     });
+
+    function modalOpen()
+    {
+        openModal = true;
+        isAdd = true;
+    }
+    function modalClose()
+    {
+        openModal =false;
+    }
 </script>
 
+{#if openModal == true}
+    <AddItem modelOpen={openModal} {isAdd} {coinBag} {backgroundMusic} {powerUp} on:close={modalClose}> </AddItem>
+{/if}
 <div class="flex justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
     <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Item List</p>
     <div class="flex-grow flex justify-center">
@@ -23,9 +71,9 @@
         <button class="font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
             View Transaction
         </button>
-        <button class="flex items-center font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
+        <button on:click={modalOpen} class="flex items-center font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="text-white mr-2" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M13 6.5V11h4.5v2H13v4.5h-2V13H6.5v-2H11V6.5z"/></svg>
-            Add Section
+            Add Item
         </button>
     </div>
 </div>
