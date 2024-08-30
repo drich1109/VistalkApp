@@ -85,6 +85,23 @@ def getItemTypes():
 @app.route('/saveItemShop', methods=['POST'])
 def saveItem():
     return shop.save_item()
+  
+@app.route('/contentInactive', methods=['PUT'])
+def contentInactive():
+    return content.contentInactive()
+
+@app.route('/sectionInactive', methods=['PUT'])
+def sectionInactive():
+    return section.sectionInactive()
+
+@app.route('/unitInactive', methods=['PUT'])
+def unitInactive():
+    return section.unitInactive()
+
+@app.route('/questionInactive', methods=['PUT'])
+def questionInactive():
+    return question.questionInactive()
+
 
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

@@ -178,3 +178,17 @@ def save_question_match():
     conn.close()
     
     return jsonify({'message': 'Question and choices saved successfully.'}), 200
+
+def questionInactive():
+    questionID = int(request.args.get('questionID')) 
+    print(questionID)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        UPDATE content SET isActive = false where contentID = %s
+    """
+    print(query)
+    values = [questionID,]
+    cursor.execute(query, values)
+    conn.commit()
+    return jsonify({'isSuccess': True, "message": "Content updated successfully"}), 200

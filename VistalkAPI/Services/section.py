@@ -3,6 +3,7 @@ from db import get_db_connection
 from flask import request, jsonify
 
 def save_section():
+    print("yes")
     data = request.get_json()
 
     section_id = data.get('sectionId')
@@ -49,7 +50,7 @@ def get_Sections():
     langID = request.args.get('languageID')
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    query = "SELECT * FROM section WHERE languageID = %s"
+    query = "SELECT * FROM section WHERE languageID = %s and isActive = true"
     values = (langID,)
     cursor.execute(query, values)
     sections = cursor.fetchall()
@@ -141,7 +142,7 @@ def get_Units():
     cursor = conn.cursor(dictionary=True)
     query = """
         SELECT * FROM unit
-        WHERE sectionID = %s
+        WHERE sectionID = %s and isActive = true
     """
     values = [sectionID]
 
@@ -183,3 +184,27 @@ def get_Units():
                 'data2': None,
                 'totalCount': total_count
             }), 200
+
+def sectionInactive():
+    sectionID = int(request.args.get('sectionID')) 
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        UPDATE section SET isActive = false where sectionID = %s
+    """
+    values = [sectionID,]
+    cursor.execute(query, values)
+    conn.commit()
+    return jsonify({'isSuccess': True, "message": "Content updated successfully"}), 200
+
+def unitInactive():
+    unitID = int(request.args.get('unitID')) 
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        UPDATE unit SET isActive = false where unitID = %s
+    """
+    values = [unitID,]
+    cursor.execute(query, values)
+    conn.commit()
+    return jsonify({'isSuccess': True, "message": "Content updated successfully"}), 200
