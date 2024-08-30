@@ -337,7 +337,7 @@ def get_Contents():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     query = """
-        SELECT * FROM content where languageID = %s
+        SELECT * FROM content where languageID = %s and isActive = true
     """
     values = [langID,]
 
@@ -505,4 +505,33 @@ def getFileByFileName():
         return send_from_directory(Syllables, fileName)
     elif isSyllable == 'false':
         return send_from_directory(PronunciationFolder, fileName)
+    
+def contentInactive():
+    contentId = int(request.args.get('contentId')) 
+    print(contentId)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        UPDATE content SET isActive = false where contentID = %s
+    """
+    print(query)
+    values = [contentId,]
+    cursor.execute(query, values)
+    conn.commit()
+    return jsonify({'isSuccess': True, "message": "Content updated successfully"}), 200
+
+def sectionInactive():
+    contentId = int(request.args.get('contentId')) 
+    print(contentId)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        UPDATE content SET isActive = false where contentID = %s
+    """
+    print(query)
+    values = [contentId,]
+    cursor.execute(query, values)
+    conn.commit()
+    return jsonify({'isSuccess': True, "message": "Content updated successfully"}), 200
+
 

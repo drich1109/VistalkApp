@@ -32,12 +32,13 @@
 
 <div class="flex mt-6">
     <table class="bg-white w-full shadow-lg rounded-xl">
-        <thead class="font-['Cambria'] bg-[#99BC85] text-white  text-center">
+        <thead class="font-['Cambria'] bg-[#99BC85] text-white text-center">
             <tr class="first:rounded-t-xl last:rounded-b-xl">
                 <th class="px-4 py-2 first:rounded-tl-xl last:rounded-tr-xl">Name</th>
                 <th class="px-4 py-2">Image</th>
                 <th class="px-4 py-2">Description</th>
                 <th class="px-4 py-2 first:rounded-tl-xl last:rounded-tr-xl">Cost</th>
+                <th class="px-4 py-2 first:rounded-tl-xl last:rounded-tr-xl">Actions</th>
             </tr>
         </thead>
         <tbody class="text-center text-sm">
@@ -46,7 +47,15 @@
                 <td class="px-4 py-2">aldrichbatislaon@gmail.com</td>
                 <td class="px-4 py-2">100000</td>
                 <td class="px-4 py-2">hquieywuiyeiuqwyeuqw</td>
+                <td class="px-4 py-2 flex justify-center items-center">
+                    <button>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h4a1 1 0 1 1 0 2h-1.069l-.867 12.142A2 2 0 0 1 17.069 22H6.93a2 2 0 0 1-1.995-1.858L4.07 8H3a1 1 0 0 1 0-2h4zm2 2h6V4H9zM6.074 8l.857 12H17.07l.857-12zM10 10a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1m4 0a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1"/></svg>
+                    </button>
+                </td>
             </tr>
+        </tbody>
+    </table>
+    
         </div>
         <div class="fixed bottom-0 right-0 flex justify-center items-center bg-white rounded-xl py-2 px-4 shadow-lg ml-4 mr-4 mb-4" style="left: 80px;">
             <div class="flex items-center">
