@@ -228,10 +228,10 @@
     <AddContent modelOpen={modelOpen} {isAdd} languageId={currentValue} {content} on:close={closeModal} on:refresh={refresh}></AddContent>
 {/if}
 
-<div class="flex justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
+<div class="flex-wrap justify-between items-center mt-1 bg-white rounded-xl py-4 px-4shadow-lg">
     <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Content List</p>
-    <div class="flex-grow flex justify-center">
-        <div class="flex items-center border border-[#B9B9B9] rounded-xl px-12 py-1 bg-white">
+    <div class="flex-grow flex">
+        <div class="flex items-center border border-[#B9B9B9] rounded-xl px-12 mt-8 py-1 bg-white">
             <input type="text" bind:value={searchString} placeholder="Search" class="outline-none text-gray-600 placeholder-[#99BC85]">
             <button>
                 <svg xmlns="http://www.w3.org/2000/svg" class="text-[#99BC85]" width="1.5em" height="1.5em" viewBox="0 0 12 12" fill="none">
@@ -240,7 +240,7 @@
             </button>
         </div>
     </div>
-    <div class="flex gap-4">
+    <div class="flex gap-4 mt-8">
         <select bind:value={currentValue} on:change={refresh} class="font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg ">
             {#each languages as lang}
                 <option class="py-2" value={lang.languageID}>{lang.name}</option>

@@ -1,5 +1,6 @@
 <script lang="ts">
     import SideBar from '$lib/components/SideBar.svelte';
+    import MobileNavbar from '$lib/components/MobileNavbar.svelte';
     import { getLoggedInUser } from '$lib/auth/oidcService';
     import { onMount } from 'svelte';
     import { loggedInUser } from '$lib/store';
@@ -9,6 +10,7 @@
     let user: LoggedInUser | null = null;
     let isLoading = true;
     let isSidebarExpanded = true;
+    let isMobileExpanded = true;
 
     async function getUser() {
         user = await getLoggedInUser();
@@ -29,6 +31,7 @@
     // Function to handle sidebar toggle
     function handleSidebarToggle() {
         isSidebarExpanded = !isSidebarExpanded;
+        isMobileExpanded = !isMobileExpanded;
     }
 </script>
 
@@ -39,13 +42,28 @@
     <div class="layout">
         <SideBar on:logout={logout} on:toggleSidebar={handleSidebarToggle} />
         <main class="content" class:collapsed={!isSidebarExpanded} class:expanded={isSidebarExpanded}>
-            <slot />
+            <div>
+                <slot/>
+            </div>
         </main>
     </div>
+
+    <div class="mobile-layout h-screen flex flex-col">
+        <MobileNavbar on:logout={logout} on:toggleSidebar={handleSidebarToggle} />
+        <main class="mobile-content flex-1 pt-16 overflow-auto">
+            <div class="content-inner w-full h-full">
+                <slot/>
+            </div>
+        </main>
+    </div>
+
 {:else}
-    <slot />
+    <slot/>
 {/if}
+
+
 <style>
+    /* General styles */
     .layout {
         display: flex;
         height: 100vh;
@@ -58,11 +76,44 @@
         background-color: #f4f4f4;
     }
 
-    .content.collapsed {
-        margin-left: 80px;
+    .mobile-layout {
+        display: none; /* Hide mobile layout by default */
     }
 
-    .content.expanded {
-        margin-left: 250px;
+    .mobile-content {
+        flex: 1;
+        transition: margin-top 0.3s ease;
+        padding: 20px;
+        background-color: #f4f4f4;
+    }
+
+    /* Desktop styles */
+    @media (min-width: 769px) {
+        .mobile-layout {
+            display: none; /* Hide mobile layout on desktop */
+        }
+
+        .content {
+            margin-left: 250px; /* Sidebar width when expanded */
+        }
+
+        .content.collapsed {
+            margin-left: 80px; /* Sidebar width when collapsed */
+        }
+    }
+
+    /* Mobile styles */
+    @media (max-width: 768px) {
+        .layout {
+            display: none; /* Hide desktop layout on mobile */
+        }
+
+        .mobile-layout {
+            display: flex; /* Show mobile layout */
+        }
+
+        .mobile-content {
+            margin-top: 100px; /* Adjust based on the mobile navbar height */
+        }
     }
 </style>
