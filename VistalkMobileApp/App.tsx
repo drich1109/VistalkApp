@@ -1,63 +1,65 @@
 import React from 'react';
-import { SafeAreaView, Text, TouchableOpacity, View, StyleSheet, Image, Alert,ImageBackground } from 'react-native';
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from './types'; // Adjust the import path
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Home from './routes/Home';
+import LogIn from './routes/LogIn'; 
+import Register from './routes/Register';
+import Languages  from './routes/Languages'; 
+import { RootStackParamList } from './types'; // Ensure this import path is correct
+import Dashboard from './routes/Dashboard';
+import Dictionary from './routes/Dictionary';
+import Practice from './routes/Practice';
+import Shop from './routes/Shop';
 
-type Props = StackScreenProps<RootStackParamList, 'Home'>;
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
-const HomeScreen: React.FC<Props> = ({ navigation }) => {
+const App: React.FC = () => {
   return (
-    <ImageBackground source={require('./assets/bg.png')} style={styles.background}>
-    <SafeAreaView style={styles.container}>
-      <View style={styles.logoContainer}>
-        <Image source={require('./assets/logo.png')} style={styles.logo} />
-      </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('LogIn')}>
-          <Text style={styles.buttonText}>Login</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => Alert.alert('Create Account pressed')}>
-          <Text style={styles.buttonText}>Create an Account</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
-    </ImageBackground>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen
+          name="Home"
+          component={Home}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="LogIn"
+          component={LogIn}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={Register}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Languages"
+          component={Languages}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Dashboard"
+          component={Dashboard}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Dictionary"
+          component={Dictionary}
+          options={{ headerShown: false }}
+        />
+                <Stack.Screen
+          name="Practice"
+          component={Practice}
+          options={{ headerShown: false }}
+        />
+                <Stack.Screen
+          name="Shop"
+          component={Shop}
+          options={{ headerShown: false }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };
 
-const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    resizeMode: 'cover',
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 16,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  logo: {
-    width: 150,
-    height: 150,
-  },
-  buttonContainer: {
-    marginTop: 20,
-  },
-  button: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  buttonText: {
-    color: '#99BC85',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
-
-export default HomeScreen;
+export default App;

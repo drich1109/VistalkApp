@@ -388,6 +388,8 @@ FodyWeavers.xsd
 # Python virtual environments
 venv/
 .venv/
+env/
+.env/
 
 # Python-specific files
 *.pyc

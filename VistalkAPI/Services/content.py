@@ -1,10 +1,11 @@
 # user.py
-from db import get_db_connection, PronunciationDirectory, SyllableDirectory
+from db import get_db_connection, PronunciationDictionary, SyllableDirectory
 from flask import request, jsonify, send_from_directory
 import os
 
-PronunciationFolder = PronunciationDirectory
+PronunciationFolder = PronunciationDictionary
 Syllables =  SyllableDirectory
+
 if not os.path.exists(Syllables):
     os.makedirs(Syllables)
 

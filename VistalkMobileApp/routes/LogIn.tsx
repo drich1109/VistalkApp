@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { SafeAreaView, Text, TextInput, TouchableOpacity, View, StyleSheet, Alert } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from './types'; // Adjust the import path
+import { RootStackParamList } from '../types'; // Adjust the import path
+import { getFromBaseApi } from '../api/apiService';
+import { loginUser } from './repo';
 
 type Props = StackScreenProps<RootStackParamList, 'LogIn'>;
 
@@ -10,28 +12,16 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
   const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
-    const payload = { email, password };
-    console.log(payload);
-
-    const queryString = new URLSearchParams(payload).toString();
     try {
-      const response = await fetch(`http://192.168.1.18:5000/login?${queryString}`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const response = await loginUser(email, password);
       console.log(response);
 
-      if (!response.ok && response.status !== 401) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log(data);
-
-      if (data.token) {
-        Alert.alert('Login Successful', `Welcome ${data.name}!`);
+      if (response.isSuccess == true) {
+        Alert.alert('Login Successful', `Welcome ${response.data.name}!`, [
+          { text: 'OK', onPress: () => navigation.goBack() }, 
+        ]);
       } else {
-        Alert.alert('Login Failed', data.error);
+        Alert.alert('Login Failed', response.message);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -49,7 +39,11 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
           placeholderTextColor="#666"
           onChangeText={setEmail}
           value={email}
+          keyboardType="email-address" // Set the keyboard type to email
+          autoCapitalize="none" // Prevent auto-capitalization
+          textContentType="emailAddress" // Provide additional hint for the keyboard
         />
+
         <TextInput
           style={[styles.input, { color: '#000' }]}
           placeholder="Password"
