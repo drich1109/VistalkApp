@@ -102,6 +102,9 @@ def unitInactive():
 def questionInactive():
     return question.questionInactive()
 
+@app.route('/registerUser', methods=['POST'])
+def registerVista():
+    return user.createVista()
 
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
