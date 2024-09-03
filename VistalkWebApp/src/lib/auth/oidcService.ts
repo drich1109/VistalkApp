@@ -32,14 +32,23 @@ export async function getUser(): Promise<User | null> {
 export async function getLoggedInUser(): Promise<LoggedInUser | null> {
     const token = getTokenFromLocalStorage();
     if (!token) return null;
+    
     try {
-		const decodedToken: any = jwtDecode(token);
-		const user: LoggedInUser = {
+        const decodedToken: any = jwtDecode(token);
+        const currentTime = Math.floor(Date.now() / 1000);
+        
+        if (decodedToken.exp && decodedToken.exp < currentTime) {
+            clearLocalStorage();
+            return null;
+        }
+
+        const user: LoggedInUser = {
             name: decodedToken.sub,
             token
         };
-        return user;  
-	} catch {
+        
+        return user;
+    } catch {
         clearLocalStorage();
         return null;
     }

@@ -3,7 +3,7 @@ import { LoggedInUser, CallResultDto, Languages, UserDto } from "./type";
 
 export async function loginUser(email:string, password:string)
 {
-    return await getFromBaseApi<CallResultDto<LoggedInUser>>('login', {email, password});
+    return await getFromBaseApi<CallResultDto<LoggedInUser>>('loginVista', {email, password});
 }
 
 export async function getLanguages()
