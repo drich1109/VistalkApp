@@ -1,12 +1,12 @@
 # user.py
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from db import get_db_connection
 from flask import request, jsonify
 import hashlib
 
 def generate_token(user_name):
-    expiration_time = datetime.utcnow() + timedelta(hours=1)
+    expiration_time = datetime.now(timezone.utc) + timedelta(days=1)
     token = jwt.encode({
         'sub': user_name,
         'exp': expiration_time
@@ -15,7 +15,7 @@ def generate_token(user_name):
 
 def login():
     email = request.args.get('email')
-    password = request.args.get('password')
+    password = request.args.get('hashedPassword')
 
     if not email or not password:
         return jsonify({
@@ -30,10 +30,10 @@ def login():
     cursor = conn.cursor(dictionary=True)
     
     try:
-        cursor.execute("SELECT name, encryptedpassword FROM user WHERE email = %s", (email,))
+        cursor.execute("SELECT name, encryptedpassword FROM user WHERE email = %s AND isAdmin = true", (email,))
         user = cursor.fetchone()
 
-        if user and hash_password(password) == user['encryptedpassword']:
+        if user and password == user['encryptedpassword']:
             token = generate_token(user['name'])
             return jsonify({
                 'isSuccess': True,
@@ -80,16 +80,14 @@ def createVista():
     cursor = conn.cursor(dictionary=True)
 
     try:
-        # Insert into user table
         query = """
-        INSERT INTO user (name, email, encryptedPassword, isActive, isAdmin, isPlayer, isAccountLocked) 
+        INSERT INTO user (name, email, encryptedPassword, isActive, isAdmin, isPlayer, isAccountLocked, failedLogins) 
         VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-        cursor.execute(query, (name, email, password, 1, 0, 1, 0))
+        cursor.execute(query, (name, email, hash_password(password), 1, 0, 1, 0, 0))
         conn.commit()
         userId = cursor.lastrowid
 
-        # Insert into vista table
         vistaQuery = """
         INSERT INTO vista (userPlayerId, vCoin, totalScoreWeekly, currentLanguageId) 
         VALUES (%s, %s, %s, %s)
@@ -97,7 +95,6 @@ def createVista():
         cursor.execute(vistaQuery, (userId, 0, 0, languageId))
         conn.commit()
 
-        # Select unit IDs for the specified language
         sectionQuery = """
         SELECT u.unitId 
         FROM unit u 
@@ -107,7 +104,6 @@ def createVista():
         cursor.execute(sectionQuery, (languageId,))
         unitIds = cursor.fetchall()
 
-        # Insert into userunit table
         for unit in unitIds:
             userUnitQuery = """
             INSERT INTO userunit (userPlayerId, unitId, totalCorrectAnswers, viStars, totalScore) 
@@ -116,7 +112,6 @@ def createVista():
             cursor.execute(userUnitQuery, (userId, unit['unitId'], 0, 0, 0))
         conn.commit()
 
-        # Select item IDs
         itemQuery = """
         SELECT i.itemId 
         FROM powerUp p 
@@ -125,7 +120,6 @@ def createVista():
         cursor.execute(itemQuery)
         itemIds = cursor.fetchall()
 
-        # Insert into userItem table
         for item in itemIds:
             userItemQuery = """
             INSERT INTO userItem (userPlayerId, itemId, quantity) 
@@ -140,6 +134,118 @@ def createVista():
         conn.rollback()
         return jsonify({'isSuccess': False, "message": str(e)}), 500
 
+    finally:
+        cursor.close()
+        conn.close()
+
+from datetime import datetime, timedelta
+
+def lock_account(email, conn):
+    cursor = conn.cursor()
+    lockout_time = datetime.now() + timedelta(days=1)
+    cursor.execute("""
+        UPDATE user
+        SET isAccountLocked = true, 
+            logInTimeLockOut = %s,
+            failedlogins = 0
+        WHERE email = %s
+    """, (lockout_time, email))
+    conn.commit()
+    cursor.close()
+
+def loginVista():
+    email = request.args.get('email')
+    password = request.args.get('hashedPassword')
+
+    if not email or not password:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Email and password are required',
+            'data': None,
+            'data2': None,
+            'totalCount': None
+        }), 200
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        cursor.execute("""
+            SELECT name, encryptedpassword, failedlogins, isAccountLocked, logInTimeLockOut
+            FROM user
+            WHERE email = %s AND isPlayer = true AND isActive = true
+        """, (email,))
+        user = cursor.fetchone()
+
+        if not user:
+            return jsonify({
+                'isSuccess': False,
+                'message': 'Invalid credentials',
+                'data': None,
+                'data2': None,
+                'totalCount': None
+            }), 200
+        
+        if user['isAccountLocked']:
+            if datetime.now() < user['logInTimeLockOut']:
+                return jsonify({
+                    'isSuccess': False,
+                    'message': 'Your account is locked. Please try again tomorrow.',
+                    'data': None,
+                    'data2': None,
+                    'totalCount': None
+                }), 200
+            else:
+                cursor.execute("""
+                    UPDATE user
+                    SET isAccountLocked = false, logInTimeLockOut = NULL
+                    WHERE email = %s
+                """, (email,))
+                conn.commit()
+        
+        if password == user['encryptedpassword']:
+            token = generate_token(user['name'])
+            cursor.execute("""
+                UPDATE user
+                SET failedlogins = 0
+                WHERE email = %s
+            """, (email,))
+            conn.commit()
+            return jsonify({
+                'isSuccess': True,
+                'message': 'Login successful',
+                'data': {
+                    'name': user['name'],
+                    'token': token
+                },
+                'data2': None,
+                'totalCount': None 
+            }), 200
+        else:
+            new_failed_logins = user['failedlogins'] + 1
+            if new_failed_logins >= 5:
+                lock_account(email, conn)
+                return jsonify({
+                    'isSuccess': False,
+                    'message': 'Too many failed login attempts. Your account is locked for one day.',
+                    'data': None,
+                    'data2': None,
+                    'totalCount': None
+                }), 200
+            else:
+                cursor.execute("""
+                    UPDATE user
+                    SET failedlogins = %s
+                    WHERE email = %s
+                """, (new_failed_logins, email))
+                conn.commit()
+                return jsonify({
+                    'isSuccess': False,
+                    'message': 'Invalid credentials',
+                    'data': None,
+                    'data2': None,
+                    'totalCount': None
+                }), 200
     finally:
         cursor.close()
         conn.close()

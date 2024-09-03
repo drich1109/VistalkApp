@@ -106,5 +106,9 @@ def questionInactive():
 def registerVista():
     return user.createVista()
 
+@app.route('/loginVista', methods=['GET'])
+def loginVista():
+    return user.loginVista()
+
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
