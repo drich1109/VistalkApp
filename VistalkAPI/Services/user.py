@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from db import get_db_connection
 from flask import request, jsonify
 import hashlib
+from Services import emailService
 
 def generate_token(user_name):
     expiration_time = datetime.now(timezone.utc) + timedelta(days=1)
@@ -76,13 +77,22 @@ def createVista():
             'totalCount': None
         }), 200
 
+    if is_email_in_use(email):
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Email already in use, please use another email',
+            'data': None,
+            'data2': None,
+            'totalCount': None
+        }), 200
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
     try:
         query = """
         INSERT INTO user (name, email, encryptedPassword, isActive, isAdmin, isPlayer, isAccountLocked, failedLogins) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s , %s)
         """
         cursor.execute(query, (name, email, hash_password(password), 1, 0, 1, 0, 0))
         conn.commit()
@@ -128,6 +138,16 @@ def createVista():
             cursor.execute(userItemQuery, (userId, item['itemId'], 0))
         conn.commit()
 
+        subject = "Welcome to Vistalk"
+        message = """
+        Maayong Adlaw, Vista!
+
+        Welcome to the Vistalk Family! We're excited to help you learn Visayan. Enjoy the journey with the Vistalk App!
+
+        Daghang Salamat,
+        The Vistalk Team
+        """
+        emailService.send_email(email, subject, message)
         return jsonify({'isSuccess': True, "message": "User registered successfully"}), 201
 
     except Exception as e:
@@ -165,7 +185,7 @@ def loginVista():
             'data2': None,
             'totalCount': None
         }), 200
-
+    
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
@@ -246,6 +266,20 @@ def loginVista():
                     'data2': None,
                     'totalCount': None
                 }), 200
+    finally:
+        cursor.close()
+        conn.close()
+
+def is_email_in_use(email):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        query = "SELECT email FROM user WHERE email = %s"
+        cursor.execute(query, (email,))
+        result = cursor.fetchone()
+        return result is not None
+    except Exception as e:
+        return jsonify({'isSuccess': False, 'message': str(e)}), 500
     finally:
         cursor.close()
         conn.close()
