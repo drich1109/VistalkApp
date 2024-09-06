@@ -1,9 +1,11 @@
 import { getFromBaseApi, getFromMainApi, postToBaseApi } from "../api/apiService";
 import { LoggedInUser, CallResultDto, Languages, UserDto } from "./type";
+import CryptoJS from 'crypto-js';
 
 export async function loginUser(email:string, password:string)
 {
-    return await getFromBaseApi<CallResultDto<LoggedInUser>>('loginVista', {email, password});
+    const hashedPassword = CryptoJS.MD5(password).toString();
+    return await getFromBaseApi<CallResultDto<LoggedInUser>>('loginVista', {email, hashedPassword});
 }
 
 export async function getLanguages()

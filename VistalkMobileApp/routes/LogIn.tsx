@@ -17,9 +17,7 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
       console.log(response);
 
       if (response.isSuccess == true) {
-        Alert.alert('Login Successful', `Welcome ${response.data.name}!`, [
-          { text: 'OK', onPress: () => navigation.goBack() }, 
-        ]);
+        navigation.navigate('Dashboard')
       } else {
         Alert.alert('Login Failed', response.message);
       }

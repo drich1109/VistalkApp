@@ -412,7 +412,7 @@ build/
 .env
 
 # React Native
-api/apiService.ts
+VistalkMobileApp/api/apiService.ts
 
 # Android
 /android/.gradle
@@ -437,6 +437,10 @@ api/apiService.ts
 
 # Node.js
 /node_modules
+# Explicitly include package.json and package-lock.json
+package.json
+package-lock.json
+
 /.pnp
 .pnp.js
 
