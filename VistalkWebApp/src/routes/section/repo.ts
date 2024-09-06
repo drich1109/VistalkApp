@@ -1,4 +1,4 @@
-import { post, get } from "$lib/api/baseRepo";
+import { post, get, put } from "$lib/api/baseRepo";
 import type { CallResultDto } from "../../types/types";
 import type { Language } from "../type";
 import type { Content, MatchingType, MultipleChoice, QuestionDto, QuestionType, Section, Unit } from "./type";
@@ -45,4 +45,11 @@ export async function getMatchingType(questionMatchingTypeID:number) {
 	let result =  await get<CallResultDto<MatchingType>>(`/getMatchingType`,{questionMatchingTypeID});
 	console.log(result)
     return result;
+  
+export async function sectionInactive(sectionID:number) {
+	return await put<CallResultDto<object>>(`/sectionInactive`, {sectionID});
+}
+
+export async function unitInactive(unitID:number) {
+	return await put<CallResultDto<object>>(`/unitInactive`, {unitID});
 }

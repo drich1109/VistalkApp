@@ -250,7 +250,7 @@ def get_multiple_choice():
                 'data2': None,
                 'totalCount': total_count
             }), 200
-
+  
 def get_matching_type():
     questionMatchingTypeID = request.args.get('questionMatchingTypeID')
     conn = get_db_connection()
@@ -281,3 +281,61 @@ def get_matching_type():
                 'data2': None,
                 'totalCount': total_count
             }), 200
+
+def save_question_match():
+    data = request.json
+
+    question_text = data.get('questionText')
+    unit_id = data.get('unitId')
+    question_type_id = data.get('questionTypeID')
+    choices = [
+        data.get('choice1'),
+        data.get('choice2'),
+        data.get('choice3'),
+        data.get('choice4'),
+        data.get('match1'),
+        data.get('match2'),
+        data.get('match3'),
+        data.get('match4')
+    ]
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        '''
+        INSERT INTO question (questionText, unitId, questionTypeID)
+        VALUES (%s, %s, %s)
+        ''',
+        (question_text, unit_id, question_type_id)
+    )
+
+    conn.commit()
+    question_id = cursor.lastrowid
+
+    cursor.execute(
+        '''
+        INSERT INTO questionmatchingtype (questionID, word1, word2, word3, word4, match1, match2, match3, match4)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ''',
+        (question_id, choices[0], choices[1], choices[2], choices[3], choices[4], choices[5], choices[6], choices[7])
+    )
+    
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'message': 'Question and choices saved successfully.'}), 200
+
+def questionInactive():
+    questionID = int(request.args.get('questionID')) 
+    print(questionID)
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = """
+        UPDATE content SET isActive = false where contentID = %s
+    """
+    print(query)
+    values = [questionID,]
+    cursor.execute(query, values)
+    conn.commit()
+    return jsonify({'isSuccess': True, "message": "Content updated successfully"}), 200

@@ -3,7 +3,7 @@
     import { createEventDispatcher, onMount } from 'svelte';
     import type { CallResultDto } from '../../types/types';
     import type { QuestionType, Unit } from './type';
-    import { getQuestionTypes, getUnits } from './repo';
+    import { getQuestionTypes, getUnits, unitInactive } from './repo';
     import AddUnit from './AddUnit.svelte';
     import { page } from '$app/stores';
     import Pagination from '$lib/components/Pagination.svelte';
@@ -92,14 +92,19 @@
         if(searchString != null)
             refresh();
     }
+
     function closeQuestion()
     {
         showQuestion = false;
     }
+
+    async function setInactive(id:number){ await unitInactive(id); refresh();}
+
 </script>
 {#if showModal == true}
     <AddUnit modelOpen = {showModal} {unit} {isAdd} on:close={closeModal} on:refresh={refresh}></AddUnit>
 {/if}
+
 {#if showQuestion}
     <QuestionList {languageId} {unitId} on:back={closeQuestion}></QuestionList>
 {:else}
@@ -142,7 +147,14 @@
                     <td class="px-4 py-2">{u.title}</td>
                     <td class="px-4 py-2">{u.description}</td>
                     <td class="px-4 py-2">{u.totalItems}</td>
-                    <td class="px-4 py-2"><button on:click={() => toggleModal(false,u)}><svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 16 16"><path fill="black" d="M15.49 7.3h-1.16v6.35H1.67V3.28H8V2H1.67A1.21 1.21 0 0 0 .5 3.28v10.37a1.21 1.21 0 0 0 1.17 1.25h12.66a1.21 1.21 0 0 0 1.17-1.25z"/><path fill="black" d="M10.56 2.87L6.22 7.22l-.44.44l-.08.08l-1.52 3.16a1.08 1.08 0 0 0 1.45 1.45l3.14-1.53l.53-.53l.43-.43l4.34-4.36l.45-.44l.25-.25a2.18 2.18 0 0 0 0-3.08a2.17 2.17 0 0 0-1.53-.63a2.2 2.2 0 0 0-1.54.63l-.7.69l-.45.44zM5.51 11l1.18-2.43l1.25 1.26zm2-3.36l3.9-3.91l1.3 1.31L8.85 9zm5.68-5.31a.9.9 0 0 1 .65.27a.93.93 0 0 1 0 1.31l-.25.24l-1.3-1.3l.25-.25a.88.88 0 0 1 .69-.25z"/></svg></button></td>
+                    <td class="px-4 py-2">
+                        
+                        <button on:click={(event) => { event.stopPropagation(); toggleModal(false,u)}}><svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 16 16"><path fill="black" d="M15.49 7.3h-1.16v6.35H1.67V3.28H8V2H1.67A1.21 1.21 0 0 0 .5 3.28v10.37a1.21 1.21 0 0 0 1.17 1.25h12.66a1.21 1.21 0 0 0 1.17-1.25z"/><path fill="black" d="M10.56 2.87L6.22 7.22l-.44.44l-.08.08l-1.52 3.16a1.08 1.08 0 0 0 1.45 1.45l3.14-1.53l.53-.53l.43-.43l4.34-4.36l.45-.44l.25-.25a2.18 2.18 0 0 0 0-3.08a2.17 2.17 0 0 0-1.53-.63a2.2 2.2 0 0 0-1.54.63l-.7.69l-.45.44zM5.51 11l1.18-2.43l1.25 1.26zm2-3.36l3.9-3.91l1.3 1.31L8.85 9zm5.68-5.31a.9.9 0 0 1 .65.27a.93.93 0 0 1 0 1.31l-.25.24l-1.3-1.3l.25-.25a.88.88 0 0 1 .69-.25z"/></svg></button>
+                        
+                        <button on:click={(event) => { event.stopPropagation() ; setInactive(u.unitID);}}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h4a1 1 0 1 1 0 2h-1.069l-.867 12.142A2 2 0 0 1 17.069 22H6.93a2 2 0 0 1-1.995-1.858L4.07 8H3a1 1 0 0 1 0-2h4zm2 2h6V4H9zM6.074 8l.857 12H17.07l.857-12zM10 10a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1m4 0a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1"/></svg>
+                        </button>
+                    </td>
                 </tr>
                 {/each}
                 {:else}

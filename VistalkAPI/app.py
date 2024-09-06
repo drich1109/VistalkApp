@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import db
 from flask_cors import CORS
-from Services import user, section, content, question
+from Services import user, section, content, question, shop
 
 app = Flask(__name__)
 CORS(app)
@@ -77,7 +77,38 @@ def save_questionMultiple():
 @app.route('/save_questionMatch', methods=['POST'])
 def save_questionMatch():
     return question.save_question_match()
+  
+@app.route('/getItemType', methods=['GET'])
+def getItemTypes():
+    return shop.getItemType()
 
+@app.route('/saveItemShop', methods=['POST'])
+def saveItem():
+    return shop.save_item()
+  
+@app.route('/contentInactive', methods=['PUT'])
+def contentInactive():
+    return content.contentInactive()
+
+@app.route('/sectionInactive', methods=['PUT'])
+def sectionInactive():
+    return section.sectionInactive()
+
+@app.route('/unitInactive', methods=['PUT'])
+def unitInactive():
+    return section.unitInactive()
+
+@app.route('/questionInactive', methods=['PUT'])
+def questionInactive():
+    return question.questionInactive()
+
+@app.route('/registerUser', methods=['POST'])
+def registerVista():
+    return user.createVista()
+
+@app.route('/loginVista', methods=['GET'])
+def loginVista():
+    return user.loginVista()
 @app.route('/getQuestions', methods=['GET'])
 def getQuestions():
     return question.get_Questions()
@@ -88,7 +119,7 @@ def getMultipleChoice():
 
 @app.route('/getMatchingType', methods=['GET'])
 def getMatchingType():
-    return question.get_matching_type()
+    return question.get_matching_type()  
 
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

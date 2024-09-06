@@ -1,4 +1,5 @@
-import { post, get, postForm, getFile } from "$lib/api/baseRepo";
+import { post, get, postForm, getFile, put } from "$lib/api/baseRepo";
+import { pt } from "date-fns/locale";
 import type { CallResultDto } from "../../types/types";
 import type { Content, ContentDto, ContentType, DefinitionDto, ExampleDto, SyllableDto } from "./type";
 
@@ -96,4 +97,6 @@ export async function getFileByFileName(fileName: string, isSyllable:boolean): P
     }
 }
 
-
+export async function contentInactived(contentId:number) {
+	return await put<CallResultDto<object>>(`/contentInactive`, {contentId});
+}

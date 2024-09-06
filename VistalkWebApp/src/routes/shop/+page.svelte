@@ -1,12 +1,60 @@
 <script lang="ts">
     import { redirectIfLoggedIn } from '$lib/shortcuts';
     import { onMount } from 'svelte';
+    import AddItem from './AddItem.svelte';
+    import type { BackgroundMusic, CoinBag, PowerUp } from './type';
+
+    let openModal:boolean = false;
+    let isAdd:boolean = false;
+
+    let powerUp: PowerUp = {
+        itemID: 0,
+        itemTypeID: 0,
+        vcoinPrice: 0,
+        isPremium: false,
+        name: '',
+        description: '',
+        filePath: '',
+        file: null
+    };
+
+    let backgroundMusic: BackgroundMusic = {
+        itemID: 0,
+        itemTypeID: 0,
+        vcoinPrice: 0,
+        isPremium: false,
+        musicTitle: '',
+        musicGenre: '',
+        filePath: '',
+        file: null
+    };
+
+    let coinBag: CoinBag = {
+        coinBagId: 0,
+        quantity: 0,
+        moneyPrice: 0,
+        coinBagName: ''
+    };
+
 
     onMount(async () => {
         await redirectIfLoggedIn(''); // Redirect to login if not logged in
     });
+
+    function modalOpen()
+    {
+        openModal = true;
+        isAdd = true;
+    }
+    function modalClose()
+    {
+        openModal =false;
+    }
 </script>
 
+{#if openModal == true}
+    <AddItem modelOpen={openModal} {isAdd} {coinBag} {backgroundMusic} {powerUp} on:close={modalClose}> </AddItem>
+{/if}
 <div class="flex justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
     <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Item List</p>
     <div class="flex-grow flex justify-center">
@@ -23,21 +71,22 @@
         <button class="font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
             View Transaction
         </button>
-        <button class="flex items-center font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
+        <button on:click={modalOpen} class="flex items-center font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="text-white mr-2" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M13 6.5V11h4.5v2H13v4.5h-2V13H6.5v-2H11V6.5z"/></svg>
-            Add Section
+            Add Item
         </button>
     </div>
 </div>
 
 <div class="flex mt-6">
     <table class="bg-white w-full shadow-lg rounded-xl">
-        <thead class="font-['Cambria'] bg-[#99BC85] text-white  text-center">
+        <thead class="font-['Cambria'] bg-[#99BC85] text-white text-center">
             <tr class="first:rounded-t-xl last:rounded-b-xl">
                 <th class="px-4 py-2 first:rounded-tl-xl last:rounded-tr-xl">Name</th>
                 <th class="px-4 py-2">Image</th>
                 <th class="px-4 py-2">Description</th>
                 <th class="px-4 py-2 first:rounded-tl-xl last:rounded-tr-xl">Cost</th>
+                <th class="px-4 py-2 first:rounded-tl-xl last:rounded-tr-xl">Actions</th>
             </tr>
         </thead>
         <tbody class="text-center text-sm">
@@ -46,7 +95,15 @@
                 <td class="px-4 py-2">aldrichbatislaon@gmail.com</td>
                 <td class="px-4 py-2">100000</td>
                 <td class="px-4 py-2">hquieywuiyeiuqwyeuqw</td>
+                <td class="px-4 py-2 flex justify-center items-center">
+                    <button>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h4a1 1 0 1 1 0 2h-1.069l-.867 12.142A2 2 0 0 1 17.069 22H6.93a2 2 0 0 1-1.995-1.858L4.07 8H3a1 1 0 0 1 0-2h4zm2 2h6V4H9zM6.074 8l.857 12H17.07l.857-12zM10 10a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1m4 0a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1"/></svg>
+                    </button>
+                </td>
             </tr>
+        </tbody>
+    </table>
+    
         </div>
         <div class="fixed bottom-0 right-0 flex justify-center items-center bg-white rounded-xl py-2 px-4 shadow-lg ml-4 mr-4 mb-4" style="left: 80px;">
             <div class="flex items-center">

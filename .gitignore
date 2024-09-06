@@ -388,6 +388,8 @@ FodyWeavers.xsd
 # Python virtual environments
 venv/
 .venv/
+env/
+.env/
 
 # Python-specific files
 *.pyc
@@ -410,6 +412,7 @@ build/
 .env
 
 # React Native
+api/apiService.ts
 
 # Android
 /android/.gradle
