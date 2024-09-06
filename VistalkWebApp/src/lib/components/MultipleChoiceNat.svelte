@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   import type { Content } from '../../routes/section/type';
   import type { QuestionMultipleDto } from '$lib/api/componentType';
     import { saveMainContent } from '../../routes/contents/repo';
@@ -8,14 +8,28 @@
   export let modelOpen: boolean;
   export let choices: Content[];
   export let mainQuestion: QuestionMultipleDto;
+  export let searchQueries: string[];
 
   const dispatch = createEventDispatcher();
 
-  let searchQueries: string[] = ['', '', '', ''];
   let selectedChoices: (Content | undefined)[] = Array(searchQueries.length).fill(undefined);
   let fileType: 'audio' | 'image' | null = null;
+  let prevent: boolean[] = Array(searchQueries.length).fill(false); 
+  let fileUrl: string;
+
+  onMount(async () => {
+    // Initialize selectedChoices based on searchQueries
+    searchQueries.forEach((query, index) => {
+      const matchingChoice = choices.find(choice => choice.contentText.toLowerCase() === query.toLowerCase());
+      if (matchingChoice) {
+        selectedChoices[index] = matchingChoice;
+        console.log(selectedChoices)
+      }
+    });
+  });
 
   function closeModal() {
+      mainQuestion.file = null
       dispatch('close');
   }
 
@@ -29,12 +43,14 @@
     if(selectedChoices)
       selectedChoices[index] = choice;
       searchQueries[index] = choice.contentText;
+      
   }
 
   function handleFileUpload(event: Event) {
       const target = event.target as HTMLInputElement;
       if (target.files && target.files.length > 0) {
           mainQuestion.file = target.files[0];
+          fileUrl = URL.createObjectURL(mainQuestion.file);
       }
   }
 
@@ -79,6 +95,7 @@
     {
         if (searchQueries[index].length === 0) {
             selectedChoices[index] = undefined; // Reset the selection
+            prevent[index] = true;
         }
       }
 }
@@ -164,8 +181,10 @@ function createEmptyContent() {
                         accept={fileType === 'audio' ? 'audio/*' : 'image/*'}
                         on:change={handleFileUpload}
                         class="block w-full px-3 py-2 mt-2 text-gray-600 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40"
+                        
                       />
                       {#if mainQuestion.file}
+                        <img src={fileUrl} alt="Upload Image" class="mt-2 max-w-xs rounded-md">
                         <p class="mt-2 text-sm text-gray-600">
                           File: {mainQuestion.file.name} ({(mainQuestion.file.size / 1024).toFixed(2)} KB)
                         </p>
@@ -196,7 +215,7 @@ function createEmptyContent() {
                         style="background-color: {mainQuestion.correctChoice === i ? 'darkseagreen' : 'white'};"
                     />
                     
-                    {#if searchQueries[i-1].length > 0 && !selectedChoices[i-1]}
+                    {#if searchQueries[i-1].length > 0 && !selectedChoices[i-1] && prevent[i-1]}
                         <ul class="absolute left-2 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 z-10 top-full">
                             {#each getFilteredChoices(searchQueries[i-1]) as choice}
                                 <li 

@@ -92,13 +92,16 @@
         if(searchString != null)
             refresh();
     }
-
+    function closeQuestion()
+    {
+        showQuestion = false;
+    }
 </script>
 {#if showModal == true}
     <AddUnit modelOpen = {showModal} {unit} {isAdd} on:close={closeModal} on:refresh={refresh}></AddUnit>
 {/if}
 {#if showQuestion}
-    <QuestionList {languageId} {unitId}></QuestionList>
+    <QuestionList {languageId} {unitId} on:back={closeQuestion}></QuestionList>
 {:else}
 <button class="bg-[#99BC85] rounded-lg p-1" on:click={goBackToSection}><svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 512 512"><path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M244 400L100 256l144-144M120 256h292"/></svg></button>
 <div class="flex justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">

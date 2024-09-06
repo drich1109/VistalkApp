@@ -126,7 +126,6 @@
         const syllableListCallResult = await getSyllablesByContentId(id);
         const definitionListCallResult = await getDefinitionByContentId(id);
         const exampleListCallResult = await getExamplesByContentId(id);
-        let contentMain = contentMainCallResult.data;
         //create here an await getfilebyfilename passing the content audio path , then false
         let syllables = syllableListCallResult.data;
         let definitions = definitionListCallResult.data;

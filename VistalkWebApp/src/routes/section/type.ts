@@ -1,3 +1,5 @@
+import type { NumericRange } from "@sveltejs/kit";
+
 export type Section = {
     sectionId: number;
     sectionNumber: number;
@@ -33,4 +35,37 @@ export type Content =
     audio:HTMLAudioElement | null;
     file:File | null;
     isPlaying:boolean
+}
+
+export type QuestionDto = {
+  questionID: number;
+  questionText: string;
+  imagePath: string;
+  audioPath: string;
+  questionTypeID: number;
+  unitId: number;
+  typeName: string
+}
+
+export type MultipleChoice = {
+  questionChoiceID: number,
+  questionID: number,
+  correctChoice: number,
+  choice1: number,
+  choice2: number,
+  choice3: number,
+  choice4: number,
+}
+
+export type MatchingType = {
+  questionMatchingTypeID: number;
+  questionID: number;
+  word1: number;
+  match1: number;
+  word2: number;
+  match2: number;
+  word3: number;
+  match3: number;
+  word4: number;
+  match4: number;
 }
