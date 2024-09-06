@@ -1,14 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, Text, View, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { getLanguages, register } from './repo'; // Adjust the import path
-import type { Languages, UserDto } from './type'; // Adjust the import path
-import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../types';
+import React, {useState, useEffect} from 'react';
+import {
+  SafeAreaView,
+  Text,
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  ImageBackground,
+  Image,
+  TouchableOpacity,
+} from 'react-native';
+import {getLanguages, register} from './repo'; // Adjust the import path
+import type {Languages, UserDto} from './type'; // Adjust the import path
+import {StackScreenProps} from '@react-navigation/stack';
+import {RootStackParamList} from '../types';
 
 type Props = StackScreenProps<RootStackParamList, 'Languages'>;
 
-const LanguageList: React.FC<Props> = ({ route, navigation }) => {
-  const { userDto } = route.params; // Extract userDto from the route parameters
+const LanguageList: React.FC<Props> = ({route, navigation}) => {
+  const {userDto} = route.params; // Extract userDto from the route parameters
 
   console.log(userDto); // Log userDto to verify it's being received correctly
 
@@ -31,14 +40,17 @@ const LanguageList: React.FC<Props> = ({ route, navigation }) => {
     fetchLanguages();
   }, []);
 
-  const selectLanguage = async (userDto: UserDto | undefined, languageId: number) => {
+  const selectLanguage = async (
+    userDto: UserDto | undefined,
+    languageId: number,
+  ) => {
     if (!userDto) {
       console.error('UserDto is not provided');
       return;
     }
 
     // Update userDto with the selected language ID
-    const updatedUserDto: UserDto = { ...userDto, languageId };
+    const updatedUserDto: UserDto = {...userDto, languageId};
 
     try {
       const result = await register(updatedUserDto);
@@ -70,23 +82,54 @@ const LanguageList: React.FC<Props> = ({ route, navigation }) => {
     );
   }
 
+  console.log(languages);
+
   return (
     <SafeAreaView style={styles.container}>
-      {languages.map((language, index) => (
-        <TouchableOpacity key={index} onPress={() => selectLanguage(userDto, language.languageID)}>
-          <View style={styles.languageContainer}>
-            <Text style={styles.languageText}>{language.name}</Text>
+      <ImageBackground
+        resizeMode={'stretch'}
+        source={require('../assets/bg.png')}
+        style={styles.background}>
+        <Image source={require('../assets/logo.png')} style={styles.logo} />
+        {languages.map((language, index) => (
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginVertical: 10,
+            }}>
+            <Image
+              source={require('../assets/cebuano.png')}
+              style={{width: 100, height: 100}}
+            />
+            <TouchableOpacity
+              key={index}
+              style={{flex: 1}}
+              onPress={() => selectLanguage(userDto, language.languageID)}>
+              <View style={styles.languageContainer}>
+                <Text style={styles.languageText}>{language.name}</Text>
+              </View>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      ))}
+        ))}
+      </ImageBackground>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  logo: {
+    width: 120,
+    height: 120,
+    marginVertical: 40,
+    alignSelf: 'center',
+  },
+  background: {
     flex: 1,
     padding: 16,
+  },
+  container: {
+    flex: 1,
     backgroundColor: '#f5f5f5',
   },
   languageContainer: {
@@ -95,10 +138,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 8,
     elevation: 2,
+    marginStart: 16,
   },
   languageText: {
     fontSize: 18,
     color: 'black',
+    textAlign: 'center',
   },
   errorText: {
     fontSize: 16,

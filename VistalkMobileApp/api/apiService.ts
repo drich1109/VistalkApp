@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
-const BASE_API_URL = 'http://192.168.1.8:5000'; 
+const BASE_API_URL = 'http://192.168.100.128:5000'; 
 
-const MAIN_API_URL = 'http://192.168.1.8:5001'; 
+const MAIN_API_URL = 'http://192.168.100.128:5001'; 
 
 const baseAxiosInstance = axios.create({
   baseURL: BASE_API_URL,
