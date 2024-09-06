@@ -1,12 +1,13 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte";
-    import type { QuestionType, Content} from "./type";
+    import type { QuestionType, Content, QuestionDto} from "./type";
     import MultipleChoiceEnglish from '$lib/components/MultipleChoiceEng.svelte';  
     import MultipleChoiceNative from '$lib/components/MultipleChoiceNat.svelte'; 
     import MatchingType from "$lib/components/MatchingType.svelte";
     import { getQuestionTypes, getChoices } from './repo';
     import type { QuestionMatchingTypeDto, QuestionMultipleDto } from "$lib/api/componentType";
   import MatchingTypeEng from "$lib/components/MatchingTypeEng.svelte";
+    import { getValue } from "$lib/store";
 
     export let questionTypes: QuestionType[];
     export let showModal: boolean;
@@ -20,6 +21,8 @@
     let showMatchingType: boolean = false;
     let showMatchingTypeEng: boolean = false;
     let contents: Content[] = [];
+    let searchQueries: string[] = ['', '', '', ''];
+
 
     let mainQuestion: QuestionMultipleDto = {
         questionID: 0,
@@ -118,7 +121,7 @@
 {/if}
 
 {#if showNativeMultiple}
-<MultipleChoiceNative modelOpen={showNativeMultiple} choices={contents} mainQuestion={mainQuestion} on:close={closeModal} />
+<MultipleChoiceNative modelOpen={showNativeMultiple} choices={contents} mainQuestion={mainQuestion} {searchQueries} on:close={closeModal} />
 {/if}
 
 {#if showMatchingType}

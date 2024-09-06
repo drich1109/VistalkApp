@@ -77,7 +77,7 @@ def save_questionMultiple():
 @app.route('/save_questionMatch', methods=['POST'])
 def save_questionMatch():
     return question.save_question_match()
-
+  
 @app.route('/getItemType', methods=['GET'])
 def getItemTypes():
     return shop.getItemType()
@@ -109,6 +109,17 @@ def registerVista():
 @app.route('/loginVista', methods=['GET'])
 def loginVista():
     return user.loginVista()
+@app.route('/getQuestions', methods=['GET'])
+def getQuestions():
+    return question.get_Questions()
+
+@app.route('/getMultipleChoice', methods=['GET'])
+def getMultipleChoice():
+    return question.get_multiple_choice()
+
+@app.route('/getMatchingType', methods=['GET'])
+def getMatchingType():
+    return question.get_matching_type()  
 
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
