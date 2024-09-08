@@ -283,3 +283,25 @@ def is_email_in_use(email):
     finally:
         cursor.close()
         conn.close()
+
+def forgotPassword():
+    data = request.json
+    email = data.get('email')
+    hashedPassword = data.get('hashedPassword')
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        UPDATE user
+        SET encryptedPassword = %s
+        WHERE email = %s
+    """, (hashedPassword, email))
+    conn.commit()
+    return jsonify({
+                    'isSuccess': True,
+                    'message': 'Password Saved Successfully!',
+                    'data': None,
+                    'data2': None,
+                    'totalCount': None
+                }), 200

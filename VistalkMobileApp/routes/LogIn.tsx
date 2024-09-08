@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View, StyleSheet, Alert } from 'react-native';
+import { SafeAreaView, Text, TextInput, TouchableOpacity, View, StyleSheet, Alert, ImageBackground, Image } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../types'; // Adjust the import path
-import { getFromBaseApi } from '../api/apiService';
 import { loginUser } from './repo';
 
 type Props = StackScreenProps<RootStackParamList, 'LogIn'>;
@@ -10,13 +9,15 @@ type Props = StackScreenProps<RootStackParamList, 'LogIn'>;
 const LogIn: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [emailPlaceholder, setEmailPlaceholder] = useState('Email');
+  const [passwordPlaceholder, setPasswordPlaceholder] = useState('Password');
 
   const handleLogin = async () => {
     try {
       const response = await loginUser(email, password);
       console.log(response);
 
-      if (response.isSuccess == true) {
+      if (response.isSuccess === true) {
         navigation.navigate('Dashboard')
       } else {
         Alert.alert('Login Failed', response.message);
@@ -29,31 +30,48 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.inner}>
-        <Text style={styles.title}>Login</Text>
+      <ImageBackground source={require('../assets/bg.png')} style={styles.background} resizeMode="cover">
+        <Image source={require('../assets/logo.png')} style={styles.logo} resizeMode="contain" />
+
         <TextInput
-          style={[styles.input, { color: '#000' }]}
-          placeholder="Email"
-          placeholderTextColor="#666"
+          style={styles.input}
+          placeholder={emailPlaceholder}
+          placeholderTextColor="#fff"
           onChangeText={setEmail}
           value={email}
-          keyboardType="email-address" // Set the keyboard type to email
-          autoCapitalize="none" // Prevent auto-capitalization
-          textContentType="emailAddress" // Provide additional hint for the keyboard
+          keyboardType="email-address"
+          autoCapitalize="none"
+          textContentType="emailAddress"
+          onFocus={() => setEmailPlaceholder('')}
+          onBlur={() => setEmailPlaceholder('Email')}
         />
 
         <TextInput
-          style={[styles.input, { color: '#000' }]}
-          placeholder="Password"
-          placeholderTextColor="#666"
+          style={styles.input}
+          placeholder={passwordPlaceholder}
+          placeholderTextColor="#fff"
           secureTextEntry
           onChangeText={setPassword}
           value={password}
+          onFocus={() => setPasswordPlaceholder('')}
+          onBlur={() => setPasswordPlaceholder('Password')}
         />
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Login</Text>
+
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
-      </View>
+
+        <TouchableOpacity style={styles.googleButton} onPress={() => Alert.alert('Google Sign In')}>
+          <Text style={styles.googleButtonText}>Sign in with Google</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.forgotPasswordContainer}
+          onPress={() => navigation.navigate('ForgotPassword')}
+        >
+          <Text style={styles.forgotPassword}>Forgot password?</Text>
+        </TouchableOpacity>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -61,37 +79,64 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  background: {
+    flex: 1,
     justifyContent: 'center',
-    padding: 16,
-  },
-  inner: {
-    padding: 24,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    elevation: 5,
-  },
-  title: {
-    fontSize: 32,
-    marginBottom: 48,
-    textAlign: 'center',
-  },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderBottomWidth: 1,
-    marginBottom: 20,
-    fontSize: 16,
-    paddingHorizontal: 8,
-  },
-  button: {
-    backgroundColor: '#0066cc',
-    padding: 16,
-    borderRadius: 8,
     alignItems: 'center',
   },
-  buttonText: {
+  logo: {
+    width: 150,
+    height: 150,
+    marginBottom: 40,
+  },
+  googleButton: {
+    backgroundColor: '#fff',
+    padding: 12,
+    width: '80%',
+    borderRadius: 40,
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  googleButtonText: {
+    color: '#99BC85',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  input: {
+    width: '80%',
+    height: 50,
+    borderColor: '#fff',
+    borderWidth: 2,
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
     color: '#fff',
-    fontSize: 18,
+  },
+  loginButton: {
+    backgroundColor: '#fff',
+    padding: 12,
+    width: '80%',
+    borderRadius: 40,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  loginText: {
+    color: '#99BC85',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  forgotPasswordContainer: {
+    width: '80%',
+    alignItems: 'flex-end', 
+  },
+  forgotPassword: {
+    color: '#fff',
+    marginTop: 0,
+    textAlign: 'right',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 

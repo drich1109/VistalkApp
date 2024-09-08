@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View, StyleSheet, Alert } from 'react-native';
+import { SafeAreaView, Text, TextInput, TouchableOpacity, ImageBackground, Image, View, StyleSheet } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../types'; // Adjust the import path
-import { loginUser } from './repo';
 import { UserDto } from './type'; // Adjust the import path
 
 type Props = StackScreenProps<RootStackParamList, 'Register'>;
@@ -21,7 +20,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
     languageId: 0
   };
 
-    const handlePasswordChange = (text: string) => {
+  const handlePasswordChange = (text: string) => {
     setPassword(text);
     setPasswordMatch(text === confirmPassword);
   };
@@ -31,56 +30,70 @@ const Register: React.FC<Props> = ({ navigation }) => {
     setPasswordMatch(password === text);
   };
 
-  function clickRegister()
-  {
-    console.log(userDto);
-    navigation.navigate('Languages', { userDto })
+  function clickRegister() {
+    if (passwordMatch && password) {
+      console.log(userDto);
+      navigation.navigate('Languages', { userDto });
+    } else {
+      console.warn("Passwords do not match.");
+    }
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.inner}>
-        <Text style={styles.title}>Register</Text>
-        <TextInput
-          style={[styles.input, { color: '#000' }]}
-          placeholder="Name"
-          placeholderTextColor="#666"
-          onChangeText={setName}
-          value={name}
-        />
-        <TextInput
-          style={[styles.input, { color: '#000' }]}
-          placeholder="Email"
-          placeholderTextColor="#666"
-          onChangeText={setEmail}
-          value={email}
-          keyboardType="email-address" // Set the keyboard type to email
-          autoCapitalize="none" // Prevent auto-capitalization
-          textContentType="emailAddress" // Provide additional hint for the keyboard
-        />
-        <TextInput
-          style={[styles.input, { color: '#000' }]}
-          placeholder="Password"
-          placeholderTextColor="#666"
-          secureTextEntry
-          onChangeText={handlePasswordChange}
-          value={password}
-        />
-        <TextInput
-          style={[styles.input, { color: '#000' }]}
-          placeholder="Confirm Password"
-          placeholderTextColor="#666"
-          secureTextEntry
-          onChangeText={handleConfirmPasswordChange}
-          value={confirmPassword}
-        />
-        {!passwordMatch && password.length > 0 && confirmPassword.length > 0 && <Text style={styles.errorText}>Passwords do not match</Text>
-    }
+      <ImageBackground source={require('../assets/bg.png')} style={styles.background} resizeMode="cover">
+        <Image source={require('../assets/logo.png')} style={styles.logo} resizeMode="contain" />
 
-        <TouchableOpacity style={styles.button} onPress={clickRegister}>
-          <Text style={styles.buttonText}>Register</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.inner}>
+          <TextInput
+            style={[styles.input, { color: '#000' }]}
+            placeholder="Full Name"
+            placeholderTextColor="#fff"
+            onChangeText={setName}
+            value={name}
+          />
+
+          <TextInput
+            style={[styles.input, { color: '#000' }]}
+            placeholder="Email"
+            placeholderTextColor="#fff"
+            onChangeText={setEmail}
+            value={email}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            textContentType="emailAddress" 
+          />
+
+          <TextInput
+            style={[styles.input, { color: '#000' }]}
+            placeholder="Password"
+            placeholderTextColor="#fff"
+            secureTextEntry
+            onChangeText={handlePasswordChange}
+            value={password}
+          />
+          <TextInput
+            style={[styles.input, { color: '#000' }]}
+            placeholder="Confirm Password"
+            placeholderTextColor="#fff"
+            secureTextEntry
+            onChangeText={handleConfirmPasswordChange}
+            value={confirmPassword}
+          />
+          {!passwordMatch && password.length > 0 && confirmPassword.length > 0 && <Text style={styles.errorText}>Passwords do not match</Text>}
+
+          <TouchableOpacity style={styles.button} onPress={clickRegister}>
+            <Text style={styles.buttonText}>Create</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.haveanaccountContainer}
+            onPress={() => navigation.navigate('LogIn')}
+          >
+            <Text style={styles.haveanaccount}>Already have an account?</Text>
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
@@ -88,43 +101,61 @@ const Register: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  background: {
+    flex: 1,
     justifyContent: 'center',
-    padding: 16,
-  },
-  inner: {
-    padding: 24,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    elevation: 5,
-  },
-  title: {
-    fontSize: 32,
-    marginBottom: 48,
-    textAlign: 'center',
-    color: 'black'
-  },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderBottomWidth: 1,
-    marginBottom: 20,
-    fontSize: 16,
-    paddingHorizontal: 8,
-  },
-  button: {
-    backgroundColor: '#0066cc',
-    padding: 16,
-    borderRadius: 8,
     alignItems: 'center',
   },
-  buttonText: {
+  logo: {
+    width: 150,
+    height: 150,
+    marginBottom: 40,
+  },
+  inner: {
+    width: '100%',
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  input: {
+    width: '100%',
+    height: 50,
+    borderColor: '#fff',
+    borderWidth: 2,
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
     color: '#fff',
-    fontSize: 18,
+  },
+  button: {
+    backgroundColor: '#fff',
+    padding: 12,
+    width: '100%',
+    borderRadius: 50,
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  buttonText: {
+    color: '#99BC85',
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   errorText: {
     color: 'red',
     marginBottom: 10,
     textAlign: 'center',
+  },
+  haveanaccountContainer: {
+    width: '100%',
+    alignItems: 'flex-end',
+  },
+  haveanaccount: {
+    color: '#fff',
+    marginTop: 20,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 

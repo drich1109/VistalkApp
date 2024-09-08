@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import db
 from flask_cors import CORS
-from Services import user, section, content, question, shop
+from Services import user, section, content, question, shop, emailService
 
 app = Flask(__name__)
 CORS(app)
@@ -109,6 +109,7 @@ def registerVista():
 @app.route('/loginVista', methods=['GET'])
 def loginVista():
     return user.loginVista()
+
 @app.route('/getQuestions', methods=['GET'])
 def getQuestions():
     return question.get_Questions()
@@ -120,6 +121,18 @@ def getMultipleChoice():
 @app.route('/getMatchingType', methods=['GET'])
 def getMatchingType():
     return question.get_matching_type()  
+
+@app.route('/forgotPassword', methods=['GET'])
+def forgotPassword():
+    return emailService.send_code_to_email()  
+
+@app.route('/verifyCode', methods=['GET'])
+def verifyCode():
+    return emailService.verify_code()  
+
+@app.route('/changePassword', methods=['PUT'])
+def changePassword():
+    return user.forgotPassword()  
 
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
