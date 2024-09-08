@@ -10,6 +10,8 @@ import Dashboard from './routes/Dashboard';
 import Dictionary from './routes/Dictionary';
 import Practice from './routes/Practice';
 import Shop from './routes/Shop';
+import ForgotPassword from './routes/ForgotPassword';
+import SetNewPassword from './routes/SetNewPassword';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -55,6 +57,16 @@ const App: React.FC = () => {
                 <Stack.Screen
           name="Shop"
           component={Shop}
+          options={{ headerShown: false }}
+        />
+          <Stack.Screen
+          name="ForgotPassword"
+          component={ForgotPassword}
+          options={{ headerShown: false }}
+        />
+          <Stack.Screen
+          name="SetNewPassword"
+          component={SetNewPassword}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

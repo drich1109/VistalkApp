@@ -45,7 +45,8 @@ export async function getMatchingType(questionMatchingTypeID:number) {
 	let result =  await get<CallResultDto<MatchingType>>(`/getMatchingType`,{questionMatchingTypeID});
 	console.log(result)
     return result;
-  
+}
+
 export async function sectionInactive(sectionID:number) {
 	return await put<CallResultDto<object>>(`/sectionInactive`, {sectionID});
 }

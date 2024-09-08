@@ -2,7 +2,14 @@
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from flask import request
+from flask import request, jsonify
+import random
+import string
+from datetime import datetime, timedelta
+from db import get_db_connection
+
+def generate_confirmation_code():
+    return ''.join(random.choices(string.digits, k=6))
 
 def send_email(recipient_email, subject, message):
     if not recipient_email:
@@ -28,7 +35,103 @@ def send_email(recipient_email, subject, message):
         server.send_message(msg)
         server.quit()
         
-        return "Email sent successfully"
+        return jsonify({
+            'isSuccess': True,
+            'message': 'Email successfuly sent',
+            'data': None,
+            'data2': None,
+            'totalCount': None
+        }), 200
     
     except Exception as e:
         return f"Failed to send email: {str(e)}", 500
+    
+def store_verification_code(email):
+    confirmation_code = generate_confirmation_code()
+    expiration_time = datetime.now() + timedelta(minutes=10)  # Code expires in 10 minutes
+    conn = get_db_connection()
+
+    cursor = conn.cursor()
+
+    # Insert the verification details into the table
+    cursor.execute("""
+        INSERT INTO email_verifications (email, confirmation_code, expiration_time)
+        VALUES (%s, %s, %s)
+    """, (email, confirmation_code, expiration_time))
+
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return confirmation_code
+
+def send_code_to_email():
+    email = request.args.get('email')
+    confirmation_code = store_verification_code(email)
+    subject = "Your Verification Code"
+    message = f"Your verification code is: {confirmation_code}"
+    
+    send_email(email, subject, message)
+    return jsonify({
+                'isSuccess': True,
+                'message': 'Code sent successfully, please check your email.',
+                'data': None,
+                'data2': None,
+                'totalCount': None
+            }), 200 
+
+def verify_code():
+    email = request.args.get('email')
+    code = request.args.get('code')
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT confirmation_code, expiration_time, is_verified
+        FROM email_verifications
+        WHERE email = %s AND confirmation_code = %s
+    """, (email, code))
+    
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if result:
+        confirmation_code, expiration_time, is_verified = result
+        if datetime.now() > expiration_time:
+            return jsonify({
+                'isSuccess': False,
+                'message': 'Code is already expired, try resending code',
+                'data': None,
+                'data2': None,
+                'totalCount': None
+            }), 200
+        elif is_verified:
+            return jsonify({
+            'isSuccess': False,
+            'message': 'Code is already expired, try resending code',
+            'data': None,
+            'data2': None,
+            'totalCount': None
+        }), 200
+        elif confirmation_code == code:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE email_verifications
+                SET is_verified = TRUE
+                WHERE email = %s
+            """, (email,))
+            conn.commit()
+            cursor.close()
+            conn.close()
+            
+            return jsonify({
+            'isSuccess': True,
+            'message': 'Email verified',
+            'data': None,
+            'data2': None,
+            'totalCount': None
+        }), 200
+    else:
+        return "Invalid code"

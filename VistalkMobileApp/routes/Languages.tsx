@@ -17,7 +17,7 @@ import {RootStackParamList} from '../types';
 type Props = StackScreenProps<RootStackParamList, 'Languages'>;
 
 const LanguageList: React.FC<Props> = ({route, navigation}) => {
-  const {userDto} = route.params; // Extract userDto from the route parameters
+  const {userDto} = route.params;
 
   console.log(userDto); // Log userDto to verify it's being received correctly
 
