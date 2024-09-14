@@ -12,6 +12,7 @@ import Practice from './routes/Practice';
 import Shop from './routes/Shop';
 import ForgotPassword from './routes/ForgotPassword';
 import SetNewPassword from './routes/SetNewPassword';
+import DictionaryMeaning from './routes/DictionaryMeaning';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -47,6 +48,11 @@ const App: React.FC = () => {
         <Stack.Screen
           name="Dictionary"
           component={Dictionary}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="DictionaryMeaning"
+          component={DictionaryMeaning}
           options={{ headerShown: false }}
         />
                 <Stack.Screen

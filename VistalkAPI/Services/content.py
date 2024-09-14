@@ -1,9 +1,9 @@
 # user.py
-from db import get_db_connection, PronunciationDictionary, SyllableDirectory
+from db import get_db_connection, PronunciationDirectory, SyllableDirectory
 from flask import request, jsonify, send_from_directory
 import os
 
-PronunciationFolder = PronunciationDictionary
+PronunciationFolder = PronunciationDirectory
 Syllables =  SyllableDirectory
 
 if not os.path.exists(Syllables):
