@@ -5,7 +5,8 @@ import Menu from '../components/Menu'; // Adjust the import path as needed
 const Shop: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Hi, this is the shop</Text>
+      <Text style={styles.text}>Hi, this is the shop
+      </Text>
       <Menu />
     </View>
   );

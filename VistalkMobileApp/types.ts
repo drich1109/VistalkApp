@@ -11,6 +11,7 @@ export type RootStackParamList = {
   Dashboard:undefined;
   Shop:undefined;
   Dictionary:undefined;
+  DictionaryMeaning:undefined;
   Practice:undefined;
   ForgotPassword:undefined;
   SetNewPassword:{email:string};
@@ -24,6 +25,7 @@ export type DashboardScreenNavigationProp = NativeStackNavigationProp<RootStackP
 export type ShopScreenNavigatorProp = NativeStackNavigationProp<RootStackParamList, 'Shop'>;
 export type PracticeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Practice'>;
 export type DictionaryScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Dictionary'>;
+export type DictionaryMeaningScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'DictionaryMeaning'>;
 export type ForgotPasswordScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ForgotPassword'>;
 export type SetNewPasswordScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'SetNewPassword'>;
 
