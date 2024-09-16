@@ -78,6 +78,7 @@
     function closeUnit()
     {
         showUnits = false;
+        getSectionDisplay();
     }
 
     async function getSectionDisplay()

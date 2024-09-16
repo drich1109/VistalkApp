@@ -305,3 +305,91 @@ def forgotPassword():
                     'data2': None,
                     'totalCount': None
                 }), 200
+
+def get_Users():
+    searchString = request.args.get('searchString')
+    pageNo = int(request.args.get('pageNo', 1))
+    isShowSubscriber = request.args.get('isShowSubscriber')
+    showInactive = request.args.get('showInactive')
+    print(isShowSubscriber, showInactive)
+
+    if(isShowSubscriber == 'false'):
+        isShowSubscriber = 0
+    else:
+        isShowSubscriber = 1
+    
+    if(showInactive == 'false'):
+        showInactive = 0
+    else:
+        showInactive = 1
+    
+    pageSize = 15
+    offset = (pageNo - 1) * pageSize
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    query = """
+        SELECT v.*, u.name, u.email, u.imagePath
+        FROM vista v
+        INNER JOIN user u ON u.userId = v.userPlayerId
+        WHERE (%s = False or u.isActive = 1) AND u.Isplayer = TRUE AND (%s = False OR v.isPremium = 1)
+    """
+    
+    values = [showInactive, isShowSubscriber]
+
+    if searchString:
+        query += " AND (u.name LIKE %s OR u.email LIKE %s)"
+        likePattern = f"%{searchString}%"
+        values.extend([likePattern, likePattern])
+
+    query += """
+        ORDER BY u.name
+        LIMIT %s OFFSET %s
+    """
+    values.extend([pageSize, offset])
+
+    cursor.execute(query, tuple(values))
+    users = cursor.fetchall()
+    print(users)
+    for user in users:
+        user['powerUps'] = get_UserPowerUps(user['userPlayerId'])
+
+    count_query = """
+        SELECT COUNT(*) AS total 
+        FROM vista v
+        INNER JOIN user u ON u.userId = v.userPlayerId
+        WHERE u.isActive = TRUE AND u.Isplayer = TRUE
+    """
+    
+    count_values = []
+    
+    if searchString:
+        count_query += " AND (u.name LIKE %s OR u.email LIKE %s)"
+        count_values.extend([likePattern, likePattern])
+
+    cursor.execute(count_query, tuple(count_values))
+    total_count = cursor.fetchone()['total']
+
+    if not users:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No users found',
+            'data': [],
+            'totalCount': 0
+        }), 200
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully retrieved',
+        'data': users,
+        'totalCount': total_count
+    }), 200
+
+def get_UserPowerUps(userID):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = "SELECT p.name, ui.itemId, ui.quantity FROM powerUp p inner join userItem ui on ui.itemId = p.itemID WHERE userplayerID = %s;"
+    values = (userID,)
+    cursor.execute(query, values)
+    powerUps = cursor.fetchall()
+    return powerUps

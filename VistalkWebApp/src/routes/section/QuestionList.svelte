@@ -2,9 +2,8 @@
     import { redirectIfLoggedIn } from '$lib/shortcuts';
     import { createEventDispatcher, onMount } from 'svelte';
     import type { QuestionDto, QuestionType, Content, MultipleChoice } from './type';
-    import { getQuesions, getQuestionTypes, getMultipleChoice, getChoices } from './repo';
+    import { getQuesions, getQuestionTypes, getMultipleChoice, getChoices, getQuestionFile, questionInactive } from './repo';
     import AddQuestionPopup from './AddQuestionPopup.svelte';
-    import Unit from './Unit.svelte';
     import type { Language } from '../type';
     import { getLanguages } from '../repo';
     import type { CallResultDto } from '../../types/types';
@@ -14,7 +13,7 @@
     import MultipleChoiceEng from '$lib/components/MultipleChoiceEng.svelte';
     import MultipleChoiceNat from '$lib/components/MultipleChoiceNat.svelte';
     import type { QuestionMatchingTypeDto, QuestionMultipleDto } from '$lib/api/componentType';
-    import { getFileByFileName } from '../contents/repo';
+    import Loader from '$lib/components/Loader.svelte';
 
     export let languageId:number;
     export let unitId:number;
@@ -24,7 +23,7 @@
     let showModal:boolean = false;
     let isAdd:boolean = false;
     let pageNo:number =1;
-    let questionID: number = 0;
+    let fileUrl: string = "";
     let question: QuestionDto;
     let searchString:string | null = null;
     let questionList: QuestionDto [] = [];
@@ -36,6 +35,8 @@
     let contents: Content[] = [];
     let multiple: MultipleChoice;
     let searchQueries: string[] = ['', '', '', ''];
+    let fileType: 'audio' | 'image' | null = null;
+    let isLoading: boolean = false;
 
     let mainQuestion: QuestionMultipleDto = {
         questionID: 0,
@@ -82,14 +83,15 @@
         const questionTypeCallResult = await getQuestionTypes();
         questionTypes = questionTypeCallResult.data;
         const languageCallResult = await getLanguages();
-        languageType = languageCallResult.data;
-        
+        languageType = languageCallResult.data; 
     });
     
     async function refresh()
     {
+        isLoading = true;
         questionCallResult = await getQuesions(unitId, pageNo, searchString);
         questionList = questionCallResult.data;
+        isLoading = false;
     }
 
     function handlePageChange(event:CustomEvent) {
@@ -133,6 +135,7 @@
         showNativeMultiple = false;
         showMatchingType = false;
         showMatchingTypeEng = false;
+        refresh();
     }
 
     function goBackToUnit()
@@ -149,10 +152,12 @@
         matchQuestion.questionID = quest.questionID;
         mainQuestion.questionTypeID = currentType;
             matchQuestion.questionTypeID = currentType;
+            mainQuestion.audioPath = quest.audioPath;
+            mainQuestion.imagePath = quest.imagePath;
             switch (currentType) {
                 case 2:
                     const result = await getMultipleChoice(quest.questionID);
-                    multiple = result.data;                  
+                    multiple = result.data; 
                     mainQuestion.choice1 = multiple.choice1
                     mainQuestion.choice2 = multiple.choice2
                     mainQuestion.choice3 = multiple.choice3
@@ -160,12 +165,30 @@
                     mainQuestion.correctChoice = multiple.correctChoice
                     mainQuestion.questionText = quest.questionText
                     searchQueries = [
-                    mapChoiceToContentText(mainQuestion.choice1),
-                    mapChoiceToContentText(mainQuestion.choice2),
-                    mapChoiceToContentText(mainQuestion.choice3),
-                    mapChoiceToContentText(mainQuestion.choice4),
-                ];
-                    console.log(mainQuestion)
+                        mapChoiceToContentText(mainQuestion.choice1),
+                        mapChoiceToContentText(mainQuestion.choice2),
+                        mapChoiceToContentText(mainQuestion.choice3),
+                        mapChoiceToContentText(mainQuestion.choice4),
+                    ];
+                    
+                    if(mainQuestion.imagePath != null){
+                        const fileBlob = await getQuestionFile(mainQuestion.imagePath);
+                        if (fileBlob != null) {
+                            fileUrl = URL.createObjectURL(fileBlob);
+                            mainQuestion.file = new File([fileBlob], mainQuestion.imagePath, { type: fileBlob.type });
+                        }
+                        fileType = 'image';
+                        }
+                        else if (mainQuestion.audioPath != null)
+                        {
+                             const fileBlob = await getQuestionFile(mainQuestion.audioPath);
+                             if (fileBlob != null) {
+                            fileUrl = URL.createObjectURL(fileBlob);
+                            mainQuestion.file = new File([fileBlob], mainQuestion.audioPath, { type: fileBlob.type });
+                        }
+                        fileType='audio';
+                    }
+
                     showNativeMultiple = true;
                     showEnglishMultiple = false;
                     showMatchingTypeEng = false;
@@ -174,13 +197,36 @@
                 case 1:
                     const Engresult = await getMultipleChoice(quest.questionID);
                     multiple = Engresult.data;
-               
                     mainQuestion.choice1 = multiple.choice1
                     mainQuestion.choice2 = multiple.choice2
                     mainQuestion.choice3 = multiple.choice3
                     mainQuestion.choice4 = multiple.choice4
                     mainQuestion.correctChoice = multiple.correctChoice
                     mainQuestion.questionText = quest.questionText
+                    searchQueries = [
+                        mapChoiceToPronunciation(mainQuestion.choice1),
+                        mapChoiceToPronunciation(mainQuestion.choice2),
+                        mapChoiceToPronunciation(mainQuestion.choice3),
+                        mapChoiceToPronunciation(mainQuestion.choice4),
+                    ];
+                    
+                    if(mainQuestion.imagePath != null){
+                        const fileBlob = await getQuestionFile(mainQuestion.imagePath);
+                        if (fileBlob != null) {
+                            fileUrl = URL.createObjectURL(fileBlob);
+                            mainQuestion.file = new File([fileBlob], mainQuestion.imagePath, { type: fileBlob.type });
+                        }
+                        fileType = 'image';
+                        }
+                        else if (mainQuestion.audioPath != null)
+                        {
+                             const fileBlob = await getQuestionFile(mainQuestion.audioPath);
+                             if (fileBlob != null) {
+                            fileUrl = URL.createObjectURL(fileBlob);
+                            mainQuestion.file = new File([fileBlob], mainQuestion.audioPath, { type: fileBlob.type });
+                        }
+                        fileType='audio';
+                    }
 
                     showNativeMultiple = false;
                     showEnglishMultiple = true;
@@ -211,15 +257,30 @@
     const content = contents.find(c => c.contentID === choiceId);
     return content ? content.contentText : '';
 }
+
+function mapChoiceToPronunciation(choiceId: number): string {
+    const content = contents.find(c => c.contentID === choiceId);
+    return content ? content.englishTranslation : '';
+}
+
+async function setInactive(questionID:number, unitID:number){ 
+    await questionInactive(questionID, unitID);
+    refresh();
+}
+
 </script>
+
+{#if isLoading}
+    <Loader {isLoading}></Loader>
+{/if}
 {#if showModal}
     <AddQuestionPopup {languageId} {questionTypes} {unitId} {showModal} on:close={closeModal} on:refresh={refresh}></AddQuestionPopup>
 {/if}
 {#if showEnglishMultiple === true}
-    <MultipleChoiceEng modelOpen={showEnglishMultiple} choices={contents} mainQuestion={mainQuestion} on:close={closeModal}></MultipleChoiceEng>
+    <MultipleChoiceEng modelOpen={showEnglishMultiple} choices={contents} mainQuestion={mainQuestion} {searchQueries} {fileType} {fileUrl}  on:close={closeModal}></MultipleChoiceEng>
 {/if}
 {#if showNativeMultiple === true}
-    <MultipleChoiceNat modelOpen={showNativeMultiple} choices={contents} mainQuestion={mainQuestion} {searchQueries}  on:close={closeModal}></MultipleChoiceNat>
+    <MultipleChoiceNat modelOpen={showNativeMultiple} choices={contents} mainQuestion={mainQuestion} {searchQueries} {fileType} {fileUrl} on:close={closeModal}></MultipleChoiceNat>
 {/if}
 {#if showMatchingType === true}
     <MatchingType modelOpen={showMatchingType} choices={contents} mainQuestion={matchQuestion} on:close={closeModal}></MatchingType>
@@ -244,12 +305,6 @@
         </div>
     </div>
     <div class="flex gap-4">
-        <select class="font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
-            <option class="py-2" value={0}>-- Select Language --</option>
-            {#each languageType as language}
-            <option class="py-2" value={language.languageID}>{language.name}</option>
-            {/each}
-        </select>
         <button on:click={()=> openModal(true,null)} class="flex items-center font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
             <svg xmlns="http://www.w3.org/2000/svg" class="text-white mr-2" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M13 6.5V11h4.5v2H13v4.5h-2V13H6.5v-2H11V6.5z"/></svg>
             Add Question
@@ -261,10 +316,7 @@
     <table class="bg-white w-full shadow-lg rounded-xl">
         <thead class="font-['Cambria'] bg-[#99BC85] text-white  text-center">
             <tr class="first:rounded-t-xl last:rounded-b-xl">
-                <th class="px-4 py-2 first:rounded-tl-xl last:rounded-tr-xl">Question Id</th>
                 <th class="px-4 py-2">Questions</th>
-                <th class="px-4 py-2">Image</th>
-                <th class="px-4 py-2">Audio</th>
                 <th class="px-4 py-2">Question Type</th>
                 <th class="px-4 py-2 first:rounded-tl-xl last:rounded-tr-xl">Action</th>
             </tr>
@@ -273,14 +325,14 @@
             {#if questionCallResult.totalCount != null && questionCallResult.totalCount > 0}
             {#each questionList as q}
                 <tr class="border-t-2 mx-4">
-                    <td class="px-4 py-2">{q.questionID}</td>
                     <td class="px-4 py-2">{q.questionText}</td>
-                    <td class="px-4 py-2">{q.imagePath}</td>
-                    <td class="px-4 py-2">{q.audioPath}</td>
                     <td class="px-4 py-2">{q.typeName}</td> 
                     <td class="flex justify-center items-center px-4 py-2 gap-4">
                         <button on:click={() => editQuestion(q)}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"/></g></svg>
+                        </button>
+                        <button on:click={() => setInactive(q.questionID, q.unitId)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h4a1 1 0 1 1 0 2h-1.069l-.867 12.142A2 2 0 0 1 17.069 22H6.93a2 2 0 0 1-1.995-1.858L4.07 8H3a1 1 0 0 1 0-2h4zm2 2h6V4H9zM6.074 8l.857 12H17.07l.857-12zM10 10a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1m4 0a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1"/></svg>
                         </button>
                     </td>
             </tr>

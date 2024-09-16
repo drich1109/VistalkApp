@@ -134,5 +134,33 @@ def verifyCode():
 def changePassword():
     return user.forgotPassword()  
 
+@app.route('/getItemList', methods=['GET'])
+def getItemList():
+    return shop.get_items()  
+
+@app.route('/getShopFileByFileName', methods=['GET'])
+def getShopFileByFileName():
+    return shop.getShopFileByFileName()  
+
+@app.route('/itemInactive', methods=['PUT'])
+def setItemInactive():
+    return shop.itemInactive()  
+
+@app.route('/coinBagInactive', methods=['PUT'])
+def coinBagInactive():
+    return shop.coinBagInactive()
+
+@app.route('/getQuestionFiles', methods=['GET'])
+def getQuestionFile():
+    return question.getQuestionFile()  
+
+@app.route('/getusers', methods=['GET'])
+def get_Users():
+    return user.get_Users()  
+
+@app.route('/getuserPowerUps', methods=['GET'])
+def get_UserPowerUps():
+    return user.get_UserPowerUps()  
+
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

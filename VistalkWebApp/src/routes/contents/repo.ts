@@ -20,9 +20,11 @@ export async function saveMainContent(content: ContentDto) {
     formData.append('contentTypeId', content.content.contentTypeId.toString());
     formData.append('audioPath', content.content.audioPath.toString());
     if (content.content.file) {
-        const file = new File([content.content.file], 'audio.mp3', { type: 'audio/mp3' });
+        const file = new File([content.content.file], 'audio.wav', { type: 'audio/wav' });
         formData.append('contentAudioFile', file);
     }
+    console.log(content.syllables);
+
     content.syllables.forEach((syllable, index) => {
         formData.append(`syllables[${index}].id`, syllable.id.toString());
         formData.append(`syllables[${index}].contentId`, syllable.contentId.toString());
@@ -31,7 +33,7 @@ export async function saveMainContent(content: ContentDto) {
         formData.append(`syllables[${index}].orderNumber`, syllable.orderNumber.toString());
 
         if (syllable.file) {
-            const file = new File([syllable.file], 'audio.mp3', { type: 'audio/mp3' });
+            const file = new File([syllable.file], 'audio.wav', { type: 'audio/wav' });
             formData.append(`syllables[${index}].audioFile`, file);
         }
     });

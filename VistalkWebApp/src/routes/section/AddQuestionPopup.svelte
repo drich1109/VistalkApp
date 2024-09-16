@@ -22,7 +22,8 @@
     let showMatchingTypeEng: boolean = false;
     let contents: Content[] = [];
     let searchQueries: string[] = ['', '', '', ''];
-
+    let fileType: 'audio' | 'image' | null = null;
+    let fileUrl: string = "";
 
     let mainQuestion: QuestionMultipleDto = {
         questionID: 0,
@@ -106,22 +107,18 @@
         showEnglishMultiple = false;
         showAudioType = false;
         showMatchingType = false;
-        showModal=true;
-    }
-
-    async function refresh() {
-        const questionCallResult = await getQuestionTypes();
-        questionTypes = questionCallResult.data;
+        showModal=false;
+        dispatch('refresh')
     }
 
 </script>
 
 {#if showEnglishMultiple}
-<MultipleChoiceEnglish modelOpen={showEnglishMultiple} choices={contents} mainQuestion={mainQuestion} on:close={closeModal} />
+<MultipleChoiceEnglish modelOpen={showEnglishMultiple} choices={contents} mainQuestion={mainQuestion} {searchQueries} {fileType} {fileUrl} on:close={closeModal} />
 {/if}
 
 {#if showNativeMultiple}
-<MultipleChoiceNative modelOpen={showNativeMultiple} choices={contents} mainQuestion={mainQuestion} {searchQueries} on:close={closeModal} />
+<MultipleChoiceNative modelOpen={showNativeMultiple} choices={contents} mainQuestion={mainQuestion} {searchQueries} {fileType} {fileUrl} on:close={closeModal} />
 {/if}
 
 {#if showMatchingType}
