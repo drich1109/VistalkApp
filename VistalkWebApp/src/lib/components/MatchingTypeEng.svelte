@@ -52,6 +52,7 @@
         mainQuestion.match4 = mainQuestion.choice4;
         console.log(mainQuestion);
         await save_questionMatch(mainQuestion);
+        closeModal();
     }
 
     function handleInputChange(index: number, side: 'left' | 'right', event: Event) {
@@ -127,6 +128,7 @@
               <input
                   id="choice-left-{i}" 
                   type="text" 
+                  autocomplete="off"
                   placeholder={`Match ${i}`} 
                   bind:value={leftQueries[i-1]}
                   on:input={(event) => handleInputChange(i-1, 'left', event)}
@@ -136,6 +138,7 @@
               <input
                   id="choice-right-{i}" 
                   type="text" 
+                  autocomplete="off"
                   placeholder={`Answer ${i}`} 
                   value={rightQueries[i-1]}
                   on:focus={() => handleRightInputFocus(i-1)}

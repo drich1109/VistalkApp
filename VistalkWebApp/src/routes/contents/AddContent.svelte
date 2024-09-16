@@ -11,12 +11,17 @@
   
     let contentTypes: ContentType[] = [];
     let syllables = content.syllables;
-    let syllableOrderNumber: number = 1;
+    let syllableOrderNumber = content.syllables.length > 0 
+      ? Math.max(...content.syllables.map(s => s.orderNumber)) + 1 
+      : 1;
     let definitions = content.definitions
-    let definitionOrderNumber:number = 1;
+    let definitionOrderNumber = content.definitions.length > 0 
+        ? Math.max(...content.definitions.map(d => d.orderNumber)) + 1 
+        : 1;
     let examples = content.examples
-    let exampleOrderNumber:number = 1;
-  
+    let exampleOrderNumber = content.examples.length > 0 
+        ? Math.max(...content.examples.map(e => e.orderNumber)) + 1 
+        : 1;  
     const dispatch = createEventDispatcher();
   
     const isAccordionOpen1 = writable(false);
@@ -61,30 +66,44 @@
 
 
     function togglePlayPause() {
-      if (content.content.audio) {
-        if (content.content.audio.paused) {
-            content.content.audio.play();
-          content.content.isPlaying=true;
-        } else {
-            content.content.audio.pause();
-            content.content.isPlaying=false;
-        }
+    if (content.content.audio) {
+      if (content.content.audio.paused) {
+        content.content.audio.play();
+        content.content.isPlaying = true;
+
+        content.content.audio.onended = () => {
+          content.content.isPlaying = false;
+        };
+      } else {
+        content.content.audio.pause();
+        content.content.isPlaying = false;
       }
     }
-  
-    function togglePlayPauseSyllable(sylla:SyllableDto) {
-        if(sylla.audio){
-            if (sylla.isPlaying) {
-            sylla.audio.pause();
-            sylla.isPlaying = false;
-            } else {
-            sylla.audio.play();
-            sylla.isPlaying = true;
-            }
-        }
-        sylla = { ...sylla, isPlaying: !sylla.isPlaying };
-        syllables = syllables.map(s => (s === sylla ? sylla : s));
   }
+    
+  function togglePlayPauseSyllable(sylla: SyllableDto) {
+    if (sylla.audio) {
+        if (sylla.audio.paused) {
+            sylla.audio.play();
+            syllables = syllables.map(s => 
+                s === sylla ? { ...sylla, isPlaying: true } : s
+            );
+
+            sylla.audio.onended = () => {
+                syllables = syllables.map(s => 
+                    s.orderNumber === sylla.orderNumber ? { ...sylla, isPlaying: false } : s
+                );
+            };
+        } else {
+            sylla.audio.pause();
+            syllables = syllables.map(s => 
+                s === sylla ? { ...sylla, isPlaying: false } : s
+            );
+        }
+    }
+}
+
+
   
     function closeModal() {
       dispatch('close');
@@ -135,8 +154,8 @@
     }
 
     function removeSyllable(index: number) {
-      syllables.splice(index, 1); // Directly modify the array using splice
-      syllables = [...syllables]; // Reassign to trigger reactivity
+      syllables.splice(index, 1); 
+      syllables = [...syllables]; 
     }
 
     function addDefinition() {
@@ -146,7 +165,7 @@
     }
 
     function removeDefinition(index: number){
-      definitions.splice(index, 1); // Directly modify the array using splice
+      definitions.splice(index, 1); 
       definitions = [...definitions];
     }
 
@@ -162,24 +181,24 @@
     }
 
     async function saveContent() {
-    content.syllables = syllables;
+        content.syllables = syllables;
 
-    content.examples = examples;
-    content.definitions = definitions;
-    if (content.content.contentID == 0) {
-      await saveMainContent(content);
-    }
-    else {
-      content.syllables.forEach((syllable) => {
-        syllable.contentId = content.content.contentID
-    });
-    content.examples.forEach((examples) => {
-        examples.contentId = content.content.contentID
-    });
-    content.definitions.forEach((definitions) => {
-        definitions.contentID = content.content.contentID
-    });
-    await saveMainContent(content);
+        content.examples = examples;
+        content.definitions = definitions;
+        if (content.content.contentID == 0) {
+          await saveMainContent(content);
+        }
+        else {
+          content.syllables.forEach((syllable) => {
+            syllable.contentId = content.content.contentID
+        });
+        content.examples.forEach((examples) => {
+            examples.contentId = content.content.contentID
+        });
+        content.definitions.forEach((definitions) => {
+            definitions.contentID = content.content.contentID
+        });
+        await saveMainContent(content);
     }
 
     dispatch('refresh');
@@ -276,7 +295,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/></svg>
                               </label>
                               <input 
-                              type="file" class="file-input" accept=".mp3" style="visibility: hidden;" id="file"
+                              type="file" class="file-input" accept=".wav" style="visibility: hidden;" id="file"
                             on:change={(event) => handleFile(event)}/>
                             </div>
                             </div>
@@ -286,7 +305,7 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/></svg>
                               </label>
                               <input 
-                              type="file" class="file-input" accept=".mp3" style="visibility: hidden;" id="file"
+                              type="file" class="file-input" accept=".wav" style="visibility: hidden;" id="file"
                             on:change={(event) => handleFile(event)}/>
                             </div>
                             {/if}
@@ -344,9 +363,9 @@
                                         {#if sylla.audio != null}
                                         <div class="flex items-justify">
                                           <button 
-                                              on:click={togglePlayPause} 
+                                              on:click={() => togglePlayPauseSyllable(sylla)} 
                                               class=" mr-2 text-gray-600 focus:outline-none hover:text-gray-700">
-                                              {#if sylla.isPlaying}
+                                              {#if sylla.isPlaying == true}
                                               <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 32 32"><path fill="black" d="M14 10h-2v12h2zm6 0h-2v12h2z"/><path fill="black" d="M16 4A12 12 0 1 1 4 16A12 12 0 0 1 16 4m0-2a14 14 0 1 0 14 14A14 14 0 0 0 16 2"/></svg>      
                                               {:else}
                                               <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 20 20"><path fill="black" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07m12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32M7 6l8 4l-8 4z"/></svg>
@@ -356,14 +375,14 @@
                                           {sylla.audioPath}
                                         </div>
                                         <div class="flex items-center">
-                                          <label for="filesylla" class="py-2 px-3 cursor-pointer">
+                                          <label for="filesylla{sylla.orderNumber}" class="py-2 px-3 cursor-pointer">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
                                               <path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/>
                                             </svg>
                                           </label>
                                           <input 
-                                            type="file" class="file-input" accept=".mp3" 
-                                            style="position: absolute; left: -9999px;" id="filesylla"
+                                            type="file" class="file-input" accept=".wav" 
+                                            style="position: absolute; left: -9999px;" id="filesylla{sylla.orderNumber}"
                                             on:change={(event) => handleFile(event, sylla)}/>
                                         </div>                                        
                                         </div>
@@ -373,7 +392,7 @@
                                             <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/></svg>
                                           </label>
                                           <input 
-                                          type="file" class="file-input" accept=".mp3" style="position: absolute; left: -9999px;"  id="filesylla{sylla.orderNumber}"
+                                          type="file" class="file-input" accept=".wav" style="position: absolute; left: -9999px;"  id="filesylla{sylla.orderNumber}"
                                         on:change={(event) => handleFile(event, sylla)}/>
                                         </div>
                                         {/if}

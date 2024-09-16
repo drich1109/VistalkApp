@@ -3,6 +3,8 @@ import type { CallResultDto } from "../../types/types";
 import type { Language } from "../type";
 import type { Content, MatchingType, MultipleChoice, QuestionDto, QuestionType, Section, Unit } from "./type";
 
+const baseUrl = import.meta.env.VITE_BASE_API;
+
 export async function saveSection(section:Section) {
 	return await post<CallResultDto<object>>(`/saveSection`, {}, section);
 }
@@ -38,12 +40,10 @@ export async function getQuesions(unitId:number, pageNo:number, searchString :st
 
 export async function getMultipleChoice(questionID:number) {
 	let result =  await get<CallResultDto<MultipleChoice>>(`/getMultipleChoice`,{questionID});
-	console.log(result)
     return result;
 }
 export async function getMatchingType(questionMatchingTypeID:number) {
 	let result =  await get<CallResultDto<MatchingType>>(`/getMatchingType`,{questionMatchingTypeID});
-	console.log(result)
     return result;
 }
 
@@ -53,4 +53,28 @@ export async function sectionInactive(sectionID:number) {
 
 export async function unitInactive(unitID:number) {
 	return await put<CallResultDto<object>>(`/unitInactive`, {unitID});
+}
+
+export async function getQuestionFile(fileName: string): Promise<Blob | null> {
+    try {
+        const response = await fetch(`${baseUrl}/getQuestionFiles?fileName=${fileName}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/octet-stream'
+            }
+        });
+        if (response.ok) {
+            return await response.blob();
+        } else {
+            console.error(`Failed to fetch file: ${response.statusText}`);
+            return null;    
+        }
+    } catch (error) {
+        console.error(`Failed to fetch file:`, error);
+        return null;
+    }
+}
+
+export async function questionInactive(questionID:number, unitID:number) {
+	return await put<CallResultDto<object>>(`/questionInactive`, {questionID, unitID});
 }

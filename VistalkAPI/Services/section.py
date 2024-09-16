@@ -30,12 +30,37 @@ def save_section():
     conn = get_db_connection()
     cursor = conn.cursor()
     if(section_id == 0 or section_id is None):
+
+        query = "SELECT * FROM section WHERE sectionNumber = %s"
+        cursor.execute(query, (section_number,))
+        existing_section = cursor.fetchone()
+        if existing_section:
+            return jsonify({
+                'isSuccess': False,
+                'message': 'Section Number is already existing. Please select another section number.',
+                'data': None,
+                'data2': None,
+                'totalCount': None
+            }), 200
+        
         query = """
         INSERT INTO section (sectionNumber, title, isPremium, description, languageID)
         VALUES (%s, %s, %s, %s, %s)
         """
         values = (section_number, title, is_premium, description, langID)
     else:
+        query = "SELECT * FROM section WHERE sectionNumber = %s AND sectionId != %s"
+        cursor.execute(query, (section_number, section_id))
+        conflicting_section = cursor.fetchone()
+        if conflicting_section:
+            return jsonify({
+                'isSuccess': False,
+                'message': 'Section Number is already existing. Please select another section number.',
+                'data': None,
+                'data2': None,
+                'totalCount': None
+            }), 200
+        
         query = """
         UPDATE section SET sectionNumber = %s, title = %s, isPremium = %s, description = %s WHERE sectionId = %s
         """

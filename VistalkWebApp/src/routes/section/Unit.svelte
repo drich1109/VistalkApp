@@ -96,6 +96,7 @@
     function closeQuestion()
     {
         showQuestion = false;
+        refresh();
     }
 
     async function setInactive(id:number){ await unitInactive(id); refresh();}
