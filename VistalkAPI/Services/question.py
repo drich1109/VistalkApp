@@ -1,9 +1,9 @@
 # user.py
-from db import get_db_connection
+from db import get_db_connection, QuestionFiles
 from flask import request, jsonify, send_from_directory
 import os
 
-QuestionFiles =  'D:\Capstone 2\VistalkApp\QuestionFile'
+QuestionFiles =  QuestionFiles
 
 def get_QuestionTypes():
     conn = get_db_connection()
@@ -83,6 +83,7 @@ def get_Questions():
             q.questionTypeID = qt.typeID
         WHERE 
             q.unitId = %s
+            AND q.isActive = true
     """
     values = [unitId]
 
@@ -149,13 +150,21 @@ def save_questionMultiple():
     cursor = conn.cursor()
 
     if question_ID == 0 or question_ID is None:
-        # Insert a new question
         query = """INSERT INTO question (questionText, unitId, questionTypeID) VALUES (%s, %s, %s)"""
         values = (question_text, unit_id, questionTypeID)
         cursor.execute(query, values)
         conn.commit()
-
         question_id = cursor.lastrowid
+
+        query_update = """
+        UPDATE unit 
+        SET totalItems = totalItems + 1
+        WHERE unitID = %s
+        """
+        values_update = (unit_id,)
+        cursor.execute(query_update, values_update)
+        conn.commit()
+
         file = request.files.get('file')
 
         if file:
@@ -200,16 +209,20 @@ def save_questionMultiple():
 
         if file:
             if image_path or audio_path:
-                print("tae aldruch")
 
                 if image_path:
+                    print(question_ID)
                     safe_filename = f"{question_text.replace(' ', '_')}.png"
-                    cursor.execute('UPDATE question SET imagePath = %s WHERE questionId = %s', (safe_filename, question_ID))
+                    cursor.execute('UPDATE question SET imagePath = %s, audioPath = null WHERE questionId = %s', (safe_filename, question_ID))
+                    conn.commit()
                     file_path = os.path.join(QuestionFiles, safe_filename)
                     file.save(file_path)
                 elif audio_path:
+                    print(question_ID)
                     safe_filename = f"{question_text.replace(' ', '_')}.mp3"
-                    cursor.execute('UPDATE question SET audioPath = %s WHERE questionId = %s', (safe_filename, question_ID))
+                    print(safe_filename)
+                    cursor.execute('UPDATE question SET audioPath = %s, imagePath = null WHERE questionId = %s', (safe_filename, question_ID))
+                    conn.commit()
                     file_path = os.path.join(QuestionFiles, safe_filename)
                     file.save(file_path)
 
@@ -226,7 +239,7 @@ def get_multiple_choice():
         SELECT * FROM questionchoice WHERE questionID = %s
     """
     values = [questionID]
-    cursor.execute(query, tuple(questionID,))
+    cursor.execute(query, tuple(values))
     multiple_choices = cursor.fetchone()
     print(multiple_choices)
     count_query = "SELECT COUNT(*) as total FROM questionchoice WHERE questionID = %s"
@@ -312,6 +325,14 @@ def save_question_match():
 
     conn.commit()
     question_id = cursor.lastrowid
+    query_update = """
+        UPDATE unit 
+        SET totalItems = totalItems + 1
+        WHERE unitID = %s
+        """
+    values_update = (unit_id,)
+    cursor.execute(query_update, values_update)
+    conn.commit()
 
     cursor.execute(
         '''
@@ -327,15 +348,28 @@ def save_question_match():
     return jsonify({'message': 'Question and choices saved successfully.'}), 200
 
 def questionInactive():
-    questionID = int(request.args.get('questionID')) 
-    print(questionID)
+    questionID = int(request.args.get('questionID'))
+    unit_id = int(request.args.get('unitID'))
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     query = """
-        UPDATE content SET isActive = false where contentID = %s
+        UPDATE question SET isActive = false where questionID = %s
     """
-    print(query)
     values = [questionID,]
     cursor.execute(query, values)
     conn.commit()
+
+    query_update = """
+        UPDATE unit 
+        SET totalItems = totalItems - 1
+        WHERE unitID = %s
+        """
+    values_update = (unit_id,)
+    cursor.execute(query_update, values_update)
+    conn.commit()
+
     return jsonify({'isSuccess': True, "message": "Content updated successfully"}), 200
+
+def getQuestionFile():
+    fileName = request.args.get('fileName')
+    return send_from_directory(QuestionFiles, fileName)

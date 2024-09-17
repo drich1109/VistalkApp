@@ -10,10 +10,10 @@
   export let coinBag:CoinBag;
   export let backgroundMusic:BackgroundMusic;
   export let powerUp:PowerUp;
+  export let fileUrl:string;
+  export let currentType:number;
 
   let itemTypes: ItemType[] = [];
-  let currentType: number = 1;
-  let fileUrl:string;
 
   function handleFile(event: Event) {
     const target = event.target as HTMLInputElement;
@@ -21,7 +21,6 @@
 
     if (file) {
       fileUrl = URL.createObjectURL(file);
-      console.log(fileUrl);
       powerUp.filePath = file.name;
       powerUp.file = file;
     }
@@ -33,22 +32,20 @@
 
     if (file) {
       fileUrl = URL.createObjectURL(file);
-      console.log(fileUrl);
       backgroundMusic.filePath = file.name;
       backgroundMusic.file = file;
     }
   }
 
   const dispatch = createEventDispatcher();
-  onMount(async () => {
-    await redirectIfLoggedIn(''); 
-    const itemTypeCallResult = await getItemType();
-    itemTypes  = itemTypeCallResult.data;
-    console.log(itemTypes);
+    onMount(async () => {
+      await redirectIfLoggedIn(''); 
+      const itemTypeCallResult = await getItemType();
+      itemTypes  = itemTypeCallResult.data;
   });
 
   function closeModal() {
-    resetModalData(); // Reset modal data when closing
+    resetModalData();
     dispatch('close');
   }
 
@@ -61,18 +58,20 @@
   }
 
   async function saveItem() {
-    if(currentType == 1) {
-      powerUp.itemTypeID = currentType;
-      const result = await savePowerup(powerUp);
+        if(currentType == 1) {
+          powerUp.itemTypeID = currentType;
+          const result = await savePowerup(powerUp);
+        }
+        else if(currentType == 2) {
+          backgroundMusic.itemTypeID = currentType;
+          const result = await saveBackgroundMusic(backgroundMusic);
+      }
+      else if(currentType == 3) {
+          const result = await saveCoinbag(coinBag,currentType);
+      }
+      closeModal();
     }
-    else if(currentType == 2) {
-      backgroundMusic.itemTypeID = currentType;
-      const result = await saveBackgroundMusic(backgroundMusic);
-  }
-  else if(currentType == 3) {
-      const result = await saveCoinbag(coinBag,currentType);
-  }
-}
+
 </script>
   
   {#if modelOpen}
@@ -108,7 +107,7 @@
   
           <form class="mt-5">
             <div>
-                <select bind:value={currentType} name="" id="" class="w-full font-['Helvetica'] bg-white text-black py-2 px-3 rounded-md text-sm border border border-gray-200">
+                <select disabled={!isAdd} bind:value={currentType} name="" id="" class="w-full font-['Helvetica'] bg-white text-black py-2 px-3 rounded-md text-sm border border border-gray-200">
                     <option class="py-2" value={0}>--Select Item Type--</option>
                     {#each itemTypes as item}
                         <option class="py-2" value={item.itemTypeID}>{item.typeName}</option>
@@ -118,17 +117,17 @@
               {#if currentType == 1}
               <div class="mt-2">
                 <label for="username" class="block text-sm text-black capitalize dark:text-black">Power Up Name</label>
-                <input bind:value={powerUp.name} placeholder="Powerup Name" type="text" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
+                <input autocomplete="off"bind:value={powerUp.name} placeholder="Powerup Name" type="text" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
             </div>
 
             <div class="mt-2">
                 <label for="username" class="block text-sm text-black capitalize dark:text-black">Item Description</label>
-                <input bind:value={powerUp.description}   placeholder="Powerup Description" type="text" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
+                <input autocomplete="off" bind:value={powerUp.description}   placeholder="Powerup Description" type="text" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
             </div>
 
               <div class="mt-2">
                 <label for="username" class="block text-sm text-black capitalize dark:text-black">VCoin Price</label>
-              <input bind:value={powerUp.vcoinPrice}  placeholder="Powerup Price" type="number" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
+              <input autocomplete="off" bind:value={powerUp.vcoinPrice}  placeholder="Powerup Price" type="number" class="block w-full px-3 py-2 mt-2 text-gray-600 placeholder-gray-400 bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40">
             </div>
 
             <div class="mt-2">  

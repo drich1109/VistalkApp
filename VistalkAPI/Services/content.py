@@ -1,9 +1,9 @@
 # user.py
-from db import get_db_connection, PronunciationDictionary, SyllableDirectory
+from db import get_db_connection, PronunciationDirectory, SyllableDirectory
 from flask import request, jsonify, send_from_directory
 import os
 
-PronunciationFolder = PronunciationDictionary
+PronunciationFolder = PronunciationDirectory
 Syllables =  SyllableDirectory
 
 if not os.path.exists(Syllables):
@@ -37,7 +37,7 @@ def save_content():
     english_translation = request.form.get('englishTranslation')
     language_id = int(request.form.get('languageId'))
     content_type_id = int(request.form.get('contentTypeId'))
-    safe_filename = f"{content_text.replace(' ', '_')}.mp3"
+    safe_filename = f"{content_text.replace(' ', '_')}.wav"
 
     audio_path = safe_filename
 
@@ -62,14 +62,12 @@ def save_content():
             'audioPath': request.form.get(f'syllables[{index}].syllableText'),
             'orderNumber': int(request.form.get(f'syllables[{index}].orderNumber')),
         }
-
         syllable_audio_file = request.files.get(f'syllables[{index}].audioFile')
         if syllable_audio_file:
-            safe_filename = f"{syllable['syllableText'].replace(' ', '_')}.mp3"
+            safe_filename = f"{syllable['syllableText'].replace(' ', '_')}.wav"
             syllable['audioPath'] = safe_filename
             syllable_audio_path = os.path.join(Syllables, safe_filename)
             syllable_audio_file.save(syllable_audio_path)
-
         syllables_data.append(syllable)
         index += 1
 
@@ -110,9 +108,8 @@ def save_content():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        
+
         if content_id == 0:
-            # Insert new content
             sql_content = """
                 INSERT INTO content (contentText, englishTranslation, audioPath, languageId, contentTypeId)
                 VALUES (%s, %s, %s, %s, %s)
@@ -190,9 +187,11 @@ def save_content():
             # Handle syllables: delete missing, update existing, add new
             existing_syllables = {syllable['id'] for syllable in syllables_data}
             cursor.execute("SELECT * FROM contentsyllable WHERE contentId = %s", (content_id,))
-            
+            print(existing_syllables)
             stored_syllables = set()
             rows = cursor.fetchall()
+            print(rows)
+
             for row in rows:
                 try:
                     stored_syllables.add(row[0])                
@@ -201,16 +200,17 @@ def save_content():
 
             for syllable in syllables_data:
                 if syllable['id'] in stored_syllables:
+                    print(syllable)
                     sql_update_syllable = """
                         UPDATE contentsyllable
                         SET syllableText = %s, audioPath = %s, orderNumber = %s
-                        WHERE contentId = %s
+                        WHERE id = %s
                     """
                     cursor.execute(sql_update_syllable, (
                         syllable['syllableText'],
                         syllable['audioPath'],
                         syllable['orderNumber'],
-                        syllable['contentId']
+                        syllable['id']
                     ))
                 else:
                     sql_insert_syllable = """

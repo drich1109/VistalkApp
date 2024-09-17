@@ -60,7 +60,7 @@
         contents = contentListCallResult.data;
         
         for (const c of contents) {
-            if (c.audioPath && c.audioPath.toLowerCase().endsWith('.mp3')) {
+            if (c.audioPath && c.audioPath.toLowerCase().endsWith('.wav')) {
                     const file = await getFileByFileName(c.audioPath,false);
                     if (file) {
                         const url = URL.createObjectURL(file);
@@ -78,12 +78,11 @@
                     }
                 
             } else {
-                console.warn(`Skipping ${c.audioPath}: Not a valid MP3 file or audioPath is null.`);
+                console.warn(`Skipping ${c.audioPath}: Not a valid WAV file or audioPath is null.`);
                 c.audio = null;
             }
         }
         contents = [...contents];
-        console.log(contents);
     }
     catch
     {
@@ -140,7 +139,7 @@
         let examples = exampleListCallResult.data;
         let contentMain = contentMainCallResult.data;
 
-        if (contentMain.audioPath && contentMain.audioPath.toLowerCase().endsWith('.mp3')) {
+        if (contentMain.audioPath && contentMain.audioPath.toLowerCase().endsWith('.wav')) {
             const pronunciationFile = await getFileByFileName(contentMain.audioPath, false);
             
             if (pronunciationFile) {
@@ -158,11 +157,13 @@
             contentMain.audio = null; // Handle cases where the audioPath is invalid or null
         }
         for (const c of syllables) {
-            if (c.audioPath && c.audioPath.toLowerCase().endsWith('.mp3')) {
+            if (c.audioPath && c.audioPath.toLowerCase().endsWith('.wav')) {
                 try {
-                    const file = await getFileByFileName(c.audioPath, true);
+                    let file = await getFileByFileName(c.audioPath, true);
                     if (file) {
                         const url = URL.createObjectURL(file);
+
+                        c.file = new File([file], c.audioPath, { type: file.type });
                         c.audio = new Audio(url);
 
                         c.audio.addEventListener('ended', () => {
@@ -181,19 +182,18 @@
                     c.audio = null;
                 }
             } else {
-                console.warn(`Skipping ${c.audioPath}: Not a valid MP3 file or audioPath is null.`);
+                console.warn(`Skipping ${c.audioPath}: Not a valid WAV file or audioPath is null.`);
                 c.audio = null;
             }
         }
         syllables = [...syllables]
-
+        console.log(syllables)
         content = {
             content: contentMain,
             syllables,
             definitions,
             examples
         }
-        console.log(content);
         modelOpen = true;
         isAdd = false;
     }
@@ -238,11 +238,11 @@
     <AddContent modelOpen={modelOpen} {isAdd} languageId={currentValue} {content} on:close={closeModal} on:refresh={refresh}></AddContent>
 {/if}
 
-<div class="flex-wrap justify-between items-center mt-1 bg-white rounded-xl py-4 px-4shadow-lg">
-    <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Content List</p>
-    <div class="flex-grow flex">
-        <div class="flex items-center border border-[#B9B9B9] rounded-xl px-12 mt-8 py-1 bg-white">
-            <input type="text" bind:value={searchString} placeholder="Search" class="outline-none text-gray-600 placeholder-[#99BC85]">
+<div class="flex flex-col sm:flex-row justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
+    <p class="font-['Helvetica'] text-[#99BC85] text-xl sm:text-lg font-bold">Content List</p>
+    <div class="flex gap-4 mt-4 sm:mt-0">
+        <div class="flex items-center border border-[#B9B9B9] rounded-xl px-4 py-1 sm:px-12 bg-white">
+            <input type="text" bind:value={searchString} placeholder="Search" class="outline-none text-gray-600 placeholder-[#99BC85] text-sm sm:text-base">
             <button>
                 <svg xmlns="http://www.w3.org/2000/svg" class="text-[#99BC85]" width="1.5em" height="1.5em" viewBox="0 0 12 12" fill="none">
                     <path d="M8.46342 8.52L10.2 10.2M5.69999 3.6C6.6941 3.6 7.49999 4.40589 7.49999 5.4M9.63999 5.72C9.63999 7.88496 7.88494 9.64 5.71999 9.64C3.55503 9.64 1.79999 7.88496 1.79999 5.72C1.79999 3.55505 3.55503 1.8 5.71999 1.8C7.88494 1.8 9.63999 3.55505 9.63999 5.72Z" stroke="#99BC85" stroke-linecap="round"/>
@@ -250,27 +250,35 @@
             </button>
         </div>
     </div>
-    <div class="flex gap-4 mt-8">
-        <select bind:value={currentValue} on:change={refresh} class="font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg ">
+    <div class="flex flex-col sm:flex-row gap-4 mt-4 sm:mt-0">
+        <!-- Language Select -->
+        <select bind:value={currentValue} on:change={refresh} class="w-full sm:w-auto font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg">
             {#each languages as lang}
                 <option class="py-2" value={lang.languageID}>{lang.name}</option>
             {/each}
         </select>
-        <select bind:value={currentType} on:change={refresh} class="font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg ">
+        
+        <!-- Content Type Select -->
+        <select bind:value={currentType} on:change={refresh} class="w-full sm:w-auto font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg">
             <option class="py-2" value={null}>Select Content Type</option>
             {#each contentTypes as conts}
                 <option class="py-2" value={conts.contentTypeID}>{conts.typeName}</option>
             {/each}
         </select>
-        <button on:click={openAddSection} class="flex items-center font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
-            <svg xmlns="http://www.w3.org/2000/svg" class="text-white mr-2" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M13 6.5V11h4.5v2H13v4.5h-2V13H6.5v-2H11V6.5z"/></svg>
-            Add Section
+    
+        <!-- Add Section Button -->
+        <button on:click={openAddSection} class="w-full sm:w-auto flex items-center justify-center font-['Helvetica'] bg-[#99BC85] text-white py-2 px-3 rounded-xl text-sm shadow-lg hover:bg-[#BFD8AF] transform hover:scale-110 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" class="text-white mr-2" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+                <path fill="currentColor" d="M13 6.5V11h4.5v2H13v4.5h-2V13H6.5v-2H11V6.5z"/>
+            </svg>
+            Add Content
         </button>
     </div>
+    
 </div>
 
-<div class="mt-6">
-    <table class="bg-white w-full shadow-lg rounded-xl">
+<div class="mt-6 overflow-x-auto">
+    <table class="bg-white w-full shadow-lg rounded-xl min-w-[640px]">
         <thead class="font-['Cambria'] bg-[#99BC85] text-white text-center">
             <tr class="first:rounded-tl-xl last:rounded-b-xl">
                 <th class="py-3 px-4 first:rounded-tl-xl  last:rounded-tr-xl">Content</th>

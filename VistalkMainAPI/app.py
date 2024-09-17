@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import db
 from flask_cors import CORS
-from Services import language
+from Services import language, pronunciation
 
 app = Flask(__name__)
 CORS(app)
@@ -9,6 +9,10 @@ CORS(app)
 @app.route('/getLanguages', methods=['GET'])
 def getLanguages():
     return language.get_Language()
+
+@app.route('/checkPronunciation', methods=['POST'])
+def checkPronunciation():
+    return pronunciation.check_pronunciation()
 
 
 if __name__ == "__main__":

@@ -13,7 +13,8 @@ export type PowerUp =
     name:string,
     description:string,
     filePath:string,
-    file:File | null
+    file:File | null,
+    isActive:boolean
 }
 
 export type BackgroundMusic = 
@@ -25,7 +26,8 @@ export type BackgroundMusic =
     musicTitle:string,
     musicGenre:string,
     filePath:string,
-    file:File | null
+    file:File | null,
+    isActive:boolean;
 }
 
 export type CoinBag = 
@@ -33,5 +35,6 @@ export type CoinBag =
     coinBagId:number,
     quantity:number,
     moneyPrice:number,
-    coinBagName:string
+    coinBagName:string,
+    isActive:boolean
 }

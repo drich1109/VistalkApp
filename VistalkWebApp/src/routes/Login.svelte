@@ -58,7 +58,7 @@
 
       <!-- Modal content -->
       <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 z-10">
-          <img class="h-auto w-auto" src="logo-white.png" alt="">
+          <img class="logo" src="logo-white.png" alt="">
         {#if showMessage == true}
           <MessageBox isDanger = {!userCallResult.isSuccess} message = {userCallResult.message} title={"Error"}></MessageBox>
         {/if}
@@ -93,4 +93,9 @@
 .bg-main {
   background-color: #99BC85;
 }
+
+.logo {
+        width: 120px;
+        height: 120px; 
+    }
 </style>

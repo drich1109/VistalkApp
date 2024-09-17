@@ -1,6 +1,8 @@
-import { get, postForm} from "$lib/api/baseRepo";
+import { get, postForm, put} from "$lib/api/baseRepo";
 import type { CallResultDto } from "../../types/types";
 import type { BackgroundMusic, CoinBag, ItemType, PowerUp } from "./type";
+
+const baseUrl = import.meta.env.VITE_BASE_API;
 
 export async function getItemType() {
 	let result =  await get<CallResultDto<ItemType[]>>(`/getItemType`);
@@ -39,7 +41,7 @@ export async function saveBackgroundMusic(BackgroundMusic: BackgroundMusic) {
 
     if (BackgroundMusic.file) {
         const file = new File([BackgroundMusic.file], 'mp3', { type: 'mp3' });
-        formData.append('mp3', file);
+        formData.append('itemAudioFile', file);
     }
 
 	let result =  await postForm<CallResultDto<object>>(`/saveItemShop`, formData);
@@ -59,4 +61,50 @@ export async function saveCoinbag(CoinBag: CoinBag, typeId:number) {
 	let result =  await postForm<CallResultDto<object>>(`/saveItemShop`, formData);
     return result;
 }
+
+export async function getItemList(itemTypeID: number | null, pageNo: number, searchString: string | null) {
+    let result;
+
+    if (itemTypeID === 1) {
+        result = await get<CallResultDto<PowerUp[]>>(`/getItemList`, { itemTypeID, pageNo, searchString });
+    } 
+    else if (itemTypeID === 2) {
+        result = await get<CallResultDto<BackgroundMusic[]>>(`/getItemList`, { itemTypeID, pageNo, searchString });
+    }
+    else if (itemTypeID === 3) {
+        result = await get<CallResultDto<CoinBag[]>>(`/getItemList`, { itemTypeID, pageNo, searchString });
+    }
+    return result;
+}
+
+export async function getItemFileByFileName(fileName: string, itemType:number): Promise<Blob | null> {
+    try {
+        const response = await fetch(`${baseUrl}/getShopFileByFileName?fileName=${fileName}&itemType=${itemType}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/octet-stream'
+            }
+        });
+        if (response.ok) {
+            return await response.blob();
+        } else {
+            console.error(`Failed to fetch file: ${response.statusText}`);
+            return null;    
+        }
+    } catch (error) {
+        console.error(`Failed to fetch file:`, error);
+        return null;
+    }
+}
+
+export async function setItemInactive(itemId:number) {
+	let result =  await put<CallResultDto<object>>(`/itemInactive`, {itemId});
+    return result;
+}
+
+export async function coinBagInactive(coinBagId:number) {
+	let result =  await put<CallResultDto<object>>(`/coinBagInactive`, {coinBagId});
+    return result;
+}
+
 
