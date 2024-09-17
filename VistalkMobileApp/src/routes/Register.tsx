@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SafeAreaView, Text, TextInput, TouchableOpacity, ImageBackground, Image, View, StyleSheet } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../types'; // Adjust the import path
+import { RootStackParamList } from '../../types'; // Adjust the import path
 import { UserDto } from './type'; // Adjust the import path
 
 type Props = StackScreenProps<RootStackParamList, 'Register'>;

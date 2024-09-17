@@ -7,7 +7,6 @@ const Shop: React.FC = () => {
     <View style={styles.container}>
       <Text style={styles.text}>Hi, this is the shop
       </Text>
-      <Menu />
     </View>
   );
 };

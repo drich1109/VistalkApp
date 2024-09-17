@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { SafeAreaView, Text, TextInput, TouchableOpacity, View, StyleSheet, Alert, ImageBackground, Image } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../types'; // Adjust the import path
+import { RootStackParamList } from '../../types'; // Adjust the import path
 import { loginUser } from './repo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Props = StackScreenProps<RootStackParamList, 'LogIn'>;
 
@@ -15,9 +16,11 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
   const handleLogin = async () => {
     try {
       const response = await loginUser(email, password);
-      console.log(response);
 
       if (response.isSuccess === true) {
+        await AsyncStorage.setItem('userToken', response.data.token);
+        await AsyncStorage.setItem('userID', response.data.id);
+        
         navigation.navigate('Dashboard')
       } else {
         Alert.alert('Login Failed', response.message);
@@ -61,9 +64,9 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.loginText}>Login</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.googleButton} onPress={() => Alert.alert('Google Sign In')}>
+  {/*       <TouchableOpacity style={styles.googleButton} onPress={() => Alert.alert('Google Sign In')}>
           <Text style={styles.googleButtonText}>Sign in with Google</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity
           style={styles.forgotPasswordContainer}

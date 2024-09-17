@@ -1,18 +1,22 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Home from './routes/Home';
-import LogIn from './routes/LogIn'; 
-import Register from './routes/Register';
-import Languages  from './routes/Languages'; 
+import Home from './src/routes/Home';
+import LogIn from './src/routes/LogIn'; 
+import Register from './src/routes/Register';
+import Languages  from './src/routes/Languages'; 
 import { RootStackParamList } from './types'; // Ensure this import path is correct
-import Dashboard from './routes/Dashboard';
-import Dictionary from './routes/Dictionary';
-import Practice from './routes/Practice';
-import Shop from './routes/Shop';
-import ForgotPassword from './routes/ForgotPassword';
-import SetNewPassword from './routes/SetNewPassword';
-import DictionaryMeaning from './routes/DictionaryMeaning';
+import Dashboard from './src/routes/Dashboard';
+import Dictionary from './src/routes/Dictionary';
+import Practice from './src/routes/Practice';
+import Shop from './src/routes/Shop';
+import ForgotPassword from './src/routes/ForgotPassword';
+import SetNewPassword from './src/routes/SetNewPassword';
+import DictionaryMeaning from './src/routes/DictionaryMeaning';
+import UserProfile from './src/routes/UserProfile';
+import Settings from './src/routes/Settings';
+import EditProfile from './src/routes/EditProfile';
+import ChangePassword from './src/routes/ChangePassword';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -73,6 +77,26 @@ const App: React.FC = () => {
           <Stack.Screen
           name="SetNewPassword"
           component={SetNewPassword}
+          options={{ headerShown: false }}
+        />
+          <Stack.Screen
+          name="UserProfile"
+          component={UserProfile}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Settings"
+          component={Settings}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="EditProfile"
+          component={EditProfile}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ChangePassword"
+          component={ChangePassword}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

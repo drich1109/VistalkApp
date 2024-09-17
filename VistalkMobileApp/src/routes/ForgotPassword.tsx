@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SafeAreaView, Text, TextInput, TouchableOpacity, ImageBackground, Image, View, StyleSheet, Modal, Alert } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../types'; // Adjust the import path
+import { RootStackParamList } from '../../types'; // Adjust the import path
 import { sendCodetoEmail, verifyCode } from './repo';
 
 type Props = StackScreenProps<RootStackParamList, 'ForgotPassword'>;

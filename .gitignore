@@ -411,9 +411,6 @@ build/
 # Environment variables files
 .env
 
-# React Native
-VistalkMobileApp/api/apiService.ts
-
 # Android
 /android/.gradle
 /android/app/build

@@ -7,6 +7,8 @@ import random
 import string
 from datetime import datetime, timedelta
 from db import get_db_connection
+import re
+
 
 def generate_confirmation_code():
     return ''.join(random.choices(string.digits, k=6))
@@ -135,3 +137,41 @@ def verify_code():
         }), 200
     else:
         return "Invalid code"
+    
+
+def is_email_used():
+    email_to_check = request.args.get('email')
+
+    email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    if not re.match(email_regex, email_to_check):
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Invalid email format. Please enter a valid email address.',
+            'data': None,
+            'data2': None,
+            'totalCount': None
+        }), 200
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    query = "SELECT COUNT(*) FROM user WHERE email = %s"
+    cursor.execute(query, (email_to_check,))
+    (count,) = cursor.fetchone()
+
+    if count > 0:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Email is already used. Please use another email.',
+            'data': None,
+            'data2': None,
+            'totalCount': None
+        }), 200
+    else:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'Email is available to be used.',
+            'data': None,
+            'data2': None,
+            'totalCount': None
+        }), 200

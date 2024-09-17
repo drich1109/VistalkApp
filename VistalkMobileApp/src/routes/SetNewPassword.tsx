@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SafeAreaView, Text, TextInput, TouchableOpacity, View, StyleSheet, Alert } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../types'; // Adjust the import path
+import { RootStackParamList } from '../../types'; // Adjust the import path
 import { updatePassword } from './repo';
 
 type Props = StackScreenProps<RootStackParamList, 'SetNewPassword'>;
@@ -24,7 +24,7 @@ const SetNewPassword: React.FC<Props> = ({ route, navigation }) => {
   const handleSubmit = async () => {
     if (newPassword === confirmPassword) {
       if (validatePassword(newPassword)) {
-        const result = await updatePassword(email, confirmPassword)
+        const result = await updatePassword(email, confirmPassword, null)
         if(result.isSuccess == true)
             navigation.navigate('LogIn');
         else{

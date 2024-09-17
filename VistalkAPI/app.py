@@ -162,5 +162,17 @@ def get_Users():
 def get_UserPowerUps():
     return user.get_UserPowerUps()  
 
+@app.route('/isEmailUse', methods=['GET'])
+def is_email_used():
+    return emailService.is_email_used()  
+
+@app.route('/editVistaProfile', methods=['PUT'])
+def editVistaProfile():
+    return user.editVistaProfile()
+  
+@app.route('/deactivateVistaAccount', methods=['PUT'])
+def deactivateVistaAccount():
+    return user.deactivateVistaAccount()  
+
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

@@ -1,10 +1,11 @@
 # user.py
 import jwt
 from datetime import datetime, timedelta, timezone
-from db import get_db_connection
+from db import get_db_connection, UserImages
 from flask import request, jsonify
 import hashlib
 from Services import emailService
+import os
 
 def generate_token(user_name):
     expiration_time = datetime.now(timezone.utc) + timedelta(days=1)
@@ -191,7 +192,7 @@ def loginVista():
     
     try:
         cursor.execute("""
-            SELECT name, encryptedpassword, failedlogins, isAccountLocked, logInTimeLockOut
+            SELECT userID as id, name, encryptedpassword, failedlogins, isAccountLocked, logInTimeLockOut
             FROM user
             WHERE email = %s AND isPlayer = true AND isActive = true
         """, (email,))
@@ -200,7 +201,7 @@ def loginVista():
         if not user:
             return jsonify({
                 'isSuccess': False,
-                'message': 'Invalid credentials',
+                'message': 'User is not found',
                 'data': None,
                 'data2': None,
                 'totalCount': None
@@ -224,6 +225,7 @@ def loginVista():
                 conn.commit()
         
         if password == user['encryptedpassword']:
+            print(user)
             token = generate_token(user['name'])
             cursor.execute("""
                 UPDATE user
@@ -236,7 +238,8 @@ def loginVista():
                 'message': 'Login successful',
                 'data': {
                     'name': user['name'],
-                    'token': token
+                    'token': token,
+                    'id': str(user['id'])
                 },
                 'data2': None,
                 'totalCount': None 
@@ -288,9 +291,35 @@ def forgotPassword():
     data = request.json
     email = data.get('email')
     hashedPassword = data.get('hashedPassword')
-
+    currentPassword = data.get('currenthashedPassword')
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
+
+    if currentPassword:
+        cursor.execute("""
+            SELECT encryptedPassword FROM user
+            WHERE email = %s
+        """, (email,))
+        user = cursor.fetchone()
+        if not user:
+            return jsonify({
+                'isSuccess': False,
+                'message': 'User not found!',
+                'data': None,
+                'data2': None,
+                'totalCount': None
+            }), 404
+
+        stored_password = user['encryptedPassword']
+
+        if stored_password != currentPassword:
+            return jsonify({
+                'isSuccess': False,
+                'message': 'Current password is incorrect!',
+                'data': None,
+                'data2': None,
+                'totalCount': None
+            }), 200
 
     cursor.execute("""
         UPDATE user
@@ -298,13 +327,14 @@ def forgotPassword():
         WHERE email = %s
     """, (hashedPassword, email))
     conn.commit()
+
     return jsonify({
-                    'isSuccess': True,
-                    'message': 'Password Saved Successfully!',
-                    'data': None,
-                    'data2': None,
-                    'totalCount': None
-                }), 200
+        'isSuccess': True,
+        'message': 'Password updated successfully!',
+        'data': None,
+        'data2': None,
+        'totalCount': None
+    }), 200
 
 def get_Users():
     searchString = request.args.get('searchString')
@@ -393,3 +423,99 @@ def get_UserPowerUps(userID):
     cursor.execute(query, values)
     powerUps = cursor.fetchall()
     return powerUps
+
+def editVistaProfile():
+    data = request.form
+    name = data.get('name')
+    email = data.get('email')
+    userID = data.get('userId')
+    file = request.files.get('file')
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        update_query = """
+            UPDATE user
+            SET name = %s, email = %s
+            WHERE userID = %s
+        """
+        cursor.execute(update_query, (name, email, userID))
+        print("next here")
+        user_images_dir = UserImages
+        if not os.path.exists(user_images_dir):
+            os.makedirs(user_images_dir)
+        
+        file_extension = os.path.splitext(file.filename)[1]
+        new_file_name = f"{name}_{userID}{file_extension}"
+        file_path = os.path.join(user_images_dir, new_file_name)
+        
+        with open(file_path, 'wb') as f:
+            f.write(file.read())
+        
+        image_update_query = """
+            UPDATE user
+            SET ImagePath = %s
+            WHERE userID = %s
+        """
+        cursor.execute(image_update_query, (new_file_name, userID))
+        
+        conn.commit()
+        return jsonify({
+            'isSuccess': True,
+            'message': 'Profile Successfully Updated!',
+            'data': [],
+            'totalCount': 0
+        }), 200
+    
+    except Exception as e:
+        conn.rollback()
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Profile Update Failed!',
+            'data': [],
+            'totalCount': 0
+        }), 200
+    
+    finally:
+        cursor.close()
+        conn.close()
+
+def deactivateVistaAccount():
+    data = request.json
+    user_id = data.get('userId')
+    if not user_id:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'User ID is required',
+            'data': None
+        }), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            UPDATE user
+            SET IsActive = 0
+            WHERE userID = %s
+        """, (user_id,))
+        conn.commit()
+
+        return jsonify({
+            'isSuccess': True,
+            'message': 'Account deactivated successfully',
+            'data': None
+        }), 200
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({
+            'isSuccess': False,
+            'message': str(e),
+            'data': None
+        }), 500
+
+    finally:
+        cursor.close()
+        conn.close()

@@ -4,10 +4,12 @@ import Menu from '../components/Menu'; // Adjust the import path as needed
 import SearchIcon from '../assets/svg/SearchIcon';
 import ArrowIcon from '../assets/svg/ArrowIcon';
 import { useNavigation } from '@react-navigation/native';
-import { DictionaryMeaningScreenNavigationProp, RootStackParamList } from '../types';
+import { DictionaryMeaningScreenNavigationProp, RootStackParamList } from '../../types';
 
 const Dictionary: React.FC = () => {
   const [searchText, setSearchText] = useState('');
+  const [activeScreen, setActiveScreen] = useState<keyof RootStackParamList | null>('Dictionary');
+
   const navigation = useNavigation<DictionaryMeaningScreenNavigationProp>();
     const navigateToMeaning = (meaning: keyof RootStackParamList) => {
         console.log(meaning);
@@ -41,7 +43,7 @@ const Dictionary: React.FC = () => {
           </View>
         </TouchableOpacity>
       </ScrollView> 
-      <Menu />
+      <Menu activeScreen={activeScreen} /> 
     </ImageBackground>
   );
 };
