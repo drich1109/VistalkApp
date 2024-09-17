@@ -1,4 +1,5 @@
 export interface LoggedInUser {
+    id:string;
 	name: string;
 	token: string;
 }
@@ -26,5 +27,22 @@ export type UserDto =
     email:string;
     password:string;
     languageId:number;
-
 }
+
+export type UserProfileDto = {
+    id: number;
+    name: string;
+    email: string;
+    imagePath: string | null;
+    vCoin: number;
+    currentLanguageId: string;
+    totalScoreWeekly: number;
+    vcoin: number;
+  }
+  
+export type EditProfileVista = {
+    name: string;
+    email: string;
+    userId: number;
+    file: File | null;
+};

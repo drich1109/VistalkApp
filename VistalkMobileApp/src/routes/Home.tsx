@@ -1,7 +1,7 @@
 import React from 'react';
 import { SafeAreaView, Text, TouchableOpacity, View, StyleSheet, Image, Alert,ImageBackground } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../types'; // Adjust the import path
+import { RootStackParamList } from '../../types'; // Adjust the import path
 
 type Props = StackScreenProps<RootStackParamList, 'Home'>;
 

@@ -12,14 +12,12 @@ import {
 import {getLanguages, register} from './repo'; // Adjust the import path
 import type {Languages, UserDto} from './type'; // Adjust the import path
 import {StackScreenProps} from '@react-navigation/stack';
-import {RootStackParamList} from '../types';
+import { RootStackParamList } from '../../types'; // Adjust the import path
 
 type Props = StackScreenProps<RootStackParamList, 'Languages'>;
 
 const LanguageList: React.FC<Props> = ({route, navigation}) => {
   const {userDto} = route.params;
-
-  console.log(userDto); // Log userDto to verify it's being received correctly
 
   const [languages, setLanguages] = useState<Languages[]>([]);
   const [loading, setLoading] = useState<boolean>(true);

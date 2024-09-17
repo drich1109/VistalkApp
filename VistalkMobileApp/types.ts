@@ -1,7 +1,7 @@
 // types.ts
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { UserDto } from './routes/type';
+import { UserDto } from './src/routes/type';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -15,6 +15,10 @@ export type RootStackParamList = {
   Practice:undefined;
   ForgotPassword:undefined;
   SetNewPassword:{email:string};
+  UserProfile:undefined;
+  Settings:undefined;
+  EditProfile:undefined;
+  ChangePassword:undefined;
 };
 
 export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -28,6 +32,10 @@ export type DictionaryScreenNavigationProp = NativeStackNavigationProp<RootStack
 export type DictionaryMeaningScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'DictionaryMeaning'>;
 export type ForgotPasswordScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ForgotPassword'>;
 export type SetNewPasswordScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'SetNewPassword'>;
+export type UserProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'UserProfile'>;
+export type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Settings'>;
+export type EditProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EditProfile'>;
+export type ChangePasswordScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ChangePassword'>;
 
 export type MenuScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, keyof RootStackParamList>;
 
