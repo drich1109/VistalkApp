@@ -42,6 +42,7 @@ export type Content =
     audioPath:string;
     languageID:number;
     contentTypeId:number;
+    isInDictionary: boolean;
     audio:HTMLAudioElement | null;
     file:File | null;
     isPlaying:boolean
