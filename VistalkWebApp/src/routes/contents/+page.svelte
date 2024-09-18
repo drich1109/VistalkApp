@@ -106,6 +106,7 @@
             englishTranslation: "",
             audioPath: "",
             contentTypeId: 0,
+            isInDictionary: false,
             audio: null,
             file: null,
             isPlaying:false

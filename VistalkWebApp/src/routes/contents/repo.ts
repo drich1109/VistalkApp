@@ -19,6 +19,7 @@ export async function saveMainContent(content: ContentDto) {
     formData.append('languageId', content.content.languageID.toString());
     formData.append('contentTypeId', content.content.contentTypeId.toString());
     formData.append('audioPath', content.content.audioPath.toString());
+    formData.append('isInDictionary', content.content.isInDictionary.toString());
     if (content.content.file) {
         const file = new File([content.content.file], 'audio.wav', { type: 'audio/wav' });
         formData.append('contentAudioFile', file);

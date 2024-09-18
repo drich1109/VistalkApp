@@ -37,6 +37,12 @@ def save_content():
     english_translation = request.form.get('englishTranslation')
     language_id = int(request.form.get('languageId'))
     content_type_id = int(request.form.get('contentTypeId'))
+    is_indictionary = request.form.get('isInDictionary')
+    if(is_indictionary == 'false'):
+            is_indictionary = 0
+    else:
+            is_indictionary = 1
+
     safe_filename = f"{content_text.replace(' ', '_')}.wav"
 
     audio_path = safe_filename
@@ -111,15 +117,16 @@ def save_content():
 
         if content_id == 0:
             sql_content = """
-                INSERT INTO content (contentText, englishTranslation, audioPath, languageId, contentTypeId)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO content (contentText, englishTranslation, audioPath, languageId, contentTypeId, isInDictionary)
+                VALUES (%s, %s, %s, %s, %s, %s)
             """
             cursor.execute(sql_content, (
                 content_text,
                 english_translation,
                 audio_path,
                 language_id,
-                content_type_id
+                content_type_id,
+                is_indictionary
             ))
             conn.commit()
             content_id = cursor.lastrowid
@@ -169,7 +176,7 @@ def save_content():
         else:
             sql_update_content = """
                 UPDATE content
-                SET contentText = %s, englishTranslation = %s, audioPath = %s, languageId = %s, contentTypeId = %s
+                SET contentText = %s, englishTranslation = %s, audioPath = %s, languageId = %s, contentTypeId = %s, isInDictionary = %s
                 WHERE contentId = %s
             """
             
@@ -179,6 +186,7 @@ def save_content():
                 audio_path,
                 language_id,
                 content_type_id,
+                is_indictionary,
                 content_id
             ))
             
