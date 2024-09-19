@@ -37,7 +37,6 @@ const DictionaryMeaning: React.FC = () => {
                     <Text style={styles.text4}>:fatigued often to the point of exhaustion.</Text>
                 </View>
             </View>
-            <Menu />
         </ImageBackground>
     );
 };

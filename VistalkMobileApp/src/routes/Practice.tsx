@@ -71,7 +71,6 @@ const Practice: React.FC = () => {
     <TouchableOpacity style={styles.center}>
         <MicrophoneIcon style={styles.microphone}/>
     </TouchableOpacity>
-      <Menu />
     </ImageBackground>
   );
 };
