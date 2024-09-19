@@ -88,6 +88,14 @@
 
                     {/if}
                     </a>
+
+                    <a class="nav-link {activePage === '/feedback' ? 'active' : ''}"  on:click={() => goto('/feedback')}>
+                        <i class="fas fa-comments"></i>
+                        {#if isExpanded}
+                            <span class="nav-text">Feedbacks</span>
+        
+                            {/if}
+                            </a>
         </nav>
 
         <button class="button is-light logout-button" on:click={handleLogout}>

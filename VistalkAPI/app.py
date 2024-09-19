@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import db
 from flask_cors import CORS
-from Services import user, section, content, question, shop, emailService
+from Services import user, section, content, question, shop, emailService, feedback
 
 app = Flask(__name__)
 CORS(app)
@@ -173,6 +173,11 @@ def editVistaProfile():
 @app.route('/deactivateVistaAccount', methods=['PUT'])
 def deactivateVistaAccount():
     return user.deactivateVistaAccount()  
+
+@app.route('/getFeedbacks', methods=['GET'])
+def getFeedbacks():
+    return feedback.get_feedback()  
+
 
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
