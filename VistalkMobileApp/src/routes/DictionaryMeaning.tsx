@@ -3,141 +3,45 @@ import SearchIcon from "../assets/svg/SearchIcon";
 import { useState } from "react";
 import SpeakerIcon from "../assets/svg/SpeakerIcon";
 import Menu from "../components/Menu";
+import { RootStackParamList } from "../../types";
 
 const DictionaryMeaning: React.FC = () => {
     const [searchText, setSearchText] = useState('');
+    const [activeScreen, setActiveScreen] = useState<keyof RootStackParamList | null>('Dictionary');
     return(
-        <ImageBackground source={require('../assets/bg.png')} style={styles.background}>
-            <View style={styles.center}>
-                <Text style={styles.centerText}>Dictionary</Text>
-            </View>
-            <View style={styles.search}>
-                <TextInput
-                style={styles.input}
-                placeholder="Search for a word"
-                placeholderTextColor="#999"
-                value={searchText}
-                onChangeText={setSearchText}
-                />
-                <SearchIcon style={styles.searchicon} />
-            </View>
-            <View style={styles.content}>
-                <View style={styles.content3}>
-                    <Text style={styles.text1}>Kapoy</Text>
-                    <Text style={styles.text3}>(Tired)</Text>
+        <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
+          <View className="items-center mb-3">
+            <Text className="text-4xl font-bold text-white">Dictionary</Text>
+          </View>
+          <View className="flex flex-row items-center justify-start bg-white rounded-lg px-4 mb-5 w-4/5 h-10">
+            <TextInput
+              className="flex-1 h-full text-[#999] text-base"
+              placeholder="Search for a word"
+              placeholderTextColor="#999"
+              value={searchText}
+              onChangeText={setSearchText}
+            />
+            <SearchIcon className="w-7 h-7" />
+          </View>
+            <View className="justify-self-start ml-4">
+                <View className="flex flex-row items-center gap-3 mb-2">
+                    <Text className="text-2xl font-bold text-white">Kapoy</Text>
+                    <Text className="text-xl italic font-light text-white">(Tired)</Text>
                 </View>
-                <View style={styles.content2}>
-                    <Text style={styles.text2}>["ka-poy"]</Text>
+                <View className="flex flex-row justify-self-start ml-4 mb-2 px-2">
+                    <Text className="text-xl italic font-light text-white w-20">["ka-poy"]</Text>
                     <TouchableOpacity>
-                        <SpeakerIcon style={styles.speaker} />
+                        <SpeakerIcon className="h-6 w-6 ml-2" />
                     </TouchableOpacity>
                 </View>
-                <View style={styles.content4}>
-                    <Text style={styles.text4}>:drained of strength and energy</Text>
-                    <Text style={styles.text4}>:fatigued often to the point of exhaustion.</Text>
+                <View className="justify-self-start ml-4 px-2 mb-4">
+                    <Text className="text-xl text-white font-light">:drained of strength and energy</Text>
+                    <Text className="text-xl text-white font-light">:fatigued often to the point of exhaustion.</Text>
                 </View>
             </View>
+            <Menu activeScreen={activeScreen} />
         </ImageBackground>
     );
 };
-
-const styles = StyleSheet.create({
-    background: {
-        flex: 1,
-        resizeMode: 'cover',
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
-      search: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        backgroundColor: 'white',
-        borderRadius: 10,
-        paddingHorizontal: 10,
-        marginBottom: 20,
-        width: '80%',
-        height: 40,
-      },
-      searchicon: {
-        height: 25,
-        width: 25,
-        marginRight: 10,
-      },
-      speaker: {
-        height: 25,
-        width: 25,
-        marginLeft: 10, // Add margin to space between text and icon
-      },
-      input: {
-        flex: 1,
-        height: '100%',
-        color: 'black',
-        fontSize: 16,
-      },
-      center: {
-        alignItems: 'center',
-        marginBottom: 10,
-      },
-      centerText: {
-        fontSize: 40,
-        fontWeight: 'bold',
-        color: '#fff', // White text
-      },
-      content: {
-        alignSelf: 'flex-start', // Align to the left
-        marginLeft: 80, // Add margin for spacing
-        marginBottom: 10,
-      },
-      content2: {
-        alignSelf: 'flex-start', // Align to the left
-        marginLeft: 20, // Add margin for spacing
-        flexDirection: 'row', // Align items horizontally
-        alignItems: 'center', // Center vertically
-        borderRadius: 10,
-        paddingHorizontal: 10,
-        marginBottom: 20,
-        width: '80%', // Adjusted width for better layout
-        height: 40,
-      },
-      content3: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 20
-      },
-      content4: {
-        alignSelf: 'flex-start', // Align to the left
-        marginLeft: 20, // Add margin for spacing
-        borderRadius: 10,
-        paddingHorizontal: 10,
-        marginBottom: 40,
-        width: '80%', // Adjusted width for better layout
-        height: 40,
-      },
-      text1: {
-        fontSize: 42,
-        fontWeight: 'bold',
-        color: 'white',
-      },
-      text2: {
-        fontSize: 24, // Adjusted size for better fit
-        fontStyle: 'italic',
-        fontWeight: '300',
-        color: 'white',
-      },
-      text3: {
-        fontSize: 28,
-        fontStyle: 'italic',
-        fontWeight: '300',
-        color: 'white',
-      },
-      text4: {
-        fontSize: 24,
-        color: 'white',
-        fontWeight: 'bold'
-      }
-});
 
 export default DictionaryMeaning;

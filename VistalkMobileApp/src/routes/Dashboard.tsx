@@ -78,7 +78,7 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
         </TouchableOpacity>
         <View className="flex-row">
           <TouchableOpacity className="ml-2">
-            <Svg  width="24" height="24" viewBox="0 0 16 16">
+            <Svg  width="24" height="24" className='bg-white rounded-lg' viewBox="0 0 16 16">
               <Path
                 fill="black"
                 d="M2 4.5A2.5 2.5 0 0 1 4.5 2h7A2.5 2.5 0 0 1 14 4.5v7a2.5 2.5 0 0 1-2.5 2.5h-7A2.5 2.5 0 0 1 2 11.5zm6.5 6a.5.5 0 0 0 .5.5h2.25a.5.5 0 0 0 0-1H9a.5.5 0 0 0-.5.5M9 6a.5.5 0 0 0 0 1h2.25a.5.5 0 0 0 0-1zM7.354 9.146a.5.5 0 0 0-.708 0L5.5 10.293l-.394-.395a.5.5 0 0 0-.708.707l.748.749a.5.5 0 0 0 .708 0l1.5-1.5a.5.5 0 0 0 0-.708m0-3.292a.5.5 0 1 0-.708-.708L5.5 6.293l-.394-.395a.5.5 0 0 0-.708.708l.748.748a.5.5 0 0 0 .708 0z"
@@ -86,7 +86,7 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
             </Svg>
           </TouchableOpacity>
           <TouchableOpacity className="ml-2">
-            <Svg  width="24" height="24" viewBox="0 0 24 24">
+            <Svg  width="24" height="24" className='bg-white rounded-lg' viewBox="0 0 24 24">
               <Path
                 fill="black"
                 d="M14.235 19c.865 0 1.322 1.024.745 1.668A4 4 0 0 1 12 22a4 4 0 0 1-2.98-1.332c-.552-.616-.158-1.579.634-1.661l.11-.006zM12 2c1.358 0 2.506.903 2.875 2.141l.046.171l.008.043a8.01 8.01 0 0 1 4.024 6.069l.028.287L19 11v2.931l.021.136a3 3 0 0 0 1.143 1.847l.167.117l.162.099c.86.487.56 1.766-.377 1.864L20 18H4c-1.028 0-1.387-1.364-.493-1.87a3 3 0 0 0 1.472-2.063L5 13.924l.001-2.97A8 8 0 0 1 8.822 4.5l.248-.146l.01-.043a3 3 0 0 1 2.562-2.29l.182-.017z"
@@ -95,7 +95,7 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
           </TouchableOpacity>
       </View>
       </View>
-      <ScrollView contentContainerStyle={{ padding: 20 }}>
+      <ScrollView contentContainerStyle={{ padding: 20 }} className="mb-8">
       {languageDetails !== undefined && (
         <View className="items-center mb-5">
           <Text className="text-4xl font-bold text-black">{languageDetails.native_name}</Text>
@@ -142,7 +142,7 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
         animationType="none"
         onRequestClose={closeModal}
       >
-        <TouchableOpacity className="flex-1 justify-end bg-black bg-opacity-60" onPress={closeModal}>
+        <TouchableOpacity className="flex-1 justify-end" style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }} onPress={closeModal}>
           <View className="bg-black rounded-t-xl w-full">
             <TouchableOpacity activeOpacity={1} className="bg-black rounded-t-xl">
               <View className="p-10">
