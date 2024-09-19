@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View, Alert, Image, Modal } from 'react-native';
+import { SafeAreaView, Text, TextInput, TouchableOpacity, View, Alert, Image, Modal, ImageBackground } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types'; // Adjust the import path
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getIsEmailUsed, getUserDetails, getUserImageUrl, sendCodetoEmail, verifyCode, editVistaProfile} from './repo'; // Ensure updateUserProfile is imported
 import { EditProfileVista, UserProfileDto } from './type';
 import { launchImageLibrary } from 'react-native-image-picker';
+import { Path, Svg } from 'react-native-svg';
 
 type Props = StackScreenProps<RootStackParamList, 'EditProfile'>;
 
@@ -129,47 +130,54 @@ const EditProfile: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-900 p-4">
-      <View className="flex-row justify-between items-center mb-4">
+    <SafeAreaView className="flex-1">
+      <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
+      <View className="flex-row justify-between w-full px-5 absolute top-10">
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text className="text-white text-lg">Back</Text>
-        </TouchableOpacity>
-        <Text className="text-white text-2xl font-bold">Edit Profile</Text>
-        <View />
-      </View>
-      <View className="items-center mb-4">
-        <TouchableOpacity onPress={handleImageSelect}>
-          {fileUrl ? (
-            <Image
-              source={{ uri: fileUrl }}
-              className="w-20 h-20 rounded-full border-2 border-white"
-              
-            />
-          ) : (
-            <View className="w-20 h-20 rounded-full border-2 border-white bg-gray-700 justify-center items-center">
-              <Text className="text-white text-base">Select Image</Text>
-            </View>
-          )}
+          <Svg width="30" height="30" className='bg-white text-[#99BC85] rounded-lg' viewBox="0 0 24 24">
+                <Path
+                  fill="currentColor"
+                  d="M3.636 11.293a1 1 0 000 1.414l5.657 5.657a1 1 0 001.414-1.414L6.757 13H20a1 1 0 100-2H6.757l3.95-3.95a1 1 0 00-1.414-1.414z"
+                />
+          </Svg>
         </TouchableOpacity>
       </View>
       <View className="flex-1 justify-center">
+        <View className="items-center mb-4">
+          <Text className="text-white text-2xl font-bold">Edit Profile</Text>
+        </View>
+        <View className="items-center mb-4">
+          <TouchableOpacity onPress={handleImageSelect}>
+            {fileUrl ? (
+              <Image
+                source={{ uri: fileUrl }}
+                className="w-20 h-20 rounded-full border-2 border-white"
+                
+              />
+            ) : (
+              <View className="w-20 h-20 rounded-full border-2 border-white bg-gray-600 justify-center items-center">
+                <Text className="text-white text-base">Select Image</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
         <TextInput
-          className="bg-gray-800 text-white p-3 mb-3 rounded-lg"
+          className="bg-transparent border-2 border-white text-white p-3 mb-3 rounded-lg"
           placeholder="Name"
-          placeholderTextColor="#aaa"
+          placeholderTextColor="#white"
           value={name}
           onChangeText={setName}
         />
         <TextInput
-          className="bg-gray-800 text-white p-3 mb-3 rounded-lg"
+          className="bg-transparent border-2 border-white text-white p-3 mb-3 rounded-lg"
           placeholder="Email"
-          placeholderTextColor="#aaa"
+          placeholderTextColor="white"
           value={email}
           onChangeText={setEmail}
           keyboardType="email-address"
         />
-        <TouchableOpacity className="bg-blue-500 p-3 rounded-lg items-center" onPress={handleSave}>
-          <Text className="text-white text-lg">Save Changes</Text>
+        <TouchableOpacity className="bg-white p-2 rounded-lg items-center" onPress={handleSave}>
+          <Text className="text-[#99BC85] text-lg">Save Changes</Text>
         </TouchableOpacity>
       </View>
 
@@ -200,6 +208,7 @@ const EditProfile: React.FC<Props> = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+      </ImageBackground>
     </SafeAreaView>
   );
 };

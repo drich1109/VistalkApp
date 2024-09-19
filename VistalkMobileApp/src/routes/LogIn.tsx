@@ -32,14 +32,14 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ImageBackground source={require('../assets/bg.png')} style={styles.background} resizeMode="cover">
-        <Image source={require('../assets/logo.png')} style={styles.logo} resizeMode="contain" />
+    <SafeAreaView className="flex-1">
+      <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
+        <Image source={require('../assets/logo.png')} className="w-44 h-44 mb-12" resizeMode="contain" />
 
         <TextInput
-          style={styles.input}
+          className="w-4/5 h-13 border-2 border-white mb-5 px-3 rounded-lg bg-transparent text-white"
           placeholder={emailPlaceholder}
-          placeholderTextColor="#fff"
+          placeholderTextColor="white"
           onChangeText={setEmail}
           value={email}
           keyboardType="email-address"
@@ -50,9 +50,9 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
         />
 
         <TextInput
-          style={styles.input}
+          className="w-4/5 h-13 border-2 border-white mb-5 px-3 rounded-lg bg-transparent text-white"
           placeholder={passwordPlaceholder}
-          placeholderTextColor="#fff"
+          placeholderTextColor="white"
           secureTextEntry
           onChangeText={setPassword}
           value={password}
@@ -60,8 +60,8 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
           onBlur={() => setPasswordPlaceholder('Password')}
         />
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginText}>Login</Text>
+        <TouchableOpacity className="bg-white p-3 w-4/5 rounded-full items-center mb-4" onPress={handleLogin}>
+          <Text className="text-[#99BC85] text-xl font-bold">Login</Text>
         </TouchableOpacity>
 
   {/*       <TouchableOpacity style={styles.googleButton} onPress={() => Alert.alert('Google Sign In')}>
@@ -69,78 +69,14 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity> */}
 
         <TouchableOpacity
-          style={styles.forgotPasswordContainer}
+          className="w-4/5 items-end"
           onPress={() => navigation.navigate('ForgotPassword')}
         >
-          <Text style={styles.forgotPassword}>Forgot password?</Text>
+          <Text className="text-white mt-0 text-right font-bold text-base">Forgot password?</Text>
         </TouchableOpacity>
       </ImageBackground>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  background: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    width: 150,
-    height: 150,
-    marginBottom: 40,
-  },
-  googleButton: {
-    backgroundColor: '#fff',
-    padding: 12,
-    width: '80%',
-    borderRadius: 40,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  googleButtonText: {
-    color: '#99BC85',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  input: {
-    width: '80%',
-    height: 50,
-    borderColor: '#fff',
-    borderWidth: 2,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    backgroundColor: 'transparent',
-    color: '#fff',
-  },
-  loginButton: {
-    backgroundColor: '#fff',
-    padding: 12,
-    width: '80%',
-    borderRadius: 40,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  loginText: {
-    color: '#99BC85',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  forgotPasswordContainer: {
-    width: '80%',
-    alignItems: 'flex-end', 
-  },
-  forgotPassword: {
-    color: '#fff',
-    marginTop: 0,
-    textAlign: 'right',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-});
 
 export default LogIn;
