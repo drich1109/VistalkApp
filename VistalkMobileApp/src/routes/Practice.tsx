@@ -6,47 +6,49 @@ import SearchIcon from '../assets/svg/SearchIcon';
 import SpeakerIcon from '../assets/svg/SpeakerIcon';
 import { Circle, Svg } from 'react-native-svg';
 import MicrophoneIcon from '../assets/svg/MicrophoneIcon';
+import { RootStackParamList } from '../../types';
 
 const Practice: React.FC = () => {
   const [searchText, setSearchText] = useState('');
+  const [activeScreen, setActiveScreen] = useState<keyof RootStackParamList | null>('Practice');
   let progressnumber = 17;
   return (
-    <ImageBackground source={require('../assets/bg.png')} style={styles.background}>
-      <TouchableOpacity style={styles.history}>
-        <HistoryIcon style={styles.historyicon} />
+    <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
+      <TouchableOpacity className="absolute top-0 right-0 mr-4 mt-4">
+        <HistoryIcon className="h-8 w-8 rounded-full bg-white" />
       </TouchableOpacity>
-      <View style={styles.center}>
-        <Text style={styles.centerText}>Pronounce</Text>
+      <View className="items-center mb-3">
+        <Text className="text-4xl font-bold text-white">Pronounce</Text>
       </View>
-      <View style={styles.search}>
-        <TextInput
-          style={styles.input}
-          placeholder="Search for a word"
-          placeholderTextColor="#999"
-          value={searchText}
-          onChangeText={setSearchText}
-        />
-        <SearchIcon style={styles.searchicon} />
+      <View className="flex flex-row items-center justify-start bg-white rounded-lg px-4 mb-5 w-4/5 h-10">
+            <TextInput
+              className="flex-1 h-full text-[#999] text-base"
+              placeholder="Search for a word"
+              placeholderTextColor="#999"
+              value={searchText}
+              onChangeText={setSearchText}
+            />
+            <SearchIcon className="w-7 h-7" />
       </View>
-      <TouchableOpacity style={styles.center}>
-        <Text style={styles.button}>
+      <TouchableOpacity className="items-center mb-4">
+        <Text className="bg-white rounded-lg p-2 text-base font-seminbold text-black">
           Random Words
         </Text>
       </TouchableOpacity>
-      <View style={styles.content}>
-        <Text style={styles.text1}>Maayong Buntag</Text>
-        <View style={styles.content2}>
-        <Text style={styles.text2}>["ma-a-yong bun-tag"]</Text>
-        <TouchableOpacity>
-          <SpeakerIcon style={styles.speaker} />
-        </TouchableOpacity>
-      </View>
+      <View className="mb-2">
+        <Text className="text-2xl font-bold text-white">Maayong Buntag</Text>
+        <View className="flex flex-row ml-2 mb-2 px-2">
+          <Text className="text-xl italic font-light text-white">["ma-a-yong bun-tag"]</Text>
+          <TouchableOpacity>
+            <SpeakerIcon className="h-6 w-6 ml-2" />
+          </TouchableOpacity>
+        </View>
       </View>
       
-      <View style={styles.center}>
-        <Text style={styles.centerText2}>Excellent !!!</Text>
+      <View className="items-center mb-4">
+        <Text className="text-3xl font-bold text-white">Excellent !!!</Text>
       </View>
-      <View style={styles.progressCircleWrapper}>
+      <View className="w-20 h-20 justify-center items-center mb-4">
               <Svg width="80" height="80">
                 <Circle
                   cx="40"
@@ -66,12 +68,12 @@ const Practice: React.FC = () => {
                   strokeDasharray={`${progressnumber / 100 * 2 * Math.PI * 35} ${2 * Math.PI * 35 - progressnumber / 100 * 2 * Math.PI * 35}`}
                   strokeDashoffset={Math.PI / 2 * 35}                />
               </Svg>
-              <Text style={styles.progressText}>{progressnumber}%</Text>
+              <Text className='absolute text-xl text-white font-bold'>{progressnumber}%</Text>
     </View>
-    <TouchableOpacity style={styles.center}>
-        <MicrophoneIcon style={styles.microphone}/>
+    <TouchableOpacity className="items-center">
+        <MicrophoneIcon className="h-24 w-24 mb-12 bg-white rounded-full p-4"/>
     </TouchableOpacity>
-      <Menu />
+      <Menu activeScreen={activeScreen}/>
     </ImageBackground>
   );
 };
