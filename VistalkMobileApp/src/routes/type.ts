@@ -46,3 +46,12 @@ export type EditProfileVista = {
     userId: number;
     file: File | null;
 };
+export type Content = {
+    contentID: number;
+    contentText: string;
+    englishTranslation: string;
+    audioPath: string;
+    languageID: number;
+    contentTypeID: number;
+    isActive: boolean;
+};

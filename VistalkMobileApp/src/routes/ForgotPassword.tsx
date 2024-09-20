@@ -69,26 +69,28 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
           animationType="slide"
           onRequestClose={() => setIsModalVisible(false)}
         >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Enter Confirmation Code</Text>
+          <View className="flex-1 justify-center items-center bg-[#00000080]">
+            <View className="w-4/5 bg-[#99BC85] p-5 rounded-lg items-center">
+              <Text className="text-xl font-bold mb-4 text-white">Enter Confirmation Code</Text>
 
               <TextInput
-                style={[styles.input, { color: '#000' }]}
+                className="w-full h-12 border border-white border-2 mb-4 px-2 rounded-md bg-transparent text-white"
                 placeholder="Confirmation Code"
-                placeholderTextColor="#999"
+                placeholderTextColor="white"
                 onChangeText={setConfirmationCode}
                 value={confirmationCode}
                 keyboardType="numeric"
               />
 
-              <TouchableOpacity style={styles.modalButton} onPress={handleConfirmCode}>
-                <Text style={styles.modalButtonText}>Confirm</Text>
-              </TouchableOpacity>
+              <View className="flex-row items-center justify-between w-[100%] gap-2">
+                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleConfirmCode}>
+                  <Text className="text-base text-black">Confirm</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity onPress={() => setIsModalVisible(false)}>
-                <Text style={styles.modalCancel}>Cancel</Text>
-              </TouchableOpacity>
+                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={() => setIsModalVisible(false)}>
+                  <Text className="text-base text-black">Cancel</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>

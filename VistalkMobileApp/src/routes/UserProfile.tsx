@@ -60,23 +60,23 @@ const UserProfile: React.FC<Props> = ({ navigation }) => {
             {fileUrl ? (
               <Image
                 source={{ uri: fileUrl }}
-                className="w-50 h-50 rounded-full mb-5 border-2 border-white"
+                className="w-16 h-16 rounded-full mb-5 border-2 border-white"
               />
             ) : (
-              <Svg width="50" height="50" viewBox="0 0 1792 1792">
+              <Svg width="50" height="50" viewBox="0 0 1792 1792" className="mb-5">
                 <Path
                   fill="black"
                   d="M1523 1339q-22-155-87.5-257.5T1251 963q-67 74-159.5 115.5T896 1120t-195.5-41.5T541 963q-119 16-184.5 118.5T269 1339q106 150 271 237.5t356 87.5t356-87.5t271-237.5m-243-699q0-159-112.5-271.5T896 256T624.5 368.5T512 640t112.5 271.5T896 1024t271.5-112.5T1280 640m512 256q0 182-71 347.5t-190.5 286T1245 1721t-349 71q-182 0-348-71t-286-191t-191-286T0 896t71-348t191-286T548 71T896 0t348 71t286 191t191 286t71 348"
                 />
               </Svg>
             )}
-            <View className="mt-2">
+            <View className="mb-5">
               <Text className="text-white text-2xl font-bold">{userDetails.name}</Text>
               <Text className="text-white text-base">{userDetails.email}</Text>
             </View>
           </View>
         )}
-        <View className="flex flex-row justify-center items-center gap-5 mt-4">
+        <View className="flex flex-row justify-center items-center gap-5 mt-2">
           <View className="w-20">
             <Text className="text-xl font-bold text-center mb-2">Units Unlocked</Text>
             <Text className="text-xl text-center">5</Text>
@@ -92,8 +92,8 @@ const UserProfile: React.FC<Props> = ({ navigation }) => {
         </View>
         <View className="items-center mt-6">
           <View className="w-60">
-            <Text className="text-4xl font-bold text-center mb-2">TOTAL WEEKLY SCORE</Text>
-            <Text className="text-4xl font-bold text-center mb-2">12,654</Text>
+            <Text className="text-2xl font-bold text-center mb-2">TOTAL WEEKLY SCORE</Text>
+            <Text className="text-2xl font-bold text-center mb-2">12,654</Text>
           </View>
         </View>
       </ImageBackground>

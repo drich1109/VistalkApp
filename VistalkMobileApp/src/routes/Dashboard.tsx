@@ -95,7 +95,7 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
           </TouchableOpacity>
       </View>
       </View>
-      <ScrollView contentContainerStyle={{ padding: 20 }} className="mb-8">
+      <ScrollView contentContainerStyle={{ padding: 20 }} className="mb-8" showsVerticalScrollIndicator={false}>
       {languageDetails !== undefined && (
         <View className="items-center mb-5">
           <Text className="text-4xl font-bold text-black">{languageDetails.native_name}</Text>

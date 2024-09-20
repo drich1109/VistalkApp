@@ -1,5 +1,5 @@
 import { getFromBaseApi, getFromMainApi, postToBaseApi, postToMainApi, putFormBaseApi, putToBaseApi, putToMainApi } from "../../api/apiService";
-import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista } from "./type";
+import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content } from "./type";
 import CryptoJS from 'crypto-js';
 import { VITE_MAIN_API } from '@env';
 
@@ -74,4 +74,8 @@ export async function deactivateVistaAccount(userId:number) {
 
 export async function sendFeedback(userId:number, feedback:string) {
     return await postToMainApi<CallResultDto<object>>('/addfeedback', {userId, feedback});
+}
+export async function getContent(searchString: string)
+{
+    return await getFromMainApi<CallResultDto<Content[]>>('getContent', {searchString});
 }

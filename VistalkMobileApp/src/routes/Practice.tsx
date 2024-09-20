@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, TextInput, TouchableOpacity, SafeAreaView, ScrollView } from 'react-native';
 import Menu from '../components/Menu'; // Adjust the import path as needed
 import HistoryIcon from '../assets/svg/HistoryIcon';
 import SearchIcon from '../assets/svg/SearchIcon';
@@ -13,11 +13,12 @@ const Practice: React.FC = () => {
   const [activeScreen, setActiveScreen] = useState<keyof RootStackParamList | null>('Practice');
   let progressnumber = 17;
   return (
-    <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
+    <SafeAreaView className="flex-1">
+      <ImageBackground source={require('../assets/bg.png')} className="flex-1 items-center" resizeMode="cover">
       <TouchableOpacity className="absolute top-0 right-0 mr-4 mt-4">
         <HistoryIcon className="h-8 w-8 rounded-full bg-white" />
       </TouchableOpacity>
-      <View className="items-center mb-3">
+      <View className="items-center mt-20 mb-3">
         <Text className="text-4xl font-bold text-white">Pronounce</Text>
       </View>
       <View className="flex flex-row items-center justify-start bg-white rounded-lg px-4 mb-5 w-4/5 h-10">
@@ -35,20 +36,20 @@ const Practice: React.FC = () => {
           Random Words
         </Text>
       </TouchableOpacity>
-      <View className="mb-2">
-        <Text className="text-2xl font-bold text-white">Maayong Buntag</Text>
-        <View className="flex flex-row ml-2 mb-2 px-2">
-          <Text className="text-xl italic font-light text-white">["ma-a-yong bun-tag"]</Text>
-          <TouchableOpacity>
-            <SpeakerIcon className="h-6 w-6 ml-2" />
-          </TouchableOpacity>
+      <View className='flex-1 items-center justify-center mt-20'>
+        <View className="mb-2">
+          <Text className="text-2xl font-bold text-white">Maayong Buntag</Text>
+          <View className="flex flex-row ml-2 mb-2 px-2">
+            <Text className="text-xl italic font-light text-white">["ma-a-yong bun-tag"]</Text>
+            <TouchableOpacity>
+              <SpeakerIcon className="h-6 w-6 ml-3" />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-      
-      <View className="items-center mb-4">
-        <Text className="text-3xl font-bold text-white">Excellent !!!</Text>
-      </View>
-      <View className="w-20 h-20 justify-center items-center mb-4">
+        <View className="items-center mb-4">
+          <Text className="text-3xl font-bold text-white">Excellent !!!</Text>
+        </View>
+        <View className="w-20 h-20 justify-center items-center mb-4">
               <Svg width="80" height="80">
                 <Circle
                   cx="40"
@@ -69,142 +70,18 @@ const Practice: React.FC = () => {
                   strokeDashoffset={Math.PI / 2 * 35}                />
               </Svg>
               <Text className='absolute text-xl text-white font-bold'>{progressnumber}%</Text>
-    </View>
-    <TouchableOpacity className="items-center">
-        <MicrophoneIcon className="h-24 w-24 mb-12 bg-white rounded-full p-4"/>
-    </TouchableOpacity>
+      </View>
+      <TouchableOpacity className="items-center">
+          <MicrophoneIcon className="h-24 w-24 bg-white rounded-full p-4"/>
+      </TouchableOpacity>
+      </View>
+      <ScrollView contentContainerStyle={{ padding: 4 }} className="mb-4" showsVerticalScrollIndicator={false}>
+
+      </ScrollView>
       <Menu activeScreen={activeScreen}/>
     </ImageBackground>
+    </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  historyicon: {
-    height: 35,
-    width: 35,
-    backgroundColor: 'white',
-    borderRadius: 20,
-  },
-  history: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    marginTop: 20,
-    marginRight: 20,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  progressCircleWrapper: {
-    width: 80, // Slightly increased size
-    height: 80,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20
-  },
-  progressText: {
-    fontSize: 18,
-    color: '#ffff',
-    fontWeight: 'bold',
-    position: 'absolute', // Center text inside the circle
-  },
-  center: {
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  centerText: {
-    fontSize: 40,
-    fontWeight: 'bold',
-    color: '#fff', // White text
-  },
-  centerText2: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#fff', // White text
-  },
-  content: {
-    alignSelf: 'flex-start', // Align to the left
-    marginLeft: 80, // Add margin for spacing
-    marginBottom: 10,
-  },
-  content2: {
-    alignSelf: 'flex-start', // Align to the left
-    marginLeft: 20, // Add margin for spacing
-    flexDirection: 'row', // Align items horizontally
-    alignItems: 'center', // Center vertically
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    width: '80%', // Adjusted width for better layout
-    height: 40,
-  },
-  search: {
-    display: 'flex',
-    flexDirection: 'row', // Align icon and input horizontally
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    backgroundColor: 'white',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    marginBottom: 20,
-    width: '80%', // Adjusted width for better layout
-    height: 40, // Adjusted height for a better look
-  },
-  searchicon: {
-    height: 25,
-    width: 25,
-    marginRight: 10,
-  },
-  speaker: {
-    height: 25,
-    width: 25,
-    marginLeft: 10, // Add margin to space between text and icon
-  },
-  microphone: {
-    height: 40,
-    width: 40,
-    marginBottom: 30,
-    backgroundColor: 'white',
-    borderRadius: 40,
-    padding: 40
-  },
-  input: {
-    flex: 1, // Takes the remaining space in the row
-    height: '100%',
-    color: 'black',
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 10,
-    fontSize: 16,
-    fontWeight: 'semibold',
-    color: 'black'
-  },
-  background: {
-    flex: 1,
-    resizeMode: 'cover',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  text1: {
-    fontSize: 42,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  text2: {
-    fontSize: 24, // Adjusted size for better fit
-    fontStyle: 'italic',
-    fontWeight: '300',
-    color: 'white',
-  },
-});
 
 export default Practice;
