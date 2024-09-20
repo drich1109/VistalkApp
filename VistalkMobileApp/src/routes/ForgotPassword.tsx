@@ -42,23 +42,23 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ImageBackground source={require('../assets/bg.png')} style={styles.background} resizeMode="cover">
-        <Image source={require('../assets/logo.png')} style={styles.logo} resizeMode="contain" />
+    <SafeAreaView className="flex-1">
+      <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
+        <Image source={require('../assets/logo.png')} className="w-44 h-44 mb-10" resizeMode="contain" />
 
-        <View style={styles.inner}>
+        <View className="w-[100%] px-5 items-center">
           <TextInput
-            style={[styles.input, { color: '#000' }]}
+            className="w-[100%] h-13 border-2 border-white mb-5 px-2.5 rounded-lg bg-transparent text-white"
             placeholder="Email"
-            placeholderTextColor="#fff"
+            placeholderTextColor="white"
             onChangeText={setEmail}
             value={email}
             keyboardType="email-address"
             autoCapitalize="none"
             textContentType="emailAddress"
           />
-          <TouchableOpacity style={styles.button} onPress={handleSendCode}>
-            <Text style={styles.buttonText}>Send Code</Text>
+          <TouchableOpacity className="bg-white w-[100%] rounded-3xl items-center p-3 mb-3" onPress={handleSendCode}>
+            <Text className="text-[#99BC85] font-bold text-xl">Send Code</Text>
           </TouchableOpacity>
         </View>
 
@@ -98,96 +98,5 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  background: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    width: 150,
-    height: 150,
-    marginBottom: 40,
-  },
-  inner: {
-    width: '100%',
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    borderColor: '#fff',
-    borderWidth: 2,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    backgroundColor: 'transparent',
-    color: '#fff',
-  },
-  button: {
-    backgroundColor: '#fff',
-    padding: 12,
-    width: '100%',
-    borderRadius: 50,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  buttonText: {
-    color: '#99BC85',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  haveanaccountContainer: {
-    width: '100%',
-    alignItems: 'flex-end',
-  },
-  haveanaccount: {
-    color: '#fff',
-    marginTop: 20,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    width: '80%',
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  modalButton: {
-    backgroundColor: '#99BC85',
-    padding: 12,
-    borderRadius: 50,
-    alignItems: 'center',
-    marginTop: 16,
-    width: '100%',
-  },
-  modalButtonText: {
-    color: '#fff',
-    fontSize: 18,
-  },
-  modalCancel: {
-    marginTop: 20,
-    color: '#999',
-    fontSize: 16,
-  },
-});
 
 export default ForgotPassword;

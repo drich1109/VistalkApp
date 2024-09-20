@@ -40,23 +40,23 @@ const Register: React.FC<Props> = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ImageBackground source={require('../assets/bg.png')} style={styles.background} resizeMode="cover">
-        <Image source={require('../assets/logo.png')} style={styles.logo} resizeMode="contain" />
+    <SafeAreaView className="flex-1">
+      <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
+        <Image source={require('../assets/logo.png')} className="w-44 h-44 mb-10" resizeMode="contain" />
 
-        <View style={styles.inner}>
+        <View className="w-[100%] px-5 items-center">
           <TextInput
-            style={[styles.input, { color: '#000' }]}
+            className="w-[100%] h-13 border-2 border-white mb-5 px-2.5 rounded-lg bg-transparent text-white"
             placeholder="Full Name"
-            placeholderTextColor="#fff"
+            placeholderTextColor="white"
             onChangeText={setName}
             value={name}
           />
 
           <TextInput
-            style={[styles.input, { color: '#000' }]}
+            className="w-[100%] h-13 border-2 border-white mb-5 px-2.5 rounded-lg bg-transparent text-white"
             placeholder="Email"
-            placeholderTextColor="#fff"
+            placeholderTextColor="white"
             onChangeText={setEmail}
             value={email}
             keyboardType="email-address"
@@ -65,98 +65,37 @@ const Register: React.FC<Props> = ({ navigation }) => {
           />
 
           <TextInput
-            style={[styles.input, { color: '#000' }]}
+            className="w-[100%] h-13 border-2 border-white mb-5 px-2.5 rounded-lg bg-transparent text-white"
             placeholder="Password"
-            placeholderTextColor="#fff"
+            placeholderTextColor="white"
             secureTextEntry
             onChangeText={handlePasswordChange}
             value={password}
           />
           <TextInput
-            style={[styles.input, { color: '#000' }]}
+            className="w-[100%] h-13 border-2 border-white mb-5 px-2.5 rounded-lg bg-transparent text-white"
             placeholder="Confirm Password"
-            placeholderTextColor="#fff"
+            placeholderTextColor="white"
             secureTextEntry
             onChangeText={handleConfirmPasswordChange}
             value={confirmPassword}
           />
-          {!passwordMatch && password.length > 0 && confirmPassword.length > 0 && <Text style={styles.errorText}>Passwords do not match</Text>}
+          {!passwordMatch && password.length > 0 && confirmPassword.length > 0 && <Text className="text-red mb-2 text-center">Passwords do not match</Text>}
 
-          <TouchableOpacity style={styles.button} onPress={clickRegister}>
-            <Text style={styles.buttonText}>Create</Text>
+          <TouchableOpacity className="bg-white w-[100%] rounded-3xl items-center p-3 mb-3" onPress={clickRegister}>
+            <Text className="text-[#99BC85] font-bold text-xl">Create</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.haveanaccountContainer}
+            className="w-[100%] items-end"
             onPress={() => navigation.navigate('LogIn')}
           >
-            <Text style={styles.haveanaccount}>Already have an account?</Text>
+            <Text className="text-white mt-4 text-center font-bold text-base">Already have an account?</Text>
           </TouchableOpacity>
         </View>
       </ImageBackground>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  background: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  logo: {
-    width: 150,
-    height: 150,
-    marginBottom: 40,
-  },
-  inner: {
-    width: '100%',
-    paddingHorizontal: 20,
-    alignItems: 'center',
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    borderColor: '#fff',
-    borderWidth: 2,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    backgroundColor: 'transparent',
-    color: '#fff',
-  },
-  button: {
-    backgroundColor: '#fff',
-    padding: 12,
-    width: '100%',
-    borderRadius: 50,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  buttonText: {
-    color: '#99BC85',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  errorText: {
-    color: 'red',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  haveanaccountContainer: {
-    width: '100%',
-    alignItems: 'flex-end',
-  },
-  haveanaccount: {
-    color: '#fff',
-    marginTop: 20,
-    textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-});
 
 export default Register;

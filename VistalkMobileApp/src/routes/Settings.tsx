@@ -93,6 +93,9 @@ const Settings: React.FC<Props> = ({ navigation }) => {
         <TouchableOpacity className="p-3 bg-white rounded-md" onPress={() => setIsFeedbackModalVisible(true)}>
           <Text className="text-black text-center text-lg font-bold">Send Feedback</Text>
         </TouchableOpacity>
+        <TouchableOpacity className="p-3 bg-white rounded-md">
+          <Text className="text-black text-center text-lg font-bold">Change Language</Text>
+        </TouchableOpacity>
         <TouchableOpacity className="p-3 bg-white rounded-md" onPress={handleSignOut}>
           <Text className="text-black text-center text-lg font-bold">Sign Out</Text>
         </TouchableOpacity>
