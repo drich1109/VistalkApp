@@ -108,11 +108,11 @@ const Settings: React.FC<Props> = ({ navigation }) => {
           <View className="bg-[#99BC85] p-6 w-[80%] rounded-lg items-center">
             <Text className="text-xl font-bold mb-3">Deactivate Account</Text>
             <Text className="text-base mb-4 text-center">Are you sure you want to deactivate your account?</Text>
-            <View className="flex-row justify-between w-[100%]">
-              <TouchableOpacity className="flex-1 p-2 bg-white rounded-md mr-2 items-center" onPress={handleConfirmDeactivate}>
+            <View className="flex-row justify-between w-[100%] gap-2">
+              <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleConfirmDeactivate}>
                 <Text className="text-base text-black">Yes</Text>
               </TouchableOpacity>
-              <TouchableOpacity className="flex-1 p-2 bg-white rounded-md mr-2 items-center" onPress={handleCancelDeactivate}>
+              <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleCancelDeactivate}>
                 <Text className="text-base text-black">No</Text>
               </TouchableOpacity>
             </View>
@@ -137,11 +137,11 @@ const Settings: React.FC<Props> = ({ navigation }) => {
               value={feedbackText}
               onChangeText={setFeedbackText}
             />
-            <View className="flex-row justify-between w-[100%]">
-              <TouchableOpacity className="flex-1 p-2 bg-white rounded-md mr-2 items-center" onPress={handleSendFeedback}>
+            <View className="flex-row justify-between w-[100%] gap-2">
+              <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleSendFeedback}>
                 <Text className="text-base text-black">Send</Text>
               </TouchableOpacity>
-              <TouchableOpacity className="flex-1 p-2 bg-white rounded-md mr-2 items-center" onPress={handleCancelFeedback}>
+              <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleCancelFeedback}>
                 <Text className="text-base text-black">Cancel</Text>
               </TouchableOpacity>
             </View>

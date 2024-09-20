@@ -40,7 +40,7 @@ const Menu: React.FC<MenuProps> = ({ activeScreen }) => {
           <DictionaryIcon className={`w-6 h-6`} isActive={activeScreen == 'Dictionary'}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigateToScreen('Practice')}>
-          <PracticeIcon className={`w-6 h-6 ${activeScreen === 'Practice' ? 'text-blue-500' : 'text-black'}`} />
+          <PracticeIcon className={`w-6 h-6`} isActive={activeScreen == 'Practice'}/>
         </TouchableOpacity>
 {/*         <TouchableOpacity
           className="bg-red-500 p-2 rounded"
