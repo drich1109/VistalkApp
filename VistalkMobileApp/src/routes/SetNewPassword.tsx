@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView, Text, TextInput, TouchableOpacity, View, StyleSheet, Alert } from 'react-native';
+import { SafeAreaView, Text, TextInput, TouchableOpacity, View, StyleSheet, Alert, ImageBackground } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types'; // Adjust the import path
 import { updatePassword } from './repo';
@@ -39,83 +39,46 @@ const SetNewPassword: React.FC<Props> = ({ route, navigation }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.inner}>
-        <Text style={styles.title}>Set New Password</Text>
-        
-        <TextInput
-          style={styles.input}
-          placeholder="New Password"
-          placeholderTextColor="#999"
-          secureTextEntry
-          onChangeText={(text) => {
-            setNewPassword(text);
-            setIsPasswordValid(validatePassword(text));
-          }}
-          value={newPassword}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Confirm Password"
-          placeholderTextColor="#999"
-          secureTextEntry
-          onChangeText={setConfirmPassword}
-          value={confirmPassword}
-        />
-        
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
-        
-        {!isPasswordValid && (
-          <Text style={styles.errorText}>
-            Password must be at least 8 characters long, include an uppercase letter, a number, and a special character.
-          </Text>
-        )}
-      </View>
+    <SafeAreaView className="flex-1">
+      <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
+        <View className="w-[100%] items-center">
+          <Text className="text-2xl text-white mb-4 font-bold">Set New Password</Text>
+          
+          <View className="w-[100%] px-5 items-center">
+            <TextInput
+              className="w-[100%] h-13 border-2 border-white mb-5 px-2.5 rounded-lg bg-transparent text-white"
+              placeholder="New Password"
+              placeholderTextColor="white"
+              secureTextEntry
+              onChangeText={(text) => {
+                setNewPassword(text);
+                setIsPasswordValid(validatePassword(text));
+              }}
+              value={newPassword}
+            />
+            <TextInput
+              className="w-[100%] h-13 border-2 border-white mb-5 px-2.5 rounded-lg bg-transparent text-white"
+              placeholder="Confirm Password"
+              placeholderTextColor="white"
+              secureTextEntry
+              onChangeText={setConfirmPassword}
+              value={confirmPassword}
+            />
+            
+            <TouchableOpacity className="bg-white w-[100%] rounded-3xl items-center p-3 mb-3" onPress={handleSubmit}>
+              <Text className="text-[#99BC85] font-bold text-xl">Submit</Text>
+            </TouchableOpacity>
+          </View>
+          
+          {!isPasswordValid && (
+            <Text className="text-red mt-2">
+              Password must be at least 8 characters long, include an uppercase letter, a number, and a special character.
+            </Text>
+          )}
+        </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  inner: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    height: 50,
-    borderColor: '#ddd',
-    borderWidth: 1,
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-  },
-  button: {
-    backgroundColor: '#007BFF',
-    padding: 12,
-    borderRadius: 50,
-    alignItems: 'center',
-    width: '100%',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-  },
-  errorText: {
-    color: 'red',
-    marginTop: 10,
-  },
-});
 
 export default SetNewPassword;
