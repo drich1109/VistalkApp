@@ -81,7 +81,7 @@
       role="dialog" 
       aria-modal="true">
       
-      <div class="flex items-end justify-center min-h-screen px-4 text-center md:items-center sm:block sm:p-0">
+      <div class="flex items-end justify-center mt-20 px-4 text-center md:items-center sm:block sm:p-0">
         
         <div 
           on:click={closeModal}
@@ -108,6 +108,7 @@
           <form class="mt-5">
             <div>
                 <select disabled={!isAdd} bind:value={currentType} name="" id="" class="w-full font-['Helvetica'] bg-white text-black py-2 px-3 rounded-md text-sm border border border-gray-200">
+                  
                     <option class="py-2" value={0}>--Select Item Type--</option>
                     {#each itemTypes as item}
                         <option class="py-2" value={item.itemTypeID}>{item.typeName}</option>

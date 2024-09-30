@@ -109,8 +109,8 @@
 {#if showQuestion}
     <QuestionList {languageId} {unitId} on:back={closeQuestion}></QuestionList>
 {:else}
-<button class="bg-[#99BC85] rounded-lg p-1" on:click={goBackToSection}><svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 512 512"><path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M244 400L100 256l144-144M120 256h292"/></svg></button>
-<div class="flex justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
+<button class="bg-[#99BC85] rounded-lg p-1 " on:click={goBackToSection}><svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 512 512"><path fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="48" d="M244 400L100 256l144-144M120 256h292"/></svg></button>
+<div class="gap-4 flex flex-col sm:flex-row justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
     <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Unit List</p>
     <div class="flex-grow flex justify-center">
         <div class="flex items-center border border-[#B9B9B9] rounded-xl px-12 py-1 bg-white">

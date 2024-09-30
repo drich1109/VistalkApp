@@ -65,7 +65,7 @@
 {#if openModal == true}
     <ViewUser modelOpen={openModal} {userView} on:close={closeModal}></ViewUser>
 {/if}
-<div class="flex justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
+<div class="gap-4 flex flex-col sm:flex-row justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
     <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">User List</p>
     <div class="flex-grow flex justify-center">
         <div class="flex items-center border border-[#B9B9B9] rounded-xl px-12 py-1 bg-white">
@@ -92,15 +92,15 @@
     </div>
 </div>
 
-<div class="flex mt-6">
-    <table class="bg-white w-full shadow-lg rounded-xl">
+<div class="mt-6 overflow-x-auto">
+    <table class="bg-white w-full shadow-lg rounded-xl min-w-[640px]">
         <thead class="font-['Cambria'] bg-[#99BC85] text-white  text-center">
             <tr class="first:rounded-t-xl last:rounded-b-xl">
-                <th class="px-4 py-2">Name</th>
+                <th class="px-4 py-2 first:rounded-tl-xl  last:rounded-tr-xl">Name</th>
                 <th class="px-4 py-2">Email Address</th>
                 <th class="px-4 py-2">Vcoins</th>
                 <th class="px-4 py-2">Power-ups</th>
-                <th class="px-4 py-2">Actions</th>
+                <th class="px-4 py-2 first:rounded-tl-xl  last:rounded-tr-xl">Actions</th>
             </tr>
         </thead>
         <tbody class="text-center text-sm">
