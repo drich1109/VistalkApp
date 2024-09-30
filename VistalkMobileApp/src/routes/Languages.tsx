@@ -87,8 +87,8 @@ const LanguageList: React.FC<Props> = ({route, navigation}) => {
       <ImageBackground
         resizeMode={'stretch'}
         source={require('../assets/bg.png')}
-        style={styles.background}>
-        <Image source={require('../assets/logo.png')} style={styles.logo} />
+        className="flex-1 p-4">
+        <Image source={require('../assets/logo.png')} className="w-44 h-44 mb-12" />
         {languages.map((language, index) => (
           <View
             style={{

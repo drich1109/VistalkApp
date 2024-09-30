@@ -7,57 +7,22 @@ type Props = StackScreenProps<RootStackParamList, 'Home'>;
 
 const HomeScreen: React.FC<Props> = ({ navigation }) => {
   return (
-    <ImageBackground source={require('../assets/bg.png')} style={styles.background}>
-    <SafeAreaView style={styles.container}>
-      <View style={styles.logoContainer}>
-        <Image source={require('../assets/logo.png')} style={styles.logo} />
+    <ImageBackground source={require('../assets/bg.png')} className="flex-1" resizeMode="cover">
+    <SafeAreaView className="flex-1 justify-center p-4">
+      <View className="items-center mb-8">
+        <Image source={require('../assets/logo.png')} className="w-44 h-44 mb-4" />
       </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('LogIn')}>
-          <Text style={styles.buttonText}>Login</Text>
+      <View className="mt-4">
+        <TouchableOpacity className="bg-white p-4 rounded-xl items-center mb-3" onPress={() => navigation.navigate('LogIn')}>
+          <Text className="text-[#99BC85] text-xl font-bold">Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Register')}>
-          <Text style={styles.buttonText}>Create an Account</Text>
+        <TouchableOpacity className="bg-white p-4 rounded-xl items-center mb-3" onPress={() => navigation.navigate('Register')}>
+          <Text className="text-[#99BC85] text-xl font-bold">Create an Account</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
     </ImageBackground>
   );
 };
-
-const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-    resizeMode: 'cover',
-  },
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 16,
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  logo: {
-    width: 150,
-    height: 150,
-  },
-  buttonContainer: {
-    marginTop: 20,
-  },
-  button: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  buttonText: {
-    color: '#99BC85',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});
 
 export default HomeScreen;

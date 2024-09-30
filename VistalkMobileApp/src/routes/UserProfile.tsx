@@ -72,7 +72,7 @@ const UserProfile: React.FC<Props> = ({ navigation }) => {
             )}
             <View className="mb-5">
               <Text className="text-white text-2xl font-bold">{userDetails.name}</Text>
-              <Text className="text-white text-base">{userDetails.email}</Text>
+              <Text className="text-white text-base w-[90%]">{userDetails.email}</Text>
             </View>
           </View>
         )}

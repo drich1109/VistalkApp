@@ -34,7 +34,7 @@ const Menu: React.FC<MenuProps> = ({ activeScreen }) => {
           <DashboardIcon className={`w-6 h-6`} isActive={activeScreen == 'Dashboard'}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigateToScreen('Shop')}>
-          <ShopIcon className={`w-6 h-6 ${activeScreen === 'Shop' ? 'text-blue-500' : 'text-black'}`} />
+          <ShopIcon className={`w-6 h-6`} isActive={activeScreen == 'Shop'}/>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigateToScreen('Dictionary')}>
           <DictionaryIcon className={`w-6 h-6`} isActive={activeScreen == 'Dictionary'}/>
