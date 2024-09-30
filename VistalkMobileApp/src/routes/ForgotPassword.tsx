@@ -48,7 +48,7 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
 
         <View style={styles.inner}>
           <TextInput
-            style={[styles.input, { color: '#000' }]}
+            style={[styles.input, { color: '#ffffff' }]}
             placeholder="Email"
             placeholderTextColor="#fff"
             onChangeText={setEmail}

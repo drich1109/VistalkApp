@@ -31,9 +31,9 @@ const Dictionary: React.FC = () => {
 
     fetchContents();
   }, [searchString]);
-  const navigateToMeaning = (meaning: keyof RootStackParamList) => {
-    console.log(meaning);
-    navigation.navigate(meaning);
+  
+  const navigateToMeaning = (contentId:number) => {
+    navigation.navigate('DictionaryMeaning', {contentId});
   };
 
   console.log(searchString)
@@ -62,7 +62,7 @@ const Dictionary: React.FC = () => {
           <ActivityIndicator className="" size="large" />
         ) : contents.length > 0 ? (
           contents.map((c, index) => (
-            <TouchableOpacity key={index} onPress={() => navigateToMeaning('DictionaryMeaning')}>
+            <TouchableOpacity key={index} onPress={() => navigateToMeaning(c.contentID)}>
               <View className="bg-white rounded-lg py-3 px-5 mb-3">
                 <View className='flex flex-row items-center gap-x-4'>
                   <Text className="text-xl text-center text-[#5B7200] w-[30%] font-bold">{c.contentText}</Text>

@@ -46,6 +46,7 @@ export type EditProfileVista = {
     userId: number;
     file: File | null;
 };
+
 export type Content = {
     contentID: number;
     contentText: string;
@@ -54,4 +55,29 @@ export type Content = {
     languageID: number;
     contentTypeID: number;
     isActive: boolean;
+    isInDictionary:boolean;
+};
+
+export type ContentSyllable = {
+    id: number;
+    contentId: number;
+    syllableText: string;
+    audioPath: string;
+    orderNumber: number;
+};
+
+export type ContentExample = {
+    id: number;
+    contentId: number;
+    nativeExample: string;
+    englishExample: string;
+    orderNumber: number;
+};
+
+export type ContentDefinition = {
+    id: number;
+    contentId: number;
+    nativeDefinition: string;
+    englishDefinition: string;
+    orderNumber: number;
 };

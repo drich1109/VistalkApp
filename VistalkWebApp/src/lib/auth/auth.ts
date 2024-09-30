@@ -40,7 +40,7 @@ export async function initAuth(cookies?: Cookies, refreshIfExpired: boolean = tr
 
 	//todo:if we need to add Apsettings in db
 	// Load user settings
-	if (decodedUser) {
+	/* if (decodedUser) {
 		try {
 	 		const settings = await getUserSetting('payrollapp:shortcuts');
 	 		if (!settings || !Array.isArray(settings)) {
@@ -53,6 +53,6 @@ export async function initAuth(cookies?: Cookies, refreshIfExpired: boolean = tr
 	 	}
 	} else {
 	 	shortcuts.set([]);
-	}
+	} */
 }
 

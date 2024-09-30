@@ -4,6 +4,7 @@
   import type { CallResultDto, LoggedInUser } from "../types/types";
   import { saveTokenToLocalStorage, saveUserToLocalStorage } from "$lib/auth/oidcService";
     import MessageBox from "$lib/components/MessageBox.svelte";
+    import { initAuth } from "$lib/auth/auth";
 
   const dispatch = createEventDispatcher();
 
@@ -27,7 +28,9 @@
         showMessage = !userCallResult.isSuccess;
         if(userCallResult.isSuccess == true){
           saveTokenToLocalStorage(user.token);
+          console.log(user)
           saveUserToLocalStorage(user);
+          await initAuth();
           dispatch('login', { user });
           handleClose();
         }
