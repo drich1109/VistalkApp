@@ -1,5 +1,5 @@
 import { getFromBaseApi, getFromMainApi, postToBaseApi, postToMainApi, putFormBaseApi, putToBaseApi, putToMainApi } from "../../api/apiService";
-import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content } from "./type";
+import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable } from "./type";
 import CryptoJS from 'crypto-js';
 import { VITE_MAIN_API } from '@env';
 
@@ -75,7 +75,39 @@ export async function deactivateVistaAccount(userId:number) {
 export async function sendFeedback(userId:number, feedback:string) {
     return await postToMainApi<CallResultDto<object>>('/addfeedback', {userId, feedback});
 }
+
 export async function getContent(searchString: string)
 {
     return await getFromMainApi<CallResultDto<Content[]>>('getContent', {searchString});
 }
+
+export async function getContentById(contentId: number)
+{
+    return await getFromMainApi<CallResultDto<Content>>('getContentByID', {contentId});
+}
+
+export async function getContentSyllableById(contentId: number)
+{
+    return await getFromMainApi<CallResultDto<ContentSyllable[]>>('getContentSyllableByID', {contentId});
+}
+
+export async function getContentExampleById(contentId: number)
+{
+    return await getFromMainApi<CallResultDto<ContentExample[]>>('getContentExampleByID', {contentId});
+}
+
+export async function getContentDefinitionById(contentId: number)
+{
+    return await getFromMainApi<CallResultDto<ContentDefinition[]>>('getContentDefinitionByID', {contentId});
+}
+
+export function getContentPronunciation(fileName: string): string {
+    const timestamp = Date.now(); 
+    return `${baseUrl}/getContentPronunciation?fileName=${fileName}&t=${timestamp}`;
+}
+
+export function getSyllablePronunciation(fileName: string): string {
+    const timestamp = Date.now(); 
+    return `${baseUrl}/getSyllablePronunciation?fileName=${fileName}&t=${timestamp}`;
+}
+

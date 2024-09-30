@@ -1,18 +1,16 @@
 import { browser } from '$app/environment';
-import { signIn, signOut } from '$lib/auth/oidcService';
-import { accessToken, getValue } from '$lib/store';
+import { getTokenFromLocalStorage, signIn, signOut } from '$lib/auth/oidcService';
+import { getValue } from '$lib/store';
 import type { AxiosError, AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 
 export const getEndpoint = () => import.meta.env.VITE_BASE_API;
-
+const access_token = await getTokenFromLocalStorage();
 const axiosInstance = axios.create({
 	headers: {}
 });
 
 export async function authenticatedRequest<T>(config: AxiosRequestConfig): Promise<T> {
-	const access_token = getValue(accessToken);
-
 	if (!config.baseURL) {
 		config.baseURL = getEndpoint();
 	}

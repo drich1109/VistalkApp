@@ -1,7 +1,7 @@
 # user.py
 import jwt
 from datetime import datetime, timedelta, timezone
-from db import get_db_connection, UserImages
+from db import get_db_connection, UserImages, SECRET_KEY
 from flask import request, jsonify
 import hashlib
 from Services import emailService
@@ -12,7 +12,7 @@ def generate_token(user_name):
     token = jwt.encode({
         'sub': user_name,
         'exp': expiration_time
-    }, '8807c2bfe813ec02b9178d3c5826118894f3cd01e5d1630555f03d64ee42e655', algorithm='HS256')
+    }, SECRET_KEY, algorithm='HS256')
     return token
 
 def login():

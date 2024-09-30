@@ -11,7 +11,7 @@ export type RootStackParamList = {
   Dashboard:undefined;
   Shop:undefined;
   Dictionary:undefined;
-  DictionaryMeaning:undefined;
+  DictionaryMeaning:{contentId:number};
   Practice:undefined;
   ForgotPassword:undefined;
   SetNewPassword:{email:string};
