@@ -208,7 +208,7 @@
   
 {#if modelOpen}
 <div 
-  class="fixed inset-0 z-50 overflow-y-auto" 
+  class="mt-20 fixed inset-0 z-50 overflow-y-auto" 
   aria-labelledby="modal-title" 
   role="dialog" 
   aria-modal="true">
@@ -236,10 +236,10 @@
               </button>
           </div>
           
-          <div class="grid grid-cols-2 gap-6">
+          <div class="gap-6">
               <!-- Column 1 -->
               <div>
-                  <div class="flex flex-wrap items-center justify-center gap-6">
+                  <div class="grid grid-cols-2 flex flex-wrap items-center justify-center gap-6">
                       <div class="flex flex-col items-left gap-6 mt-16">
                         <div class="flex gap-4">
                           <select bind:value={content.content.contentTypeId} class="w-full font-['Helvetica'] bg-white text-black py-2 px-3 rounded-lg text-sm border border-gray-300">

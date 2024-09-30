@@ -191,7 +191,7 @@
 {#if openModal == true}
     <AddItem modelOpen={openModal} {isAdd} {coinBag} {backgroundMusic} {powerUp} {fileUrl} currentType={itemTypeID} on:close={modalClose} on:refresh={refresh}> </AddItem>
 {/if}
-<div class="flex justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
+<div class="flex flex-col sm:flex-row justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
     <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Item List</p>
     <div class="flex-grow flex justify-center">
         <div class="flex items-center border border-[#B9B9B9] rounded-xl px-12 py-1 bg-white">
@@ -203,7 +203,7 @@
             </button>
         </div>
     </div>
-    <div class="flex gap-4">
+    <div class="flex flex-col sm:flex-row gap-4 mt-4 sm:mt-0">
         <select bind:value={itemTypeID} on:change={refresh} class="w-full font-['Helvetica'] bg-white text-black py-2 px-3 rounded-md text-sm border border border-gray-200">
                     {#each itemTypes as item}
                         <option class="py-2" value={item.itemTypeID}>{item.typeName}</option>

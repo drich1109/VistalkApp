@@ -78,7 +78,7 @@
     <!-- ViewFeedback component can be added here if needed -->
 {/if}
 
-<div class="flex justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
+<div class="gap-4 flex flex-col sm:flex-row justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
     <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">Feedback List</p>
     <div class="flex-grow flex justify-center">
         <div class="flex items-center border border-[#B9B9B9] rounded-xl px-12 py-1 bg-white">

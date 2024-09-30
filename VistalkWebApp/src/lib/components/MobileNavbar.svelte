@@ -95,6 +95,14 @@
                     <i class="fas fa-shop"></i>
                     <span class="nav-text">Shop</span>
                 </a>
+                <a class="nav-link {activePage === '/feedback' ? 'active' : ''}"  on:click={() => goto('/feedback')}>
+                    <i class="fas fa-comments"></i>
+                    <span class="nav-text">Feedback</span>
+                </a>
+                <a class="button is-light mobile-logout-button" on:click={handleLogout}>
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="nav-text">Logout</span>
+                </a>
             </nav>
         </div>
         {/if}
@@ -241,6 +249,19 @@
         padding: 10px;
         cursor: pointer;
         border-radius: 4px;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+    }
+    
+    .mobile-logout-button{
+        display: flex;
+        align-items: center;
+        margin-top: auto;
+        color: #ffffff;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        
         font-size: 1em;
         transition: background-color 0.3s ease;
     }
