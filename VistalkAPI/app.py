@@ -16,7 +16,7 @@ def token_required(f):
             token = request.headers['Authorization'].split(" ")[1] 
         
         if not token:
-            return jsonify({'message': 'Token is missing!'}), 401
+            return jsonify({'message': 'Unauthorized!'}), 401
         
         try:
             data = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
@@ -153,7 +153,6 @@ def registerVista():
     return user.createVista()
 
 @app.route('/loginVista', methods=['GET'])
-@token_required
 def loginVista():
     return user.loginVista()
 

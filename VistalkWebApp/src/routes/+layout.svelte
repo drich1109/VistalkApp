@@ -12,16 +12,6 @@
     let isSidebarExpanded = true;
     let isMobileExpanded = true;
 
-    async function getUser() {
-        user = await getLoggedInUser();
-        loggedInUser.set(user);
-        isLoading = false;
-    }
-
-    onMount(() => {
-        getUser();
-    });
-
     function logout(): void {
         loggedInUser.set(null);        
         localStorage.removeItem('authToken');
@@ -35,10 +25,8 @@
     }
 </script>
 
-{#if isLoading}
-    <!-- Show a loader or placeholder until the user is fetched -->
-    <div>Loading...</div>
-{:else if $loggedInUser}
+
+{#if $loggedInUser}
     <div class="layout">
         <SideBar on:logout={logout} on:toggleSidebar={handleSidebarToggle} />
         <main class="content" class:collapsed={!isSidebarExpanded} class:expanded={isSidebarExpanded}>

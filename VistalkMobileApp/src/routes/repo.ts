@@ -1,5 +1,5 @@
 import { getFromBaseApi, getFromMainApi, postToBaseApi, postToMainApi, putFormBaseApi, putToBaseApi, putToMainApi } from "../../api/apiService";
-import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable } from "./type";
+import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp } from "./type";
 import CryptoJS from 'crypto-js';
 import { VITE_MAIN_API } from '@env';
 
@@ -9,7 +9,6 @@ export async function loginUser(email:string, password:string)
 {
     const hashedPassword = CryptoJS.MD5(password).toString();
     const result =  await getFromBaseApi<CallResultDto<LoggedInUser>>('loginVista', {email, hashedPassword});
-    console.log(result)
     return result
 }
 
@@ -76,9 +75,9 @@ export async function sendFeedback(userId:number, feedback:string) {
     return await postToMainApi<CallResultDto<object>>('/addfeedback', {userId, feedback});
 }
 
-export async function getContent(searchString: string)
+export async function getContent(searchString: string,  offset:number, LIMIT:number)
 {
-    return await getFromMainApi<CallResultDto<Content[]>>('getContent', {searchString});
+    return await getFromMainApi<CallResultDto<Content[]>>('getContent', {searchString, offset, LIMIT});
 }
 
 export async function getContentById(contentId: number)
@@ -111,3 +110,20 @@ export function getSyllablePronunciation(fileName: string): string {
     return `${baseUrl}/getSyllablePronunciation?fileName=${fileName}&t=${timestamp}`;
 }
 
+export async function getPowerUps()
+{
+    return await getFromMainApi<CallResultDto<PowerUp[]>>('getPowerUps');
+}
+
+export function getPowerupImage(fileName: string): string {
+    const timestamp = Date.now(); 
+    return `${baseUrl}/getItemImage?fileName=${fileName}&t=${timestamp}`;
+}
+
+export async function getUserVCoin(userId: string) {
+    return await getFromMainApi<CallResultDto<number>>('getUserVcoin', {userId});
+}
+
+export async function buyPowerUp(userId: string, itemId:number, quantity:number) {
+    return await putToMainApi<CallResultDto<object>>('buyPowerUp', {userId, itemId, quantity});
+}

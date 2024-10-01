@@ -4,7 +4,6 @@ import oidcConfig from './oidcConfig';
 import { goto } from '$app/navigation';
 import { jwtDecode, type JwtPayload } from 'jwt-decode';
 import { browser } from '$app/environment';
-import { loggedInUser } from '$lib/store';
 import type {LoggedInUser} from'../../types/types';
 
 export type CustomJwtPayload = JwtPayload & LoggedInUser;
@@ -73,25 +72,32 @@ export async function handleCallback(): Promise<void> {
 
 export { oidcConfig, oidcClient };
 
-
-export function saveTokenToLocalStorage(token: string): void {
-    localStorage.setItem(TOKEN_KEY, token);
-}
-
-export function saveUserToLocalStorage(user: LoggedInUser): void {
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
-}
-
 export function getTokenFromLocalStorage(): string | null {
+    if (!browser) return null;
     return localStorage.getItem(TOKEN_KEY);
 }
 
 export function getUserFromLocalStorage(): LoggedInUser | null {
+    if (!browser) return null;
     const user = localStorage.getItem(USER_KEY);
     return user ? JSON.parse(user) : null;
 }
 
+export function saveTokenToLocalStorage(token: string): void {
+    if (browser) {
+        localStorage.setItem(TOKEN_KEY, token);
+    }
+}
+
+export function saveUserToLocalStorage(user: LoggedInUser): void {
+    if (browser) {
+        localStorage.setItem(USER_KEY, JSON.stringify(user));
+    }
+}
+
 export function clearLocalStorage(): void {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    if (browser) {
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(USER_KEY);
+    }
 }

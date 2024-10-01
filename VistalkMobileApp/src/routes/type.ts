@@ -81,3 +81,15 @@ export type ContentDefinition = {
     englishDefinition: string;
     orderNumber: number;
 };
+
+export type PowerUp = 
+{
+    itemID: number;
+    itemTypeID: number;
+    vcoinPrice: number;
+    isPremium: boolean;
+    filePath: string;
+    isActive: boolean;
+    name: string;
+    description: string;
+}

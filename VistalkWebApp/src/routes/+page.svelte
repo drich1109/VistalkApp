@@ -6,15 +6,12 @@
     import { loggedInUser } from '$lib/store';
     
     let user: LoggedInUser | null = null;
+    let getUserLogIn = false;
 
     async function getUser() {
         user = await getLoggedInUser();
         loggedInUser.set(user);
     }
-
-    onMount(() => {
-        getUser();
-    });
 
     function scrollToSection(sectionId: string) {
         const section = document.getElementById(sectionId);
@@ -24,6 +21,11 @@
     }
 
     let showModal = false;
+
+    onMount(async () => {
+        if(getUserLogIn == true)
+            await getUser();
+    });
 
     const openModal = () => {
         showModal = true;
@@ -35,6 +37,7 @@
 
     async function handleLogin(event: CustomEvent) {
         loggedInUser.set(event.detail.user);
+        getUserLogIn = true;
     }
 
 </script>
@@ -43,7 +46,9 @@
 <LoginModal on:close={closeModal} on:login={handleLogin} />
 {/if}
 
-{#if user == null}
+{#if $loggedInUser}
+<p>Welcome, {$loggedInUser.name}!</p>
+{:else}
 <header class="fixed top-0 w-full bg-white z-50 shadow-lg">
     <nav class="text-black py-4 px-4 md:px-20 flex justify-between items-center">
         <ul class="flex">
@@ -160,7 +165,4 @@
         <!-- Additional content here -->
     </div>
 </section>
-
-{:else}
-<p>Welcome, {user.name}!</p>
 {/if}

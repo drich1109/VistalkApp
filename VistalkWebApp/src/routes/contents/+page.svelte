@@ -188,7 +188,6 @@
             }
         }
         syllables = [...syllables]
-        console.log(syllables)
         content = {
             content: contentMain,
             syllables,

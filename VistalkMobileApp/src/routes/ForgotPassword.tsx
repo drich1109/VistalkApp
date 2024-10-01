@@ -48,7 +48,6 @@ const ForgotPassword: React.FC<Props> = ({ navigation }) => {
 
         <View className="w-[100%] px-5 items-center">
           <TextInput
-            style={[styles.input, { color: '#ffffff' }]}
             className="w-[100%] h-13 border-2 border-white mb-5 px-2.5 rounded-lg bg-transparent text-white"
             placeholder="Email"
             placeholderTextColor="white"

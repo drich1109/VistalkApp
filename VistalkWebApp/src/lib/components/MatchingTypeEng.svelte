@@ -50,7 +50,6 @@
         mainQuestion.match2 = mainQuestion.choice2;
         mainQuestion.match3 = mainQuestion.choice3;
         mainQuestion.match4 = mainQuestion.choice4;
-        console.log(mainQuestion);
         await save_questionMatch(mainQuestion);
         closeModal();
     }
