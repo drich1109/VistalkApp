@@ -3,11 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ImageBackground, TouchableOpacity, Image, ScrollView, Modal } from 'react-native';
 import Menu from '../components/Menu';
 import Svg, { Circle, Path  } from 'react-native-svg';
-import { RootStackParamList } from '../../types';
+import { RootStackParamList, UnitScreenNavigationProp } from '../../types';
 import { getUserDetails, getUserImageUrl, getUserLanguage } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Languages, UserProfileDto } from './type';
 import { StackScreenProps } from '@react-navigation/stack';
+import { useNavigation } from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
 
 type Props = StackScreenProps<RootStackParamList, 'Dashboard'>;
 
@@ -21,6 +23,7 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
   const [languageDetails, setLanguageDetails] = useState<Languages>();
   const [userDetails, setUserDetails] = useState<UserProfileDto>();
   const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const unit = useNavigation<UnitScreenNavigationProp>();
 
   let progressnumber = 17;
 
@@ -45,6 +48,10 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
     const unsubscribe = navigation.addListener('focus', fetchUserData);
     return unsubscribe;
   }, [navigation]);
+
+  const navigateToUnit = (units: keyof RootStackParamList) => {
+    unit.navigate(units);
+  };
   
   const openModal = (section: number) => {
     setCurrentSection(section);
@@ -81,10 +88,7 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
   };
 
   return (
-    <ImageBackground
-      source={require('../assets/bg.png')}
-      className="flex-1 resize-cover justify-center"
-    >
+      <LinearGradient colors={['#6addd0', '#7fc188']} className="flex-1 resize-cover justify-center">
       <View className="flex-row justify-between p-2 items-center">
         <TouchableOpacity className="w-10 h-10 rounded-full overflow-hidden bg-white justify-center items-center" onPress={() => navigation.navigate('UserProfile')}>
           {fileUrl ? (
@@ -185,7 +189,7 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
                   This is a brief description of Section {currentSection}.
                 </Text>
                 <View className="pb-10 px-10">
-                  <TouchableOpacity className="bg-white py-2 px-10 rounded-full self-center" onPress={closeModal}>
+                  <TouchableOpacity className="bg-white py-2 px-10 rounded-full self-center" onPress={() => navigateToUnit('Unit')}>
                     <Text className="text-lg text-black font-bold">Play</Text>
                   </TouchableOpacity>
                 </View>
@@ -332,7 +336,7 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
           </Modal>
 
       <Menu activeScreen={activeScreen} /> 
-    </ImageBackground>
+      </LinearGradient>
   );
 };
 

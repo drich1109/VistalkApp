@@ -3,6 +3,7 @@ import { SafeAreaView, Text, TextInput, TouchableOpacity, ImageBackground, Image
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types'; // Adjust the import path
 import { UserDto } from './type'; // Adjust the import path
+import LinearGradient from 'react-native-linear-gradient';
 
 type Props = StackScreenProps<RootStackParamList, 'Register'>;
 
@@ -41,8 +42,8 @@ const Register: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView className="flex-1">
-      <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
-        <Image source={require('../assets/logo.png')} className="w-44 h-44 mb-10" resizeMode="contain" />
+      <LinearGradient colors={['#6addd0', '#7fc188']} className="flex-1 justify-center items-center">
+        <Image source={require('../assets/White.png')} className="w-44 h-44 mb-10" resizeMode="contain" />
 
         <View className="w-[100%] px-5 items-center">
           <TextInput
@@ -93,7 +94,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
             <Text className="text-white mt-4 text-center font-bold text-base">Already have an account?</Text>
           </TouchableOpacity>
         </View>
-      </ImageBackground>
+        </LinearGradient>
     </SafeAreaView>
   );
 };

@@ -4,6 +4,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types'; // Adjust the import path
 import { loginUser } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LinearGradient from 'react-native-linear-gradient';
 
 type Props = StackScreenProps<RootStackParamList, 'LogIn'>;
 
@@ -33,8 +34,8 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView className="flex-1">
-      <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
-        <Image source={require('../assets/logo.png')} className="w-44 h-44 mb-12" resizeMode="contain" />
+      <LinearGradient colors={['#6addd0', '#7fc188']} className="flex-1 justify-center items-center">
+        <Image source={require('../assets/White.png')} className="w-44 h-44 mb-12" resizeMode="contain" />
 
         <TextInput
           className="w-4/5 h-13 border-2 border-white mb-5 px-3 rounded-lg bg-transparent text-white"
@@ -74,7 +75,7 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
         >
           <Text className="text-white mt-0 text-right font-bold text-base">Forgot password?</Text>
         </TouchableOpacity>
-      </ImageBackground>
+        </LinearGradient>
     </SafeAreaView>
   );
 };
