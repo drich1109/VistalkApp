@@ -185,9 +185,9 @@
     }
   </script>
   
-  {#if isLoading}
+ <!--  {#if isLoading}
     <Loader {isLoading}></Loader>
-    {/if}
+    {/if} -->
 {#if openModal == true}
     <AddItem modelOpen={openModal} {isAdd} {coinBag} {backgroundMusic} {powerUp} {fileUrl} currentType={itemTypeID} on:close={modalClose} on:refresh={refresh}> </AddItem>
 {/if}

@@ -9,7 +9,6 @@
   const dispatch = createEventDispatcher();
 
   async function handleClose() {
-      console.log("close");
       dispatch('close');
   };
 
@@ -22,13 +21,11 @@
   async function clickLogIn() {
     showMessage = false;
       try {
-        console.log("clicked");
         userCallResult = await login(userName, password);
         user = userCallResult.data;
         showMessage = !userCallResult.isSuccess;
         if(userCallResult.isSuccess == true){
           saveTokenToLocalStorage(user.token);
-          console.log(user)
           saveUserToLocalStorage(user);
           await initAuth();
           dispatch('login', { user });

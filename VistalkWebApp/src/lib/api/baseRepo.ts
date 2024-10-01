@@ -5,12 +5,14 @@ import type { AxiosError, AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 
 export const getEndpoint = () => import.meta.env.VITE_BASE_API;
-const access_token = await getTokenFromLocalStorage();
+
 const axiosInstance = axios.create({
 	headers: {}
 });
 
 export async function authenticatedRequest<T>(config: AxiosRequestConfig): Promise<T> {
+    const access_token = await getTokenFromLocalStorage();
+
 	if (!config.baseURL) {
 		config.baseURL = getEndpoint();
 	}
