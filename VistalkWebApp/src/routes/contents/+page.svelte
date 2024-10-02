@@ -5,7 +5,7 @@
     import type { Content, ContentDto, ContentType, DefinitionDto, ExampleDto, SyllableDto } from './type';
     import type { CallResultDto } from '../../types/types';
     import type { Language } from '../type';
-    import { getLanguages } from '../repo';
+    import { getLanguages } from '../user/repo';
     import { contentInactived, getContentById, getContents, getContentTypes, getDefinitionByContentId, getExamplesByContentId, getFileByFileName, getSyllablesByContentId } from './repo';
     import Pagination from '$lib/components/Pagination.svelte';
   import Loader from '$lib/components/Loader.svelte';

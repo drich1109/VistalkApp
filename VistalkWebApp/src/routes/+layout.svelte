@@ -6,6 +6,7 @@
     import { loggedInUser } from '$lib/store';
     import '../app.css';
     import type { LoggedInUser } from '../types/types';
+    import { initAuth } from '$lib/auth/auth';
 
     let user: LoggedInUser | null = null;
     let isLoading = true;
@@ -14,8 +15,10 @@
 
     function logout(): void {
         loggedInUser.set(null);        
+        console.log('logOUt')
         localStorage.removeItem('authToken');
         localStorage.removeItem('userData');
+        console.log('logOUt')
     }
 
     // Function to handle sidebar toggle
@@ -23,6 +26,10 @@
         isSidebarExpanded = !isSidebarExpanded;
         isMobileExpanded = !isMobileExpanded;
     }
+
+    onMount(async () => {
+        await initAuth();
+    });
 </script>
 
 

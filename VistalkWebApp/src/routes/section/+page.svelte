@@ -7,7 +7,7 @@
     import { getSections, sectionInactive } from './repo';
     import Unit from './Unit.svelte';
     import type { Language } from '../type';
-    import { getLanguages } from '../repo';
+    import { getLanguages } from '../user/repo';
 
     let showModal:boolean = false;
     let isAdd:boolean = false;

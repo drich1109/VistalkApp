@@ -21,5 +21,6 @@ export async function initAuth(cookies?: Cookies, refreshIfExpired: boolean = tr
 
 	const decodedUser = await getLoggedInUser();
 	loggedInUser.set(decodedUser);
+	
 }
 
