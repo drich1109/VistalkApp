@@ -27,7 +27,6 @@
         if(userCallResult.isSuccess == true){
           saveTokenToLocalStorage(user.token);
           saveUserToLocalStorage(user);
-          await initAuth();
           dispatch('login', { user });
           handleClose();
         }

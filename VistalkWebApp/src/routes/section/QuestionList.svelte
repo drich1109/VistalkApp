@@ -5,7 +5,6 @@
     import { getQuesions, getQuestionTypes, getMultipleChoice, getChoices, getQuestionFile, questionInactive } from './repo';
     import AddQuestionPopup from './AddQuestionPopup.svelte';
     import type { Language } from '../type';
-    import { getLanguages } from '../repo';
     import type { CallResultDto } from '../../types/types';
     import Pagination from '$lib/components/Pagination.svelte';
     import MatchingType from '$lib/components/MatchingType.svelte';
@@ -14,6 +13,7 @@
     import MultipleChoiceNat from '$lib/components/MultipleChoiceNat.svelte';
     import type { QuestionMatchingTypeDto, QuestionMultipleDto } from '$lib/api/componentType';
     import Loader from '$lib/components/Loader.svelte';
+    import { getLanguages } from '../user/repo';
 
     export let languageId:number;
     export let unitId:number;
