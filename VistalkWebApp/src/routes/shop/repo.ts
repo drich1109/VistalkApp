@@ -10,7 +10,6 @@ export async function getItemType() {
 }
 
 export async function savePowerup(powerUp: PowerUp) {
-    console.log(powerUp)
     const formData = new FormData();
 
     formData.append('itemID', String(powerUp.itemID));
@@ -29,7 +28,6 @@ export async function savePowerup(powerUp: PowerUp) {
     return result;
 }
 export async function saveBackgroundMusic(BackgroundMusic: BackgroundMusic) {
-    console.log(BackgroundMusic)
     const formData = new FormData();
 
     formData.append('itemID', String(BackgroundMusic.itemID));
@@ -48,7 +46,6 @@ export async function saveBackgroundMusic(BackgroundMusic: BackgroundMusic) {
     return result;
 }
 export async function saveCoinbag(CoinBag: CoinBag, typeId:number) {
-    console.log(CoinBag)
     const formData = new FormData();
 
     formData.append('coinBagId', String(CoinBag.coinBagId));

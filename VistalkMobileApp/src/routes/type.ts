@@ -108,3 +108,20 @@ export type CoinBag =
     moneyPrice:number;
     coinBagName:string;
 }
+
+export type SectionDetails = {
+    sectionId: number;
+    sectionNumber: number;
+    title: string;
+    isPremium: boolean;
+    description: string;
+    unitCount:number;
+};
+
+export type UnitDetails = {
+    unitID: number;
+    unitNumber: number;
+    title: string;
+    description: string;
+    totalItems:number;
+};

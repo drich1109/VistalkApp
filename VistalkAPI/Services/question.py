@@ -269,15 +269,10 @@ def get_matching_type():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary = True)
     query = """
-        SELECT * FROM questionmatchingtype WHERE questionMatchingTypeID = %s
+        SELECT * FROM questionmatchingtype WHERE questionID = %s
     """
-    cursor.execute(query, tuple(questionMatchingTypeID,))
+    cursor.execute(query, [questionMatchingTypeID,])
     matching_type = cursor.fetchone()
-    count_query = "SELECT COUNT(*) as total FROM questionmatchingtype WHERE questionMatchingTypeID = %s"
-    countvalues = [questionMatchingTypeID]
-
-    cursor.execute(count_query, tuple(countvalues))
-    total_count = cursor.fetchone()['total']
 
     if not matching_type:
         return jsonify({
@@ -292,7 +287,7 @@ def get_matching_type():
                 'message': 'Successfully Retrieved',
                 'data': matching_type,
                 'data2': None,
-                'totalCount': total_count
+                'totalCount': 1
             }), 200
 
 def save_question_match():
@@ -301,11 +296,12 @@ def save_question_match():
     question_text = data.get('questionText')
     unit_id = data.get('unitId')
     question_type_id = data.get('questionTypeID')
+    questionMatchingTypeId = data.get('questionMatchingTypeID')
     choices = [
-        data.get('choice1'),
-        data.get('choice2'),
-        data.get('choice3'),
-        data.get('choice4'),
+        data.get('word1'),
+        data.get('word2'),
+        data.get('word3'),
+        data.get('word4'),
         data.get('match1'),
         data.get('match2'),
         data.get('match3'),
@@ -314,37 +310,68 @@ def save_question_match():
 
     conn = get_db_connection()
     cursor = conn.cursor()
+    if questionMatchingTypeId == 0 or questionMatchingTypeId == None:
+        cursor.execute(
+            '''
+            INSERT INTO question (questionText, unitId, questionTypeID)
+            VALUES (%s, %s, %s)
+            ''',
+            (question_text, unit_id, question_type_id)
+        )
 
-    cursor.execute(
-        '''
-        INSERT INTO question (questionText, unitId, questionTypeID)
-        VALUES (%s, %s, %s)
-        ''',
-        (question_text, unit_id, question_type_id)
-    )
+        conn.commit()
+        question_id = cursor.lastrowid
+        query_update = """
+            UPDATE unit 
+            SET totalItems = totalItems + 1
+            WHERE unitID = %s
+            """
+        values_update = (unit_id,)
+        cursor.execute(query_update, values_update)
+        conn.commit()
 
-    conn.commit()
-    question_id = cursor.lastrowid
-    query_update = """
-        UPDATE unit 
-        SET totalItems = totalItems + 1
-        WHERE unitID = %s
-        """
-    values_update = (unit_id,)
-    cursor.execute(query_update, values_update)
-    conn.commit()
-
-    cursor.execute(
-        '''
-        INSERT INTO questionmatchingtype (questionID, word1, word2, word3, word4, match1, match2, match3, match4)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ''',
-        (question_id, choices[0], choices[1], choices[2], choices[3], choices[4], choices[5], choices[6], choices[7])
-    )
+        cursor.execute(
+            '''
+            INSERT INTO questionmatchingtype (questionID, word1, word2, word3, word4, match1, match2, match3, match4)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+            ''',
+            (question_id, choices[0], choices[1], choices[2], choices[3], choices[4], choices[5], choices[6], choices[7])
+        )
+        
+        conn.commit()
+        conn.close()
     
-    conn.commit()
-    conn.close()
-    
+    else:
+        cursor.execute(
+            '''
+            SELECT questionID FROM questionmatchingtype 
+            WHERE questionMatchingTypeID = %s
+            ''',
+            (questionMatchingTypeId,)
+        )
+
+        result = cursor.fetchone()
+        question_id = result[0]
+        cursor.execute(
+            '''
+            UPDATE question
+            SET questionText = %s
+            WHERE questionID = %s
+            ''',
+            (question_text, question_id)
+        )
+                
+        cursor.execute(
+            '''
+            UPDATE questionmatchingtype
+            SET word1 = %s, word2 = %s, word3 = %s, word4 = %s, match1 = %s, match2 = %s, match3 = %s, match4 = %s
+            WHERE questionID = %s AND questionMatchingTypeID = %s
+            ''',
+            (choices[0], choices[1], choices[2], choices[3], choices[4], choices[5], choices[6], choices[7], question_id, questionMatchingTypeId)
+        )
+
+        conn.commit()
+        conn.close()
     return jsonify({'message': 'Question and choices saved successfully.'}), 200
 
 def questionInactive():

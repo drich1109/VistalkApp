@@ -24,7 +24,9 @@
     let searchQueries: string[] = ['', '', '', ''];
     let fileType: 'audio' | 'image' | null = null;
     let fileUrl: string = "";
-
+    let leftQueries = ['', '', '', ''];  
+    let rightQueries = ['', '', '', ''];
+    let selectedChoices: (Content | undefined)[] = [];
     let mainQuestion: QuestionMultipleDto = {
         questionID: 0,
         imagePath: null,
@@ -46,10 +48,10 @@
         questionText:"",
         questionTypeID:0,
         unitId:unitId,
-        choice1: 0,
-        choice2: 0,
-        choice3: 0,
-        choice4: 0,
+        word1: 0,
+        word2: 0,
+        word3: 0,
+        word4: 0,
         match1: 0,
         match2: 0,
         match3: 0,
@@ -122,11 +124,11 @@
 {/if}
 
 {#if showMatchingType}
-<MatchingType modelOpen={showMatchingType} choices={contents} mainQuestion={matchQuestion} on:close={closeModal} />
+<MatchingType modelOpen={showMatchingType} choices={contents} mainQuestion={matchQuestion} {leftQueries} {rightQueries} {selectedChoices} on:close={closeModal} />
 {/if}
 
 {#if showMatchingTypeEng == true}
-<MatchingTypeEng modelOpen={showMatchingTypeEng} choices={contents} mainQuestion={matchQuestion} on:close={closeModal} />
+<MatchingTypeEng modelOpen={showMatchingTypeEng} choices={contents} mainQuestion={matchQuestion} {leftQueries} {rightQueries} {selectedChoices} on:close={closeModal} />
 {/if}
 
 {#if showModal}
