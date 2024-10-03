@@ -93,3 +93,18 @@ export type PowerUp =
     name: string;
     description: string;
 }
+
+export type SubscriptionDto = 
+{
+    id:number;
+    subscriptionName:string; 
+    price:number;
+}
+
+export type CoinBag = 
+{
+    coinBagId:number;
+    quantity:number; 
+    moneyPrice:number;
+    coinBagName:string;
+}

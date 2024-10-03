@@ -1,5 +1,5 @@
 import { getFromBaseApi, getFromMainApi, postToBaseApi, postToMainApi, putFormBaseApi, putToBaseApi, putToMainApi } from "../../api/apiService";
-import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp } from "./type";
+import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag } from "./type";
 import CryptoJS from 'crypto-js';
 import { VITE_MAIN_API } from '@env';
 
@@ -126,4 +126,38 @@ export async function getUserVCoin(userId: string) {
 
 export async function buyPowerUp(userId: string, itemId:number, quantity:number) {
     return await putToMainApi<CallResultDto<object>>('buyPowerUp', {userId, itemId, quantity});
+}
+
+export async function getSubscriptions()
+{
+    return await getFromMainApi<CallResultDto<SubscriptionDto[]>>('getSubscriptions');
+}
+
+export async function paymongoRedirect(amount:number, description:string)
+{
+    return await postToMainApi<{ url: string }>('paymongoRedirect', {
+        amount,
+        description,
+    });
+}
+
+export async function buySubscription(userId:string, subscriptionId:number)
+{
+    return await postToMainApi<CallResultDto<object>>('buySubscription', {
+        userId,
+        subscriptionId,
+    });
+}
+
+export async function getCoinBags()
+{
+    return await getFromMainApi<CallResultDto<CoinBag[]>>('getCoinBags');
+}
+
+export async function buyCoinBag(userId:string, coinBagId:number)
+{
+    return await postToMainApi<CallResultDto<object>>('buyCoinBag', {
+        userId,
+        coinBagId,
+    });
 }
