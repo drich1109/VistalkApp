@@ -1,7 +1,6 @@
 from flask import request, jsonify, send_from_directory
-from db import UserImages, get_db_connection, ItemImage
+from db import UserImages, get_db_connection, ItemImage, BackGroundMusicDirectory
 from datetime import datetime, timedelta
-
 
 def getItemImage():
     fileName = request.args.get('fileName')
@@ -15,7 +14,7 @@ def getPowerUps():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     query = """Select i.*, p.name, p.description from item i inner join powerup p on p.itemId = i.ItemId
-                where i.itemTypeId = true and i.isActive = true"""
+                where i.itemTypeId = 1 and i.isActive = true"""
     cursor.execute(query)
     powerUps = cursor.fetchall()
     if not powerUps:
@@ -295,3 +294,112 @@ def buyCoinBag():
         'data': None,
         'totalCount': 0
     }), 200
+
+def getMusic():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    query = """SELECT 
+                i.*, 
+                b.musicTitle, 
+                b.musicGenre, 
+                CASE 
+                    WHEN ui.itemId IS NOT NULL THEN true 
+                    ELSE false 
+                END AS isAlreadyBought
+            FROM item i
+            INNER JOIN backgroundmusic b ON b.itemId = i.itemId
+            LEFT JOIN useritem ui ON ui.itemId = i.itemId
+            WHERE i.itemTypeId = 2 
+            AND i.isActive = true"""
+    cursor.execute(query)
+    music = cursor.fetchall()
+    if not music:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No sections found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+    return jsonify({
+                'isSuccess': True,
+                'message': 'Successfully Retrieved',
+                'data': music,
+                'data2': None,
+                'totalCount': None 
+            }), 200
+
+def buyMusic():
+    data = request.get_json()  
+    user_player_id = data.get('userId')  
+    itemID = data.get('itemId') 
+    quantity = data.get('quantity') 
+    if not all([quantity, itemID, user_player_id]):
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Missing parameters',
+            'data': None,
+            'totalCount': 0
+        }), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    queryPrice = """SELECT vcoinPrice FROM item WHERE itemID = %s"""
+    cursor.execute(queryPrice, (itemID,))
+    result = cursor.fetchone()
+
+    if not result:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Item not found',
+            'data': None,
+            'totalCount': 0
+        }), 404
+
+    price = result[0]
+
+    vCoinQuery = """SELECT vCoin FROM vista WHERE userPlayerId = %s"""
+    cursor.execute(vCoinQuery, (user_player_id,))
+    vCoinResult = cursor.fetchone()
+
+    if not vCoinResult or vCoinResult[0] < price:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Insufficient vCoins',
+            'data': None,
+            'totalCount': 0
+        }), 400
+
+    updateUserItemQuery = """
+        INSERT INTO useritem (userPlayerId, itemId, quantity)
+        VALUES (%s, %s, %s)
+    """
+    cursor.execute(updateUserItemQuery, (user_player_id, itemID, quantity))
+
+    updateVCoinQuery = """
+        UPDATE vista SET vCoin = vCoin - %s WHERE userPlayerId = %s
+    """
+    cursor.execute(updateVCoinQuery, (price, user_player_id))
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully bought the item',
+        'data': None,
+        'totalCount': 0
+    }), 200
+
+
+def getBackgroundMusic():
+    fileName = request.args.get('fileName')
+    timestamp = request.args.get('t')
+    try:
+        return send_from_directory(BackGroundMusicDirectory, fileName)
+    except FileNotFoundError:
+        return None
+

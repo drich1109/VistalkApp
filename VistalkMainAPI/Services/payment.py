@@ -1,6 +1,5 @@
 import requests
 from flask import request, jsonify, send_from_directory
-from flask_socketio import SocketIO, emit
 
 def paymongoredirect():
     try:

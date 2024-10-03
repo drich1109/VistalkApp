@@ -3,6 +3,8 @@ import { View, Text, Image, TouchableOpacity, Modal, TextInput } from 'react-nat
 import { PowerUp } from './type';
 import { getPowerupImage, getPowerUps, buyPowerUp, getUserVCoin } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AddIcon from '../assets/svg/AddIcon';
+import MinusIcon from '../assets/svg/MinusIcon';
 
 type FileUrl = {
   id: number;
@@ -134,6 +136,7 @@ const PowerUps: React.FC<PowerUpsProps> = ({ vCoin, setVcoin }) => {
           </TouchableOpacity>
         </View>
       ))}
+      
 
       {selectedPowerUp && (
         <Modal
@@ -141,44 +144,44 @@ const PowerUps: React.FC<PowerUpsProps> = ({ vCoin, setVcoin }) => {
           transparent={true}
           onRequestClose={() => setModalVisible(false)}
         >
-          <View className="flex items-center justify-center flex-1 bg-gray bg-opacity-50">
-            <View className="bg-black p-6 rounded-lg w-[80%]">
-              <Text className="text-xl font-bold mb-4">Buy {selectedPowerUp.name}</Text>
-              <Text className="text-lg mb-2">Price: {selectedPowerUp.vcoinPrice} vCoins each</Text>
+          <View className="flex items-center justify-center flex-1 bg-[#00000080]">
+            <View className="bg-white items-center p-6 rounded-lg w-[80%]">
+              <Text className="text-xl text-black font-bold mb-4">Buy {selectedPowerUp.name}</Text>
+              <Text className="text-lg text-black mb-2">Price: {selectedPowerUp.vcoinPrice} vCoins each</Text>
               
               <View className="flex flex-row items-center mb-4">
                 <TouchableOpacity 
                   onPress={() => handleQuantityChange(-1)} 
-                  className="bg-gray-300 rounded-full p-2"
                 >
-                  <Text className="text-xl">−</Text>
+                  <MinusIcon className="h-4 w-4 text-black" />
                 </TouchableOpacity>
-                <Text className="mx-4 text-lg">{quantity}</Text>
+                <Text className="mx-4 text-black text-lg bg-gray-400 rounded-lg py-1 px-3">{quantity}</Text>
                 <TouchableOpacity 
                   onPress={() => handleQuantityChange(1)} 
-                  className="bg-gray-300 rounded-full p-2"
                 >
-                  <Text className="text-xl">+</Text>
+                  <AddIcon className="h-4 w-4 text-black" />
                 </TouchableOpacity>
               </View>
 
-              <Text className="text-lg mb-4">Total Price: {totalPrice} vCoins</Text>
-              <Text className="text-sm mb-4">Your vCoins: {vCoin}</Text>
+              <Text className="text-lg mb-4 text-black">Total Price: {totalPrice} vCoins</Text>
+              <Text className="text-sm mb-4 text-black">Your vCoins: {vCoin}</Text>
 
-              <TouchableOpacity
-                className={`bg-blue-500 rounded-md py-2 px-3 ${quantity === 0 || totalPrice > vCoin ? 'opacity-50' : ''}`}
-                onPress={handleBuy}
-                disabled={quantity === 0 || totalPrice > vCoin}
-              >
-                <Text className="text-white text-center">Buy</Text>
-              </TouchableOpacity>
+              <View className="flex-row gap-2 items-center">
+                <TouchableOpacity
+                  className={`bg-gray-400 rounded-md py-2 px-3 ${quantity === 0 || totalPrice > vCoin ? 'opacity-50' : ''}`}
+                  onPress={handleBuy}
+                  disabled={quantity === 0 || totalPrice > vCoin}
+                >
+                  <Text className="text-black text-center">Buy</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                className="mt-4"
-                onPress={() => setModalVisible(false)}
-              >
-                <Text className="text-center text-red-500">Cancel</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  className="mt-4 bg-gray-400 rounded-md py-2 px-3"
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text className="text-center text-black">Cancel</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>

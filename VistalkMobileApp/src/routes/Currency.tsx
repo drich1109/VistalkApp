@@ -99,26 +99,28 @@ const Currency: React.FC<CoinBagProps> = ({ vCoin, setVcoin }) => {
           transparent={true}
           onRequestClose={() => setModalVisible(false)}
         >
-          <View className="flex items-center justify-center flex-1 bg-gray bg-opacity-50">
-            <View className="bg-black p-6 rounded-lg w-[80%]">
-              <Text className="text-xl font-bold mb-4">Purchase {selectedBag.coinBagName}</Text>
-              <Text className="text-lg mb-4">Quantity: {selectedBag.quantity} VCoins</Text>
+          <View className="flex items-center justify-center flex-1 bg-[#00000080]">
+            <View className="bg-white items-center p-6 rounded-lg w-[80%]">
+              <Text className="text-xl text-black font-bold mb-4">Purchase {selectedBag.coinBagName}</Text>
+              <Text className="text-lg text-black mb-4">Quantity: {selectedBag.quantity} VCoins</Text>
 
-              <Text className="text-lg mb-4">Total Price: ₱{selectedBag.moneyPrice}</Text>
+              <Text className="text-lg text-black mb-4">Total Price: ₱{selectedBag.moneyPrice}</Text>
 
-              <TouchableOpacity
-                className={`bg-blue-500 rounded-md py-2 px-3`}
-                onPress={handleBuy}
-              >
-                <Text className="text-white text-center">Buy</Text>
-              </TouchableOpacity>
+              <View className="flex-row gap-2 items-center">
+                <TouchableOpacity
+                  className={`bg-gray-400 rounded-md py-2 px-3`}
+                  onPress={handleBuy}
+                >
+                  <Text className="text-white text-center">Buy</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                className="mt-4"
-                onPress={() => setModalVisible(false)}
-              >
-                <Text className="text-center text-red-500">Cancel</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  className="mt-4 bg-gray-400 rounded-md py-2 px-3"
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text className="text-center text-center">Cancel</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>

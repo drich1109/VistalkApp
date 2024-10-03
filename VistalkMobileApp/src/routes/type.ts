@@ -109,6 +109,20 @@ export type CoinBag =
     coinBagName:string;
 }
 
+
+export type Musics = 
+{
+    itemID: number;
+    itemTypeID: number;
+    vcoinPrice: number;
+    isPremium: boolean;
+    filePath: string;
+    isActive: boolean;
+    musicTitle: string;
+    musicGenre: string;
+    isAlreadyBought: number;
+}
+
 export type SectionDetails = {
     sectionId: number;
     sectionNumber: number;
@@ -125,3 +139,4 @@ export type UnitDetails = {
     description: string;
     totalItems:number;
 };
+
