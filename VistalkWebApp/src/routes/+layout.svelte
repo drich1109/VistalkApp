@@ -15,10 +15,8 @@
 
     function logout(): void {
         loggedInUser.set(null);        
-        console.log('logOUt')
         localStorage.removeItem('authToken');
         localStorage.removeItem('userData');
-        console.log('logOUt')
     }
 
     // Function to handle sidebar toggle

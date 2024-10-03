@@ -80,7 +80,6 @@
           audioElement.load();
         } else {
           audioElement = new Audio(fileUrl);
-          console.log(audioElement)
 
         }
       }
@@ -146,7 +145,6 @@ function togglePlayPause() {
     }
     else {
           audioElement = new Audio(fileUrl);
-          console.log(audioElement)
 
         }
   }

@@ -1,12 +1,12 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react';
-import { View, Text, ImageBackground, TouchableOpacity, Image, ScrollView, Modal } from 'react-native';
+import { View, Text, ImageBackground, TouchableOpacity, Image, ScrollView, Modal, SectionList } from 'react-native';
 import Menu from '../components/Menu';
 import Svg, { Circle, Path  } from 'react-native-svg';
 import { RootStackParamList, UnitScreenNavigationProp } from '../../types';
-import { getUserDetails, getUserImageUrl, getUserLanguage } from './repo';
+import { getSections, getUserDetails, getUserImageUrl, getUserLanguage } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Languages, UserProfileDto } from './type';
+import { Languages, SectionDetails, UserProfileDto } from './type';
 import { StackScreenProps } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -18,12 +18,13 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
   const [leaderBoardVisible, setLeaderBoardVisible] = useState(false);
   const [dailyTaskVisible, setdailyTaskVisible] = useState(false);
   const [notificationVisible, setNotificationVisible] = useState(false);
-  const [currentSection, setCurrentSection] = useState<number | null>(null);
+  const [currentSection, setCurrentSection] = useState<SectionDetails | null>(null);
   const [activeScreen] = useState<keyof RootStackParamList | null>('Dashboard');
   const [languageDetails, setLanguageDetails] = useState<Languages>();
   const [userDetails, setUserDetails] = useState<UserProfileDto>();
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const unit = useNavigation<UnitScreenNavigationProp>();
+  const [sections, setSections] = useState<SectionDetails[]>([]);
 
   let progressnumber = 17;
 
@@ -35,6 +36,9 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
       setLanguageDetails(result.data);
       const userResult = await getUserDetails(Number(userID));
       setUserDetails(userResult.data);
+      const sectionResult = await getSections(result.data.languageID);
+
+      setSections(sectionResult.data)
       if (userResult.data.imagePath) {
         setFileUrl(getUserImageUrl(userResult.data.imagePath));
       }
@@ -49,11 +53,15 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
     return unsubscribe;
   }, [navigation]);
 
-  const navigateToUnit = (units: keyof RootStackParamList) => {
-    unit.navigate(units);
+  const navigateToUnit = () => {
+    if(currentSection){
+      const sectionId = currentSection.sectionId
+      const sectionName = currentSection.sectionNumber.toString();
+    unit.navigate('Unit', { sectionId, sectionName});
+    }
   };
   
-  const openModal = (section: number) => {
+  const openModal = (section: SectionDetails) => {
     setCurrentSection(section);
     setModalVisible(true);
   };
@@ -135,12 +143,12 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
           <Text className="text-4xl font-bold text-black">{languageDetails.native_name}</Text>
         </View>
       )}
-        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(section => (
-          <View key={section} className="flex-row items-center justify-center mb-5">
+        {sections.map((section, index) => (
+          <View key={index} className="flex-row items-center justify-center mb-5">
             <TouchableOpacity className="bg-white py-2 px-8 rounded-full" onPress={() => openModal(section)}>
               <View className="flex-col items-center">
-                <Text className="text-lg font-bold text-black uppercase">SECTION {section}</Text>
-                <Text className="text-base text-gray-800">10 units</Text>
+                <Text className="text-lg font-bold text-black uppercase">SECTION {section.sectionNumber}</Text>
+                <Text className="text-base text-gray-800">{section.unitCount} Units</Text>
               </View>
             </TouchableOpacity>
             <View className="w-20 h-20 justify-center items-center ml-5">
@@ -180,16 +188,14 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
           <View className="bg-black rounded-t-xl w-full">
             <TouchableOpacity activeOpacity={1} className="bg-black rounded-t-xl">
               <View className="p-10">
-                <Text className="text-4xl font-bold text-white mb-2 text-center">SECTION {currentSection}</Text>
+                <Text className="text-4xl font-bold text-white mb-2 text-center">SECTION {currentSection?.sectionNumber}</Text>
+                <Text className="text-4xl font-bold text-white mb-2 text-center">{currentSection?.title}</Text>
                 <Text className="text-2xl text-white mb-5 text-center">10 units</Text>
                 <Text className="text-base text-white mb-5 text-center">
-                  This is a brief description of Section.
-                  This is a brief description of Section.
-                  This is a brief description of Section.
-                  This is a brief description of Section {currentSection}.
+                  {currentSection?.description}
                 </Text>
                 <View className="pb-10 px-10">
-                  <TouchableOpacity className="bg-white py-2 px-10 rounded-full self-center" onPress={() => navigateToUnit('Unit')}>
+                  <TouchableOpacity className="bg-white py-2 px-10 rounded-full self-center" onPress={() => navigateToUnit()}>
                     <Text className="text-lg text-black font-bold">Play</Text>
                   </TouchableOpacity>
                 </View>

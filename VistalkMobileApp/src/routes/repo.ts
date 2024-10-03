@@ -1,7 +1,8 @@
 import { getFromBaseApi, getFromMainApi, postToBaseApi, postToMainApi, putFormBaseApi, putToBaseApi, putToMainApi } from "../../api/apiService";
-import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, Musics } from "./type";
+import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, Musics, SectionDetails, UnitDetails } from "./type";
 import CryptoJS from 'crypto-js';
 import { VITE_MAIN_API } from '@env';
+import { SectionListRenderItem } from "react-native";
 
 const baseUrl = VITE_MAIN_API;
 
@@ -178,3 +179,14 @@ export function getBackgroundMusic(fileName: string): string {
     const timestamp = Date.now(); 
     return `${baseUrl}/getBackgroundMusic?fileName=${fileName}&t=${timestamp}`;
 }
+
+export async function getSections(languageId:number)
+{
+    return await getFromMainApi<CallResultDto<SectionDetails[]>>('getSections', {languageId});
+}
+
+export async function getUnits(sectionId:number)
+{
+    return await getFromMainApi<CallResultDto<UnitDetails[]>>('getUnits', {sectionId});
+}
+

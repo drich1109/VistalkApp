@@ -20,10 +20,10 @@ export type QuestionMatchingTypeDto =
     questionText:string;
     questionTypeID:number;
     unitId:number;
-    choice1: number;
-    choice2: number;
-    choice3: number;
-    choice4: number;
+    word1: number;
+    word2: number;
+    word3: number;
+    word4: number;
     match1: number;
     match2: number;
     match3: number;
