@@ -99,5 +99,17 @@ def getCoinBags():
 def buyCoinBag():
     return shop.buyCoinBag()
 
+@app.route('/getMusic', methods=['GET'])
+def getMusic():
+    return shop.getMusic()
+
+@app.route('/buyMusic', methods=['PUT'])
+def buyMusic():
+    return shop.buyMusic()
+
+@app.route('/getBackgroundMusic', methods=['GET'])
+def getBackgroundMusic():
+    return shop.getBackgroundMusic()
+
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

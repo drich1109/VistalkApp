@@ -84,8 +84,7 @@ const Subscription: React.FC<SusbcriptionProps> = ({ vCoin, setVcoin }) => {
             <Image  source={require('../assets/logosubs.png')} className="w-24 h-24 mb-6"/>
             <Text className="text-2xl font-bold text-black w-32 text-center">{subscription.subscriptionName}</Text>
         </View>
-        <TouchableOpacity className="bg-white rounded-md py-2 px-3" onPress={() => handleOpenModal(subscription)}
-        >
+        <TouchableOpacity className="bg-white rounded-md py-2 px-3" onPress={() => handleOpenModal(subscription)}>
             <Text className="text-base font-bold text-black">₱ {subscription.price}</Text>
         </TouchableOpacity>
       </View>))}
@@ -96,25 +95,27 @@ const Subscription: React.FC<SusbcriptionProps> = ({ vCoin, setVcoin }) => {
           transparent={true}
           onRequestClose={() => setModalVisible(false)}
         >
-          <View className="flex items-center justify-center flex-1 bg-gray bg-opacity-50">
-            <View className="bg-black p-6 rounded-lg w-[80%]">
-              <Text className="text-xl font-bold mb-4">Purchase {selectedSubcription.subscriptionName}</Text>
+          <View className="flex items-center justify-center flex-1 bg-[#00000080]">
+            <View className="bg-white items-center p-6 rounded-lg w-[80%]">
+              <Text className="text-black text-xl font-bold mb-4">Purchase {selectedSubcription.subscriptionName}</Text>
               
-              <Text className="text-lg mb-4">Total Price: ₱{selectedSubcription.price}</Text>
+              <Text className="text-lg text-black mb-4">Total Price: ₱{selectedSubcription.price}</Text>
 
-              <TouchableOpacity
-                className={`bg-blue-500 rounded-md py-2 px-3`}
-                onPress={handleBuy}
-              >
-                <Text className="text-white text-center">Buy</Text>
-              </TouchableOpacity>
+              <View className="flex-row items-cente gap-2">
+                <TouchableOpacity
+                  className={`bg-gray-400 rounded-md py-2 px-3`}
+                  onPress={handleBuy}
+                >
+                  <Text className="text-white text-center">Buy</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                className="mt-4"
-                onPress={() => setModalVisible(false)}
-              >
-                <Text className="text-center text-red-500">Cancel</Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  className="mt-4 bg-gray-400 rounded-md py-2 px-3"
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text className="text-center text-white">Cancel</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>

@@ -8,6 +8,7 @@ import Music from './Music';
 import { RootStackParamList } from '../../types';
 import { getUserVCoin } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LinearGradient from 'react-native-linear-gradient';
 
 const Shop: React.FC = () => {
   const [activeScreen, setActiveScreen] = useState<keyof RootStackParamList | null>('Shop');
@@ -25,7 +26,7 @@ const Shop: React.FC = () => {
       case 'Currency':
         return <Currency vCoin={vCoin} setVcoin={setVcoin} />;
       case 'Music':
-        return <Music />;
+        return <Music vCoin={vCoin} setVcoin={setVcoin}/>;
       default:
         return null;
     }
@@ -58,8 +59,8 @@ const Shop: React.FC = () => {
 
 
   return (
-    <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
-      {/* Top Vcoin display */}
+      <LinearGradient colors={['#6addd0', '#7fc188']} className="flex-1 justify-center items-center">
+           {/* Top Vcoin display */}
       <TouchableOpacity className="absolute top-0 right-0 mr-4 mt-4 bg-white rounded-md py-2 px-3">
         <View className="flex flex-row gap-2">
           <Image source={require('../assets/Vcoin.png')} className="w-6 h-6" />
@@ -109,9 +110,9 @@ const Shop: React.FC = () => {
       <ScrollView horizontal contentContainerStyle={{ padding: 4 }} className="mb-4 flex-1">
         {renderContent()}
       </ScrollView>
-
       <Menu activeScreen={activeScreen} />
-    </ImageBackground>
+      </LinearGradient>
+     
   );
 };
 

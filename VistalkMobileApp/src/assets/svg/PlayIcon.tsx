@@ -2,12 +2,12 @@ import * as React from "react";
 import Svg, { Path, SvgProps } from "react-native-svg";
 const PlayIcon = (props: SvgProps) => (
   <Svg
-    viewBox="0 0 512 512"
+    viewBox="0 0 16 16"
     {...props}
   >
     <Path
       fill="currentColor"
-      d="M133 440a35.37 35.37 0 0 1-17.5-4.67c-12-6.8-19.46-20-19.46-34.33V111c0-14.37 7.46-27.53 19.46-34.33a35.13 35.13 0 0 1 35.77.45l247.85 148.36a36 36 0 0 1 0 61l-247.89 148.4A35.5 35.5 0 0 1 133 440"
+      d="m11.596 8.697l-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"
     />
   </Svg>
 );

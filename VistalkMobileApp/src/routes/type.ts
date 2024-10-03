@@ -108,3 +108,16 @@ export type CoinBag =
     moneyPrice:number;
     coinBagName:string;
 }
+
+export type Musics = 
+{
+    itemID: number;
+    itemTypeID: number;
+    vcoinPrice: number;
+    isPremium: boolean;
+    filePath: string;
+    isActive: boolean;
+    musicTitle: string;
+    musicGenre: string;
+    isAlreadyBought: number;
+}
