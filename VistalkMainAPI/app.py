@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import db
 from flask_cors import CORS
-from Services import language, pronunciation, user, content, shop
+from Services import language, pronunciation, user, content, shop, payment
 
 app = Flask(__name__)
 CORS(app)
@@ -73,6 +73,31 @@ def getUserVcoin():
 @app.route('/buyPowerUp', methods=['PUT'])
 def buyPowerUp():
     return shop.buyPowerUp()
+
+@app.route('/getSubscriptions', methods=['GET'])
+def getSubscriptions():
+    return shop.getSubscriptions()
+
+@app.route('/paymongoRedirect', methods=['POST'])
+def paymentSubscription():
+    return payment.paymongoredirect()
+
+""" @app.route('/paymongowebhooks', methods=['POST'])
+def paymongo_webhook():
+    return payment.paymongo_webhook()
+ """
+
+@app.route('/buySubscription', methods=['POST'])
+def buySubscription():
+    return shop.buySubscription()
+
+@app.route('/getCoinBags', methods=['GET'])
+def getCoinBags():
+    return shop.getCoinBags()
+
+@app.route('/buyCoinBag', methods=['POST'])
+def buyCoinBag():
+    return shop.buyCoinBag()
 
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ImageBackground, TouchableOpacity, ScrollView, Image } from 'react-native';
-import Menu from '../components/Menu'; // Adjust the import path as needed
+import Menu from '../components/Menu'; 
 import PowerUps from './PowerUps';
 import Subscription from './Subscription';
 import Currency from './Currency';
@@ -21,9 +21,9 @@ const Shop: React.FC = () => {
       case 'Power Ups':
         return <PowerUps vCoin={vCoin} setVcoin={setVcoin} />;
       case 'Subscription':
-        return <Subscription />;
+        return <Subscription vCoin={vCoin} setVcoin={setVcoin} />;
       case 'Currency':
-        return <Currency />;
+        return <Currency vCoin={vCoin} setVcoin={setVcoin} />;
       case 'Music':
         return <Music />;
       default:
