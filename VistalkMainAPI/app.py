@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import db
 from flask_cors import CORS
-from Services import language, pronunciation, user, content, shop, payment
+from Services import language, pronunciation, user, content, shop, payment,section
 
 app = Flask(__name__)
 CORS(app)
@@ -9,6 +9,10 @@ CORS(app)
 @app.route('/getLanguages', methods=['GET'])
 def getLanguages():
     return language.get_Language()
+
+@app.route('/getSections', methods=['GET'])
+def getSections():
+    return section.get_Sections()
 
 @app.route('/checkPronunciation', methods=['POST'])
 def checkPronunciation():
@@ -98,6 +102,10 @@ def getCoinBags():
 @app.route('/buyCoinBag', methods=['POST'])
 def buyCoinBag():
     return shop.buyCoinBag()
+
+@app.route('/getUnits', methods=['GET'])
+def getUnits():
+    return section.get_Units()
 
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

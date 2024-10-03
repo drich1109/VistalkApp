@@ -1,4 +1,5 @@
 import { post, get, put } from "$lib/api/baseRepo";
+import type { QuestionMatchingTypeDto } from "$lib/api/componentType";
 import type { CallResultDto } from "../../types/types";
 import type { Language } from "../type";
 import type { Content, MatchingType, MultipleChoice, QuestionDto, QuestionType, Section, Unit } from "./type";
@@ -43,7 +44,7 @@ export async function getMultipleChoice(questionID:number) {
     return result;
 }
 export async function getMatchingType(questionMatchingTypeID:number) {
-	let result =  await get<CallResultDto<MatchingType>>(`/getMatchingType`,{questionMatchingTypeID});
+	let result =  await get<CallResultDto<QuestionMatchingTypeDto>>(`/getMatchingType`,{questionMatchingTypeID});
     return result;
 }
 

@@ -7,18 +7,17 @@
     export let modelOpen: boolean;
     export let choices: Content[];
     export let mainQuestion: QuestionMatchingTypeDto;
-
+    export let leftQueries:string[];
+    export let rightQueries:string[];
+    export let selectedChoices: (Content | undefined)[];
     const dispatch = createEventDispatcher();
 
-    let leftQueries = ['', '', '', ''];
-    let rightQueries = ['', '', '', ''];
-    let selectedChoices: (Content | undefined)[] = Array(leftQueries.length).fill(undefined);
     let filteredChoices: Content[] = [];
     let dropdownVisibility = Array(leftQueries.length).fill(false);
 
     function closeModal() {
-    modelOpen = false;  // Update the state to close the modal
-    closeAllDropdowns();  // Close any open dropdowns when closing the modal
+    modelOpen = false;  
+    closeAllDropdowns();  
     dispatch('close');
 }
 
@@ -37,19 +36,18 @@
         leftQueries[index] = choice.englishTranslation;
         rightQueries[index] = choice.contentText;
         
-        // Hide the dropdown after selecting a choice
         dropdownVisibility[index] = false;
     }
 
     async function saveContent() {
-        mainQuestion.choice1 = selectedChoices[0]?.contentID ?? 0;
-        mainQuestion.choice2 = selectedChoices[1]?.contentID ?? 0;
-        mainQuestion.choice3 = selectedChoices[2]?.contentID ?? 0;
-        mainQuestion.choice4 = selectedChoices[3]?.contentID ?? 0;
-        mainQuestion.match1 = mainQuestion.choice1;
-        mainQuestion.match2 = mainQuestion.choice2;
-        mainQuestion.match3 = mainQuestion.choice3;
-        mainQuestion.match4 = mainQuestion.choice4;
+        mainQuestion.word1 = selectedChoices[0]?.contentID ?? 0;
+        mainQuestion.word1 = selectedChoices[1]?.contentID ?? 0;
+        mainQuestion.word1 = selectedChoices[2]?.contentID ?? 0;
+        mainQuestion.word1 = selectedChoices[3]?.contentID ?? 0;
+        mainQuestion.match1 = mainQuestion.word1;
+        mainQuestion.match2 = mainQuestion.word2;
+        mainQuestion.match3 = mainQuestion.word3;
+        mainQuestion.match4 = mainQuestion.word4;
         await save_questionMatch(mainQuestion);
         closeModal();
     }
@@ -65,16 +63,10 @@
         dropdownVisibility[index] = true;
     }
 
-    function handleRightInputFocus(index: number) {
-        filteredChoices = getFilteredChoices(rightQueries[index], 'right');
-        dropdownVisibility[index] = true;
-    }
-
     function closeAllDropdowns() {
         dropdownVisibility = dropdownVisibility.map(() => false);
     }
 
-    // Close dropdowns when clicking outside
     function handleClickOutside(event: MouseEvent) {
         const target = event.target as HTMLElement;
         if (!target.closest('.relative')) {
@@ -82,10 +74,8 @@
         }
     }
 
-    // Add event listener for clicks outside the dropdown
     window.addEventListener('click', handleClickOutside);
 
-    // Clean up event listener on component destroy
     import { onDestroy } from 'svelte';
     onDestroy(() => {
         window.removeEventListener('click', handleClickOutside);
@@ -101,7 +91,7 @@
           style="opacity: {modelOpen ? 1 : 0}; transform: {modelOpen ? 'translateY(0)' : 'translateY(4rem)'};">
         <div class="flex items-center justify-between space-x-4">
           <h1 class="text-xl font-medium text-gray-800">
-            Multiple Choice English
+            Matching Type English
           </h1>
           <button on:click={closeModal} class="text-gray-600 focus:outline-none hover:text-gray-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -140,7 +130,6 @@
                   autocomplete="off"
                   placeholder={`Answer ${i}`} 
                   value={rightQueries[i-1]}
-                  on:focus={() => handleRightInputFocus(i-1)}
                   readonly
                   class="block w-1/2 px-3 py-2 text-gray placeholder-gray bg-white border border-gray-200 rounded-md focus:border-indigo-400 focus:outline-none focus:ring focus:ring-indigo-300 focus:ring-opacity-40"
               />
@@ -154,18 +143,6 @@
                       on:click={() => selectChoice(choice, i-1)}
                   >
                     {choice.englishTranslation}
-                  </li>
-                {/each}
-              </ul>
-            {/if}
-            {#if rightQueries[i-1].length > 0 && dropdownVisibility[i-1]}
-              <ul class="absolute right-2 w-full bg-white border border-gray-200 rounded-md shadow-lg mt-1 z-10 top-full list-none">
-                {#each filteredChoices as choice}
-                  <li 
-                      class="px-3 py-2 text-gray-700 cursor-pointer hover:bg-gray-100"
-                      on:click={() => selectChoice(choice, i-1)}
-                  >
-                    {choice.contentText}
                   </li>
                 {/each}
               </ul>

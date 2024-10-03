@@ -2,7 +2,7 @@
     import { redirectIfLoggedIn } from '$lib/shortcuts';
     import { createEventDispatcher, onMount } from 'svelte';
     import type { QuestionDto, QuestionType, Content, MultipleChoice } from './type';
-    import { getQuesions, getQuestionTypes, getMultipleChoice, getChoices, getQuestionFile, questionInactive } from './repo';
+    import { getQuesions, getQuestionTypes, getMultipleChoice, getChoices, getQuestionFile, questionInactive, getMatchingType } from './repo';
     import AddQuestionPopup from './AddQuestionPopup.svelte';
     import type { Language } from '../type';
     import type { CallResultDto } from '../../types/types';
@@ -37,7 +37,9 @@
     let searchQueries: string[] = ['', '', '', ''];
     let fileType: 'audio' | 'image' | null = null;
     let isLoading: boolean = false;
-
+    let leftQueries = ['', '', '', ''];  
+    let rightQueries = ['', '', '', ''];
+    let selectedChoices: (Content | undefined)[] = [];
     let mainQuestion: QuestionMultipleDto = {
         questionID: 0,
         imagePath: null,
@@ -58,10 +60,10 @@
         questionText:"",
         questionTypeID:0,
         unitId:unitId,
-        choice1: 0,
-        choice2: 0,
-        choice3: 0,
-        choice4: 0,
+        word1: 0,
+        word2: 0,
+        word3: 0,
+        word4: 0,
         match1: 0,
         match2: 0,
         match3: 0,
@@ -234,13 +236,58 @@
                     showMatchingType = false;
                     break;
                 case 4:
+                    const resultMatchEnglish = await getMatchingType(quest.questionID);
+                    matchQuestion = resultMatchEnglish.data;
+
+                    rightQueries = [
+                        mapChoiceToContentText(matchQuestion.word1),
+                        mapChoiceToContentText(matchQuestion.word2),
+                        mapChoiceToContentText(matchQuestion.word3),
+                        mapChoiceToContentText(matchQuestion.word4),
+                    ];
+                    leftQueries = 
+                    [
+                        mapChoiceToPronunciation(matchQuestion.match1),
+                        mapChoiceToPronunciation(matchQuestion.match2),
+                        mapChoiceToPronunciation(matchQuestion.match3),
+                        mapChoiceToPronunciation(matchQuestion.match4),
+                    ]
+                    selectedChoices = [
+                        matchQuestion.word1 ? contents.find(choice => choice.contentID === matchQuestion.word1) : undefined,
+                        matchQuestion.word2 ? contents.find(choice => choice.contentID === matchQuestion.word2) : undefined,
+                        matchQuestion.word3 ? contents.find(choice => choice.contentID === matchQuestion.word3) : undefined,
+                        matchQuestion.word4 ? contents.find(choice => choice.contentID === matchQuestion.word4) : undefined,
+                    ];
                     matchQuestion.questionText = quest.questionText
+
                     showNativeMultiple = false;
                     showEnglishMultiple = false;
                     showMatchingTypeEng = true;
                     showMatchingType = false;
                     break;
                 case 3:
+                    const resultMatch = await getMatchingType(quest.questionID);
+                    matchQuestion = resultMatch.data;
+
+                    leftQueries = [
+                        mapChoiceToContentText(matchQuestion.word1),
+                        mapChoiceToContentText(matchQuestion.word2),
+                        mapChoiceToContentText(matchQuestion.word3),
+                        mapChoiceToContentText(matchQuestion.word4),
+                    ];
+                    rightQueries = 
+                    [
+                        mapChoiceToPronunciation(matchQuestion.match1),
+                        mapChoiceToPronunciation(matchQuestion.match2),
+                        mapChoiceToPronunciation(matchQuestion.match3),
+                        mapChoiceToPronunciation(matchQuestion.match4),
+                    ]
+                    selectedChoices = [
+                        matchQuestion.word1 ? contents.find(choice => choice.contentID === matchQuestion.word1) : undefined,
+                        matchQuestion.word2 ? contents.find(choice => choice.contentID === matchQuestion.word2) : undefined,
+                        matchQuestion.word3 ? contents.find(choice => choice.contentID === matchQuestion.word3) : undefined,
+                        matchQuestion.word4 ? contents.find(choice => choice.contentID === matchQuestion.word4) : undefined,
+                    ];
                     matchQuestion.questionText = quest.questionText
                     showNativeMultiple = false;
                     showEnglishMultiple = false;
@@ -283,10 +330,10 @@ async function setInactive(questionID:number, unitID:number){
     <MultipleChoiceNat modelOpen={showNativeMultiple} choices={contents} mainQuestion={mainQuestion} {searchQueries} {fileType} {fileUrl} on:close={closeModal}></MultipleChoiceNat>
 {/if}
 {#if showMatchingType === true}
-    <MatchingType modelOpen={showMatchingType} choices={contents} mainQuestion={matchQuestion} on:close={closeModal}></MatchingType>
+    <MatchingType modelOpen={showMatchingType} choices={contents} mainQuestion={matchQuestion} {leftQueries} {rightQueries} {selectedChoices} on:close={closeModal}></MatchingType>
 {/if}
 {#if showMatchingTypeEng === true}
-    <MatchingTypeEng modelOpen={showMatchingTypeEng} choices={contents} mainQuestion={matchQuestion} on:close={closeModal}></MatchingTypeEng>
+    <MatchingTypeEng modelOpen={showMatchingTypeEng} choices={contents} mainQuestion={matchQuestion} {leftQueries} {rightQueries} {selectedChoices} on:close={closeModal}></MatchingTypeEng>
 {/if}
 
 

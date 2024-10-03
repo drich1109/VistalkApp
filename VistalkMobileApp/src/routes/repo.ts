@@ -1,7 +1,8 @@
 import { getFromBaseApi, getFromMainApi, postToBaseApi, postToMainApi, putFormBaseApi, putToBaseApi, putToMainApi } from "../../api/apiService";
-import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag } from "./type";
+import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, SectionDetails, UnitDetails } from "./type";
 import CryptoJS from 'crypto-js';
 import { VITE_MAIN_API } from '@env';
+import { SectionListRenderItem } from "react-native";
 
 const baseUrl = VITE_MAIN_API;
 
@@ -160,4 +161,14 @@ export async function buyCoinBag(userId:string, coinBagId:number)
         userId,
         coinBagId,
     });
+}
+
+export async function getSections(languageId:number)
+{
+    return await getFromMainApi<CallResultDto<SectionDetails[]>>('getSections', {languageId});
+}
+
+export async function getUnits(sectionId:number)
+{
+    return await getFromMainApi<CallResultDto<UnitDetails[]>>('getUnits', {sectionId});
 }

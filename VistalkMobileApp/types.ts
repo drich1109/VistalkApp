@@ -19,7 +19,7 @@ export type RootStackParamList = {
   Settings:undefined;
   EditProfile:undefined;
   ChangePassword:undefined;
-  Unit:undefined;
+  Unit:{sectionId:number, sectionName:string};
 };
 
 export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
