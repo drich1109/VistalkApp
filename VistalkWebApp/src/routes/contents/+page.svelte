@@ -9,6 +9,7 @@
     import { contentInactived, getContentById, getContents, getContentTypes, getDefinitionByContentId, getExamplesByContentId, getFileByFileName, getSyllablesByContentId } from './repo';
     import Pagination from '$lib/components/Pagination.svelte';
   import Loader from '$lib/components/Loader.svelte';
+  import { tr } from 'date-fns/locale';
 
     let isAdd: boolean = false;
     let modelOpen: boolean = false;
@@ -231,9 +232,7 @@
 
 </script>
 
-{#if isloading == true}
-    <Loader isLoading = {isloading}></Loader>
-{/if}
+
 {#if modelOpen}
     <AddContent modelOpen={modelOpen} {isAdd} languageId={currentValue} {content} on:close={closeModal} on:refresh={refresh}></AddContent>
 {/if}
@@ -281,49 +280,63 @@
     <table class="bg-white w-full shadow-lg rounded-xl min-w-[640px]">
         <thead class="font-['Cambria'] bg-[#99BC85] text-white text-center">
             <tr class="first:rounded-tl-xl last:rounded-b-xl">
-                <th class="py-3 px-4 first:rounded-tl-xl  last:rounded-tr-xl">Content</th>
+                <th class="py-3 px-4 first:rounded-tl-xl last:rounded-tr-xl">Content</th>
                 <th class="py-3 px-4">English Translation</th>
                 <th class="py-3 px-4">Audio</th>
-                <th class="py-3 px-4 first:rounded-tl-xl  last:rounded-tr-xl">Actions</th>
+                <th class="py-3 px-4 first:rounded-tl-xl last:rounded-tr-xl">Actions</th>
             </tr>
         </thead>
-        <tbody class="text-center text-sm">
-            {#if contents}
-            {#each contents as c}
-            <tr class="border-t-2 mx-4">
-                    <td class="py-3 px-4">{c.contentText}</td>
-                    <td class="py-3 px-4">{c.englishTranslation}</td>
-                    <td class="py-3 px-4">
-                        {#if c.audio != null}
-                            <button on:click={() => togglePlay(c)} class="bg-[#99BC85] text-white py-1 px-2 rounded-xl">
-                                {#if c.isPlaying}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 24 24"><path fill="white" d="M6 19h4V5H6zm8-14v14h4V5z"/></svg>
-                                {:else}
-                                <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 256 256"><g fill="black"><path d="M228.23 134.69L84.15 222.81A8 8 0 0 1 72 216.12V39.88a8 8 0 0 1 12.15-6.69l144.08 88.12a7.82 7.82 0 0 1 0 13.38" opacity="0.2"/><path d="M232.4 114.49L88.32 26.35a16 16 0 0 0-16.2-.3A15.86 15.86 0 0 0 64 39.87v176.26A15.94 15.94 0 0 0 80 232a16.07 16.07 0 0 0 8.36-2.35l144.04-88.14a15.81 15.81 0 0 0 0-27ZM80 215.94V40l143.83 88Z"/></g></svg>
-                                {/if}    
+        <tbody class="text-center text-sm ">
+            {#if isloading}
+            <Loader isLoading={isloading}></Loader> 
+            {:else if contents && contents.length > 2}
+                {#each contents as c}
+                    <tr class="border-t-2 mx-4">
+                        <td class="py-3 px-4">{c.contentText}</td>
+                        <td class="py-3 px-4">{c.englishTranslation}</td>
+                        <td class="py-3 px-4">
+                            {#if c.audio}
+                                <button on:click={() => togglePlay(c)} class="bg-[#99BC85] text-white py-1 px-2 rounded-xl">
+                                    {#if c.isPlaying}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 24 24">
+                                            <path fill="white" d="M6 19h4V5H6zm8-14v14h4V5z"/>
+                                        </svg>
+                                    {:else}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 256 256">
+                                            <g fill="black">
+                                                <path d="M228.23 134.69L84.15 222.81A8 8 0 0 1 72 216.12V39.88a8 8 0 0 1 12.15-6.69l144.08 88.12a7.82 7.82 0 0 1 0 13.38" opacity="0.2"/>
+                                                <path d="M232.4 114.49L88.32 26.35a16 16 0 0 0-16.2-.3A15.86 15.86 0 0 0 64 39.87v176.26A15.94 15.94 0 0 0 80 232a16.07 16.07 0 0 0 8.36-2.35l144.04-88.14a15.81 15.81 0 0 0 0-27ZM80 215.94V40l143.83 88Z"/>
+                                            </g>
+                                        </svg>
+                                    {/if}    
+                                </button>
+                            {/if}
+                        </td>
+                        <td class="px-1 py-1">
+                            <button on:click={() => clickEdit(c.contentID)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 16 16">
+                                    <path fill="black" d="M15.49 7.3h-1.16v6.35H1.67V3.28H8V2H1.67A1.21 1.21 0 0 0 .5 3.28v10.37a1.21 1.21 0 0 0 1.17 1.25h12.66a1.21 1.21 0 0 0 1.17-1.25z"/>
+                                    <path fill="black" d="M10.56 2.87L6.22 7.22l-.44.44l-.08.08l-1.52 3.16a1.08 1.08 0 0 0 1.45 1.45l3.14-1.53l.53-.53l.43-.43l4.34-4.36l.45-.44l.25-.25a2.18 2.18 0 0 0 0-3.08a2.17 2.17 0 0 0-1.53-.63a2.2 2.2 0 0 0-1.54.63l-.7.69l-.45.44zM5.51 11l1.18-2.43l1.25 1.26zm2-3.36l3.9-3.91l1.3 1.31L8.85 9zm5.68-5.31a.9.9 0 0 1 .65.27a.93.93 0 0 1 0 1.31l-.25.24l-1.3-1.3l.25-.25a.88.88 0 0 1 .69-.25z"/>
+                                </svg>
                             </button>
-                        {/if}
-                    </td>
-                    
-                    <td class="px-1 py-1">
-                        <button on:click={() => clickEdit(c.contentID)}><svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 16 16">
-                        <path fill="black" d="M15.49 7.3h-1.16v6.35H1.67V3.28H8V2H1.67A1.21 1.21 0 0 0 .5 3.28v10.37a1.21 1.21 0 0 0 1.17 1.25h12.66a1.21 1.21 0 0 0 1.17-1.25z"/><path fill="black" d="M10.56 2.87L6.22 7.22l-.44.44l-.08.08l-1.52 3.16a1.08 1.08 0 0 0 1.45 1.45l3.14-1.53l.53-.53l.43-.43l4.34-4.36l.45-.44l.25-.25a2.18 2.18 0 0 0 0-3.08a2.17 2.17 0 0 0-1.53-.63a2.2 2.2 0 0 0-1.54.63l-.7.69l-.45.44zM5.51 11l1.18-2.43l1.25 1.26zm2-3.36l3.9-3.91l1.3 1.31L8.85 9zm5.68-5.31a.9.9 0 0 1 .65.27a.93.93 0 0 1 0 1.31l-.25.24l-1.3-1.3l.25-.25a.88.88 0 0 1 .69-.25z"/>
-                    </svg>
-                    </button>
-                    <button on:click={() => setInactive(c.contentID)}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h4a1 1 0 1 1 0 2h-1.069l-.867 12.142A2 2 0 0 1 17.069 22H6.93a2 2 0 0 1-1.995-1.858L4.07 8H3a1 1 0 0 1 0-2h4zm2 2h6V4H9zM6.074 8l.857 12H17.07l.857-12zM10 10a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1m4 0a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1"/></svg>
-                    </button>
-                    </td>
-                </tr>
+                            <button on:click={() => setInactive(c.contentID)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24">
+                                    <path fill="currentColor" d="M7 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2h4a1 1 0 1 1 0 2h-1.069l-.867 12.142A2 2 0 0 1 17.069 22H6.93a2 2 0 0 1-1.995-1.858L4.07 8H3a1 1 0 0 1 0-2h4zm2 2h6V4H9zM6.074 8l.857 12H17.07l.857-12zM10 10a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1m4 0a1 1 0 0 1 1 1v6a1 1 0 1 1-2 0v-6a1 1 0 0 1 1-1"/>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
                 {/each}
-                {:else}
+            {:else}
                 <tr class="border-t-2 mx-4">
-                    <td class="px-4 py-2" colspan="5">No Contents Found</td>
+                    <td class="px-4 py-2" colspan="4">No Contents Found</td>
                 </tr>
-                {/if}  
+            {/if}  
         </tbody>
-        </table>
+    </table>
 </div>
+
+
 {#if contentListCallResult.totalCount}
 <Pagination totalCount = {contentListCallResult.totalCount} {pageNo} on:handlePageChange={handlePageChange}></Pagination>
 {/if}  

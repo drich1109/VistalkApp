@@ -341,7 +341,7 @@ def get_Contents():
     searchString = request.args.get('searchString')
     pageNo = int(request.args.get('pageNo', 1))
     print(pageNo)
-    pageSize = 15
+    pageSize = 10
     offset = (pageNo - 1) * pageSize
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
