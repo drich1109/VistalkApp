@@ -13,6 +13,9 @@
     let isShowSubscriber:boolean = false;
     let showInactive:boolean = false;
     let openModal: boolean = false;
+    let userView:UserDto;
+    let fileUrl: string = "";
+
 
     let userListCallResult:CallResultDto<UserDto[]> = 
     {
@@ -48,13 +51,19 @@
         openModal = false;
     }
 
-    function openViewModal()
+    async function openViewModal(u:UserDto)
     {
+        userView = u;
+        const fileBlob = await getItemFileByFileName(p.filePath, itemTypeID);
+            if (fileBlob != null) {
+                fileUrl = URL.createObjectURL(fileBlob);
+                powerUp.file = new File([fileBlob], powerUp.filePath, { type: fileBlob.type });
+            }
         openModal = true;
     }
 </script>
 {#if openModal == true}
-    <ViewUser modelOpen={openModal} on:close={closeModal}></ViewUser>
+    <ViewUser modelOpen={openModal} {userView} on:close={closeModal}></ViewUser>
 {/if}
 <div class="gap-4 flex flex-col sm:flex-row justify-between items-center mt-1 bg-white rounded-xl py-4 px-4 shadow-lg">
     <p class="font-['Helvetica'] text-[#99BC85] text-xl font-bold">User List</p>
@@ -108,7 +117,7 @@
                         {p.name} - {p.quantity}
                     {/each}</td>
                     <td class="px-4 py-2">
-                        <button on:click={() => openViewModal()}>
+                        <button on:click={() => openViewModal(u)}>
                             <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 16 16"><path fill="black" d="M13.5 0h-12C.675 0 0 .675 0 1.5v13c0 .825.675 1.5 1.5 1.5h12c.825 0 1.5-.675 1.5-1.5v-13c0-.825-.675-1.5-1.5-1.5M13 14H2V2h11zM4 9h7v1H4zm0 2h7v1H4zm1-6.5a1.5 1.5 0 1 1 3.001.001A1.5 1.5 0 0 1 5 4.5M7.5 6h-2C4.675 6 4 6.45 4 7v1h5V7c0-.55-.675-1-1.5-1"/></svg>
                         </button> 
                     </td>

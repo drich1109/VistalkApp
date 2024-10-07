@@ -6,21 +6,12 @@
     import { loggedInUser } from '$lib/store';
     import '../app.css';
     import type { LoggedInUser } from '../types/types';
+    import { initAuth } from '$lib/auth/auth';
 
     let user: LoggedInUser | null = null;
     let isLoading = true;
     let isSidebarExpanded = true;
     let isMobileExpanded = true;
-
-    async function getUser() {
-        user = await getLoggedInUser();
-        loggedInUser.set(user);
-        isLoading = false;
-    }
-
-    onMount(() => {
-        getUser();
-    });
 
     function logout(): void {
         loggedInUser.set(null);        
@@ -33,12 +24,14 @@
         isSidebarExpanded = !isSidebarExpanded;
         isMobileExpanded = !isMobileExpanded;
     }
+
+    onMount(async () => {
+        await initAuth();
+    });
 </script>
 
-{#if isLoading}
-    <!-- Show a loader or placeholder until the user is fetched -->
-    <div>Loading...</div>
-{:else if $loggedInUser}
+
+{#if $loggedInUser}
     <div class="layout">
         <SideBar on:logout={logout} on:toggleSidebar={handleSidebarToggle} />
         <main class="content" class:collapsed={!isSidebarExpanded} class:expanded={isSidebarExpanded}>

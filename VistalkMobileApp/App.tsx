@@ -17,6 +17,7 @@ import UserProfile from './src/routes/UserProfile';
 import Settings from './src/routes/Settings';
 import EditProfile from './src/routes/EditProfile';
 import ChangePassword from './src/routes/ChangePassword';
+import Unit from './src/routes/Unit';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -97,6 +98,11 @@ const App: React.FC = () => {
         <Stack.Screen
           name="ChangePassword"
           component={ChangePassword}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Unit"
+          component={Unit}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

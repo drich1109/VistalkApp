@@ -11,7 +11,7 @@ export type RootStackParamList = {
   Dashboard:undefined;
   Shop:undefined;
   Dictionary:undefined;
-  DictionaryMeaning:undefined;
+  DictionaryMeaning:{contentId:number};
   Practice:undefined;
   ForgotPassword:undefined;
   SetNewPassword:{email:string};
@@ -19,6 +19,7 @@ export type RootStackParamList = {
   Settings:undefined;
   EditProfile:undefined;
   ChangePassword:undefined;
+  Unit:{sectionId:number, sectionName:string};
 };
 
 export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -36,6 +37,7 @@ export type UserProfileScreenNavigationProp = NativeStackNavigationProp<RootStac
 export type SettingsScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Settings'>;
 export type EditProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'EditProfile'>;
 export type ChangePasswordScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ChangePassword'>;
+export type UnitScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Unit'>;
 
 export type MenuScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, keyof RootStackParamList>;
 

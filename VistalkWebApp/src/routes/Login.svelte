@@ -4,11 +4,11 @@
   import type { CallResultDto, LoggedInUser } from "../types/types";
   import { saveTokenToLocalStorage, saveUserToLocalStorage } from "$lib/auth/oidcService";
     import MessageBox from "$lib/components/MessageBox.svelte";
+    import { initAuth } from "$lib/auth/auth";
 
   const dispatch = createEventDispatcher();
 
   async function handleClose() {
-      console.log("close");
       dispatch('close');
   };
 
@@ -21,7 +21,6 @@
   async function clickLogIn() {
     showMessage = false;
       try {
-        console.log("clicked");
         userCallResult = await login(userName, password);
         user = userCallResult.data;
         showMessage = !userCallResult.isSuccess;

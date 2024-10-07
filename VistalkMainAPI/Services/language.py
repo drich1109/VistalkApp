@@ -32,7 +32,6 @@ def getUserLanguage():
     values = [userID,]
     cursor.execute(query, values)
     languages = cursor.fetchone()
-    print(languages)
     if not languages:
         return jsonify({
             'isSuccess': True,

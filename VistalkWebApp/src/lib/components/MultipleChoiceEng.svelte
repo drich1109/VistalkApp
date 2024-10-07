@@ -21,7 +21,6 @@
   let lasttype:  'audio' | 'image' | null = fileType;
 
   onMount(async () => {
-    // Initialize selectedChoices based on searchQueries
     searchQueries.forEach((query, index) => {
       const matchingChoice = choices.find(choice => choice.englishTranslation.toLowerCase() === query.toLowerCase());
       if (matchingChoice) {

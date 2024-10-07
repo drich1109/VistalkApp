@@ -24,8 +24,6 @@ export async function saveMainContent(content: ContentDto) {
         const file = new File([content.content.file], 'audio.wav', { type: 'audio/wav' });
         formData.append('contentAudioFile', file);
     }
-    console.log(content.syllables);
-
     content.syllables.forEach((syllable, index) => {
         formData.append(`syllables[${index}].id`, syllable.id.toString());
         formData.append(`syllables[${index}].contentId`, syllable.contentId.toString());
@@ -53,10 +51,6 @@ export async function saveMainContent(content: ContentDto) {
         formData.append(`examples[${index}].englishExample`, example.englishExample);
         formData.append(`examples[${index}].orderNumber`, example.orderNumber.toString());
     });
-    for (let [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
-    }
-
     return await postForm<CallResultDto<object>>(`/saveContent`, formData);
 }
 

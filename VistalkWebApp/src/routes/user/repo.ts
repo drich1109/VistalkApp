@@ -1,5 +1,6 @@
 import { get } from "$lib/api/baseRepo";
 import type { CallResultDto } from "../../types/types";
+import type { Language } from "../type";
 import type { PowerUpDto, UserDto } from "./type";
 
 export async function getUserList(pageNo:number, searchString :string | null, showInactive:boolean, isShowSubscriber:boolean) {
@@ -9,5 +10,10 @@ export async function getUserList(pageNo:number, searchString :string | null, sh
 
 export async function getUserPowerUp(userId:number) {
 	let result =  await get<CallResultDto<PowerUpDto[]>>(`/getuserPowerUps`, {userId});
+    return result;
+}
+
+export async function getLanguages() {
+	let result =  await get<CallResultDto<Language[]>>(`/getLanguages`);
     return result;
 }

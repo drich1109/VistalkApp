@@ -46,6 +46,7 @@ export type EditProfileVista = {
     userId: number;
     file: File | null;
 };
+
 export type Content = {
     contentID: number;
     contentText: string;
@@ -54,4 +55,88 @@ export type Content = {
     languageID: number;
     contentTypeID: number;
     isActive: boolean;
+    isInDictionary:boolean;
 };
+
+export type ContentSyllable = {
+    id: number;
+    contentId: number;
+    syllableText: string;
+    audioPath: string;
+    orderNumber: number;
+};
+
+export type ContentExample = {
+    id: number;
+    contentId: number;
+    nativeExample: string;
+    englishExample: string;
+    orderNumber: number;
+};
+
+export type ContentDefinition = {
+    id: number;
+    contentId: number;
+    nativeDefinition: string;
+    englishDefinition: string;
+    orderNumber: number;
+};
+
+export type PowerUp = 
+{
+    itemID: number;
+    itemTypeID: number;
+    vcoinPrice: number;
+    isPremium: boolean;
+    filePath: string;
+    isActive: boolean;
+    name: string;
+    description: string;
+}
+
+export type SubscriptionDto = 
+{
+    id:number;
+    subscriptionName:string; 
+    price:number;
+}
+
+export type CoinBag = 
+{
+    coinBagId:number;
+    quantity:number; 
+    moneyPrice:number;
+    coinBagName:string;
+}
+
+
+export type Musics = 
+{
+    itemID: number;
+    itemTypeID: number;
+    vcoinPrice: number;
+    isPremium: boolean;
+    filePath: string;
+    isActive: boolean;
+    musicTitle: string;
+    musicGenre: string;
+    isAlreadyBought: number;
+}
+
+export type SectionDetails = {
+    sectionId: number;
+    sectionNumber: number;
+    title: string;
+    isPremium: boolean;
+    description: string;
+    unitCount:number;
+};
+
+export type UnitDetails = {
+    unitID: number;
+    unitNumber: number;
+    title: string;
+    description: string;
+    totalItems:number;
+};
+

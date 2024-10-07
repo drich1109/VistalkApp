@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
-import { signIn, signOut } from '$lib/auth/oidcService';
-import { accessToken, getValue } from '$lib/store';
+import { getTokenFromLocalStorage, signIn, signOut } from '$lib/auth/oidcService';
+import { getValue } from '$lib/store';
 import type { AxiosError, AxiosRequestConfig } from 'axios';
 import axios from 'axios';
 
@@ -11,7 +11,7 @@ const axiosInstance = axios.create({
 });
 
 export async function authenticatedRequest<T>(config: AxiosRequestConfig): Promise<T> {
-	const access_token = getValue(accessToken);
+    const access_token = await getTokenFromLocalStorage();
 
 	if (!config.baseURL) {
 		config.baseURL = getEndpoint();
