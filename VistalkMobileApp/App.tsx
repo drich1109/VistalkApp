@@ -18,6 +18,7 @@ import Settings from './src/routes/Settings';
 import EditProfile from './src/routes/EditProfile';
 import ChangePassword from './src/routes/ChangePassword';
 import Unit from './src/routes/Unit';
+import UnitContent from './src/routes/UnitContent';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -103,6 +104,11 @@ const App: React.FC = () => {
         <Stack.Screen
           name="Unit"
           component={Unit}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="UnitContent"
+          component={UnitContent}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
