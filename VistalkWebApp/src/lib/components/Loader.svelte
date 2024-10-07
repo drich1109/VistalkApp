@@ -3,70 +3,26 @@
 </script>
 
 {#if isLoading}
-  <div class="loader-container">
-    <div class="loader-box">
-      <div class="chat-box">
-        <div class="dots">
-          <div class="dot"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <tr>
+    <td colspan="4" class="loader-cell"> <!-- Adjust the colspan based on your table structure -->
+      <div class="loader-container">
+
+            <div class="dots">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+          </div>
+    </td>
+  </tr>
 {/if}
 
 <style>
-  .loader-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #dcdcdc; /* Plain gray background */
-    z-index: 1000;
-    text-align: center;
-    overflow: hidden; /* Hide elements floating outside */
-  }
-
-  .loader-box {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    width: 80px; /* Adjusted box width */
-    height: 60px; /* Adjusted box height */
-  }
-
-  .chat-box {
-    width: 100%;
-    height: 100%;
-    background-color: #fff; /* White background for the chat box */
-    border-radius: 15px; /* Rounded corners */
-    border: 1px solid #ccc; /* Light border for the chat box */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2); /* Slight shadow for depth */
-    position: relative;
-    padding: 5px; /* Padding inside the chat box */
-  }
-
-  .chat-box::before {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid #fff; /* Triangle for the chat bubble arrow */
+  .loader-cell {
+    text-align: center; /* Center content horizontally */
+    vertical-align: middle; /* Center content vertically */
+    padding: 20px; /* Add padding for spacing */
+    height: 100px; /* Set a height to ensure vertical centering */
   }
 
   .dots {
@@ -99,5 +55,25 @@
     50% {
       transform: scale(1.5);
     }
+  }
+
+  .action-buttons {
+    margin-top: 15px; /* Space between loader and buttons */
+    display: flex;
+    gap: 10px; /* Space between buttons */
+  }
+
+  .action-btn {
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    border: none; /* Remove borders */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px 15px; /* Padding inside the button */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Smooth background transition */
+  }
+
+  .action-btn:hover {
+    background-color: #45a049; /* Darker green on hover */
   }
 </style>

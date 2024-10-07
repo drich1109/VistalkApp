@@ -4,17 +4,17 @@
     import type { LoggedInUser } from '../types/types';
     import LoginModal from './Login.svelte';
     import { loggedInUser } from '$lib/store';
+    import { initAuth } from '$lib/auth/auth';
     
     let user: LoggedInUser | null = null;
+    let isLoading = true; // Loading state to track authentication status
+    let showModal = false;
 
     async function getUser() {
         user = await getLoggedInUser();
         loggedInUser.set(user);
+        isLoading = false; // Update loading state after checking user
     }
-
-    onMount(() => {
-        getUser();
-    });
 
     function scrollToSection(sectionId: string) {
         const section = document.getElementById(sectionId);
@@ -23,7 +23,10 @@
         }
     }
 
-    let showModal = false;
+    onMount(async () => {
+        await initAuth();
+        await getUser(); // Call getUser on mount to check authentication
+    });
 
     const openModal = () => {
         showModal = true;
@@ -31,19 +34,21 @@
 
     const closeModal = () => {
         showModal = false;
-    }
+    };
 
     async function handleLogin(event: CustomEvent) {
         loggedInUser.set(event.detail.user);
     }
-
 </script>
-
 {#if showModal}
 <LoginModal on:close={closeModal} on:login={handleLogin} />
 {/if}
 
-{#if user == null}
+{#if isLoading}
+    <p>Loading...</p> <!-- Display a loading indicator while checking user status -->
+{:else if $loggedInUser}
+    <p>Welcome, {$loggedInUser.name}!</p>
+{:else}
 <header class="fixed top-0 w-full bg-white z-50 shadow-lg">
     <nav class="text-black py-4 px-4 md:px-20 flex justify-between items-center">
         <ul class="flex">
@@ -160,7 +165,4 @@
         <!-- Additional content here -->
     </div>
 </section>
-
-{:else}
-<p>Welcome, {user.name}!</p>
 {/if}

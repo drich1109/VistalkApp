@@ -90,7 +90,7 @@
             </button>
         </div>
     </div>
-    <div class="flex-grow flex justify-center gap-4">
+    <div class="flex flex-col sm:flex-row gap-4 mt-4 sm:mt-0 gap-4">
         <div class="flex items-center border border-[#B9B9B9] rounded-xl px-4 py-1 bg-white">
             <input type="date" bind:value={startDate} class="outline-none text-gray-600 placeholder-[#99BC85]" placeholder="Start Date">
         </div>
