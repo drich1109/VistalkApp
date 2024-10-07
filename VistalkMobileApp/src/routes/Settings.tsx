@@ -1,9 +1,11 @@
+/* eslint-disable prettier/prettier */
+// eslint-disable-next-line prettier/prettier
 import React, { useState } from 'react';
 import { SafeAreaView, Text, TouchableOpacity, View, Modal, StyleSheet, Alert, TextInput, ImageBackground } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types'; // Adjust the import path
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { deactivateVistaAccount, sendFeedback } from './repo'; // Ensure sendFeedback is imported from the repo
+import { deactivateVistaAccount, sendFeedback, sendReport } from './repo'; // Ensure sendFeedback is imported from the repo
 import { Path, Svg } from 'react-native-svg';
 
 type Props = StackScreenProps<RootStackParamList, 'Settings'>;
@@ -11,7 +13,9 @@ type Props = StackScreenProps<RootStackParamList, 'Settings'>;
 const Settings: React.FC<Props> = ({ navigation }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isFeedbackModalVisible, setIsFeedbackModalVisible] = useState(false);
+  const [isReportModalVisible, setIsReportModalVisible] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
+  const [reportText, setReportText] = useState('');
 
   const handleDeactivateAccount = () => {
     setIsModalVisible(true);
@@ -67,6 +71,30 @@ const Settings: React.FC<Props> = ({ navigation }) => {
     setIsFeedbackModalVisible(false);
   };
 
+  const handleSendReport = async () => {
+    if (!reportText.trim()) {
+      Alert.alert('Error', 'Please enter a report before sending.');
+      return;
+    }
+    try {
+      const userID = await AsyncStorage.getItem('userID');
+      const result = await sendReport(Number(userID), reportText); // Assuming you use the same sendFeedback API for reports.
+      if (result.isSuccess) {
+        Alert.alert('Report Sent', 'Your report has been sent successfully.');
+        setReportText('');
+        setIsReportModalVisible(false);
+      } else {
+        Alert.alert(result.message);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Failed to send report.');
+    }
+  };
+
+  const handleCancelReport = () => {
+    setIsReportModalVisible(false);
+  };
+
   return (
     <SafeAreaView className="flex-1">
       <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
@@ -92,6 +120,9 @@ const Settings: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity className="p-3 bg-white rounded-md" onPress={() => setIsFeedbackModalVisible(true)}>
           <Text className="text-black text-center text-lg font-bold">Send Feedback</Text>
+        </TouchableOpacity>
+        <TouchableOpacity className="p-3 bg-white rounded-md" onPress={() => setIsReportModalVisible(true)}>
+          <Text className="text-black text-center text-lg font-bold">Send Report</Text>
         </TouchableOpacity>
         <TouchableOpacity className="p-3 bg-white rounded-md">
           <Text className="text-black text-center text-lg font-bold">Change Language</Text>
@@ -151,6 +182,35 @@ const Settings: React.FC<Props> = ({ navigation }) => {
           </View>
         </View>
       </Modal>
+
+      {/* Report Modal */}
+      <Modal
+          transparent={true}
+          visible={isReportModalVisible}
+          animationType="slide"
+        >
+          <View className="flex-1 items-center justify-center bg-[#00000080]">
+            <View className="bg-[#99BC85] p-6 w-[80%] rounded-lg items-center">
+              <Text className="text-xl font-bold mb-3">Send Report</Text>
+              <TextInput
+                className="w-[100%] h-36 border border-gray-500 rounded-md border-1 p-5 mb-4"
+                multiline
+                numberOfLines={4}
+                placeholder="Enter your report here..."
+                value={reportText}
+                onChangeText={setReportText}
+              />
+              <View className="flex-row justify-between w-[100%] gap-2">
+                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleSendReport}>
+                  <Text className="text-base text-black">Send</Text>
+                </TouchableOpacity>
+                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={handleCancelReport}>
+                  <Text className="text-base text-black">Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </ImageBackground>
     </SafeAreaView>
   );
