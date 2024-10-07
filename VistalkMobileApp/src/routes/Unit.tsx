@@ -4,10 +4,11 @@ import LinearGradient from 'react-native-linear-gradient';
 import HexagonIcon from '../assets/svg/HexagonIcon';
 import StarIcon from '../assets/svg/StarIcon';
 import { StackScreenProps } from '@react-navigation/stack';
-import { RootStackParamList } from '../../types';
+import { RootStackParamList, UnitContentScreenNavigationProp } from '../../types';
 import BackIcon from '../assets/svg/BackIcon';
 import { UnitDetails } from './type';
 import { getUnits } from './repo';
+import { useNavigation } from '@react-navigation/native';
 
 type Props = StackScreenProps<RootStackParamList, 'Unit'>;
 
@@ -17,6 +18,7 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
     const [loading, setLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false);
     const [currentUnit, setCurrentUnit] = useState<UnitDetails | null>(null);
+    const navigate = useNavigation<UnitContentScreenNavigationProp>();
 
     useEffect(() => {
         const fetchUnits = async () => {
@@ -34,6 +36,10 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
 
         fetchUnits();
     }, [sectionId]);
+
+    const navigateToUnitContent = (u: keyof RootStackParamList) => {
+        navigate.navigate(u);
+    };
 
     const openModal = (unit: UnitDetails) => {
         setCurrentUnit(unit);
@@ -58,7 +64,7 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
             <LinearGradient colors={['#6addd0', '#7fc188']} className="flex-1 justify-center items-center">
                 <View className="flex-row justify-between w-full px-5 absolute top-10">
                     <TouchableOpacity onPress={() => navigation.goBack()}>
-                        <BackIcon className="text-black w-6 h-6 bg-white p-2 rounded-lg" />
+                        <BackIcon className=" w-8 h-8 text-white" />
                     </TouchableOpacity>
                 </View>
                 <View className="items-center mb-3 mt-8">
@@ -105,10 +111,11 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                                         <View className="pb-10 px-10">
                                             <TouchableOpacity
                                                 className="bg-white py-2 px-10 rounded-full self-center"
-                                                onPress={() => {
+                                                /* onPress={() => {
                                                     closeModal();
                                                     //navigation.navigate('PlayUnit', { unitId: currentUnit.unitId });
-                                                }}
+                                                }} */
+                                                onPress={() => navigateToUnitContent('UnitContent')}
                                             >
                                                 <Text className="text-lg text-black font-bold">Start Unit</Text>
                                             </TouchableOpacity>

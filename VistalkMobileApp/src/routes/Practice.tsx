@@ -42,7 +42,7 @@ const Practice: React.FC = () => {
           <View className="flex flex-row ml-2 mb-2 px-2">
             <Text className="text-xl italic font-light text-white">["ma-a-yong bun-tag"]</Text>
             <TouchableOpacity>
-              <SpeakerIcon className="h-6 w-6 ml-3" />
+              <SpeakerIcon className="h-6 w-6 ml-3 text-white" />
             </TouchableOpacity>
           </View>
         </View>
