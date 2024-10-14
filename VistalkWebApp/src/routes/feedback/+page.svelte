@@ -107,7 +107,6 @@
                 <th class="px-4 py-2">User Name</th>
                 <th class="px-4 py-2">Feedback</th>
                 <th class="px-4 py-2">Date</th>
-                <th class="px-4 py-2">Actions</th>
             </tr>
         </thead>
         <tbody class="text-center text-sm">
