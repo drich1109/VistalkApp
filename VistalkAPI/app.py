@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from db import SECRET_KEY, DEBUG, HOST, PORT
 from flask_cors import CORS
-from Services import user, section, content, question, shop, emailService, feedback
+from Services import user, section, content, question, shop, emailService, feedback, report, dailytask
 from functools import wraps
 import jwt
 
@@ -234,6 +234,31 @@ def deactivateVistaAccount():
 @token_required
 def getFeedbacks():
     return feedback.get_feedback()  
+
+@app.route('/getReports', methods=['GET'])
+@token_required
+def getReports():
+    return report.get_report()
+
+@app.route('/reportResponded', methods=['PUT'])
+@token_required
+def reportResponded():
+    return report.reportResponded()
+
+@app.route('/getDailyTask', methods=['GET'])
+@token_required
+def getDailyTask():
+    return dailytask.get_dailytask()
+
+@app.route('/getDailyTaskTypes', methods=['GET'])
+@token_required
+def getDailyTaskTypes():
+    return dailytask.get_DailyTaskType()
+
+@app.route('/saveDailyTask', methods=['POST'])
+@token_required
+def saveDailyTask():
+    return dailytask.save_dailyTask()
 
 
 if __name__ == "__main__":

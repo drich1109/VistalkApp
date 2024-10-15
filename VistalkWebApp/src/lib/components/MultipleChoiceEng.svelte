@@ -19,6 +19,7 @@
   let audioElement: HTMLAudioElement | null = new Audio(fileUrl) || null;
   let lastFile: File | null = mainQuestion.file;
   let lasttype:  'audio' | 'image' | null = fileType;
+  let playing = false;
 
   onMount(async () => {
     searchQueries.forEach((query, index) => {
@@ -134,16 +135,20 @@
 }
 
 function togglePlayPause() {
-    if (audioElement) {
-      if (audioElement.paused) {
-        audioElement.play();
-      } else {
-        audioElement.pause();
-      }
-      audioElement.onended = () => {
-      audioElement = new Audio(fileUrl); 
-    };    }
+  if (audioElement) {
+    if (audioElement.paused) {
+      audioElement.play();
+      playing = true;
+    } else {
+      audioElement.pause();
+      playing = false;
+    }
+
+    audioElement.onended = () => {
+      playing = false;
+    };
   }
+}
 
 </script>
 
@@ -205,12 +210,16 @@ function togglePlayPause() {
                             <p class="mt-2 text-sm text-gray-600">File: {mainQuestion.file.name}</p>
                           {:else if fileType === 'audio' && mainQuestion.file}
                             <div class="flex items-center mt-2">
-                              <button on:click={togglePlayPause}
-                                class=" mr-2 text-gray-600 focus:outline-none hover:text-gray-700">
-                                {#if audioElement && !audioElement.paused}
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 32 32"><path fill="black" d="M14 10h-2v12h2zm6 0h-2v12h2z"/><path fill="black" d="M16 4A12 12 0 1 1 4 16A12 12 0 0 1 16 4m0-2a14 14 0 1 0 14 14A14 14 0 0 0 16 2"/></svg>      
-                                {:else if audioElement  && audioElement.paused}
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 20 20"><path fill="black" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07m12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32M7 6l8 4l-8 4z"/></svg>
+                              <button on:click={togglePlayPause} class="mr-2 text-gray-600 focus:outline-none hover:text-gray-700">
+                                {#if playing}
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 32 32">
+                                    <path fill="black" d="M14 10h-2v12h2zm6 0h-2v12h2z"/>
+                                    <path fill="black" d="M16 4A12 12 0 1 1 4 16A12 12 0 0 1 16 4m0-2a14 14 0 1 0 14 14A14 14 0 0 0 16 2"/>
+                                  </svg>      
+                                {:else}
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="1.2rem" height="1.2rem" viewBox="0 0 20 20">
+                                    <path fill="black" d="M2.93 17.07A10 10 0 1 1 17.07 2.93A10 10 0 0 1 2.93 17.07m12.73-1.41A8 8 0 1 0 4.34 4.34a8 8 0 0 0 11.32 11.32M7 6l8 4l-8 4z"/>
+                                  </svg>
                                 {/if}
                               </button>
                               <p class="text-sm text-gray-600">{mainQuestion.file.name}</p>
