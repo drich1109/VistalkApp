@@ -112,7 +112,7 @@ def get_choices():
 def save_questionMultiple():
     return question.save_questionMultiple()
 
-@app.route('/save_questionMatch', methods=['POST'])
+@app.route('/savequestionMatch', methods=['POST'])
 @token_required
 def save_questionMatch():
     return question.save_question_match()
@@ -189,7 +189,6 @@ def getItemList():
     return shop.get_items()  
 
 @app.route('/getShopFileByFileName', methods=['GET'])
-@token_required
 def getShopFileByFileName():
     return shop.getShopFileByFileName()  
 
@@ -204,7 +203,6 @@ def coinBagInactive():
     return shop.coinBagInactive()
 
 @app.route('/getQuestionFiles', methods=['GET'])
-@token_required
 def getQuestionFile():
     return question.getQuestionFile()  
 

@@ -139,6 +139,14 @@
                   </label>
             </div>
 
+            <div class="mt-2">  
+              <label class="inline-flex items-center cursor-pointer">
+                  <input bind:checked={powerUp.isImplemented}  type="checkbox" class="sr-only peer">
+                  <div class="relative w-11 h-6 bg-gray-200  rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-lime-800"></div>
+                  <span class="ms-3 text-sm font-medium text-black dark:text-black">Already Implemented</span>
+                </label>
+          </div>
+
             <div class="mt-2">
                 <div class="flex">
                     <label for="powerUpFile" class="bg-black p-2 text-white text-sm rounded-md flex items-justify mr-2 cursor-pointer" >Upload file<svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24"><path fill="currentColor" d="M11 16V7.85l-2.6 2.6L7 9l5-5l5 5l-1.4 1.45l-2.6-2.6V16zm-5 4q-.825 0-1.412-.587T4 18v-3h2v3h12v-3h2v3q0 .825-.587 1.413T18 20z"/></svg></label>

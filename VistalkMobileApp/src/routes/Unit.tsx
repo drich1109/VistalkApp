@@ -23,9 +23,7 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
     useEffect(() => {
         const fetchUnits = async () => {
             try {
-                console.log(sectionName);
                 const result = await getUnits(sectionId);
-                console.log(result.data);
                 setUnits(result.data);
             } catch (error) {
                 console.error('Error fetching units:', error);
@@ -37,8 +35,14 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
         fetchUnits();
     }, [sectionId]);
 
-    const navigateToUnitContent = (u: keyof RootStackParamList) => {
-        navigate.navigate(u);
+    const navigateToUnitContent = () => {
+        if(currentUnit){
+        const unitId = currentUnit?.unitID
+        closeModal();
+        //navigate.navigate('UnitContent', {unitId, sectionId});
+        navigate.navigate('WordMatchGame');
+        }
+
     };
 
     const openModal = (unit: UnitDetails) => {
@@ -61,7 +65,7 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
 
     return (
         <SafeAreaView className="flex-1">
-            <LinearGradient colors={['#6addd0', '#7fc188']} className="flex-1 justify-center items-center">
+            <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 justify-center items-center">
                 <View className="flex-row justify-between w-full px-5 absolute top-10">
                     <TouchableOpacity onPress={() => navigation.goBack()}>
                         <BackIcon className=" w-8 h-8 text-white" />
@@ -111,11 +115,7 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                                         <View className="pb-10 px-10">
                                             <TouchableOpacity
                                                 className="bg-white py-2 px-10 rounded-full self-center"
-                                                /* onPress={() => {
-                                                    closeModal();
-                                                    //navigation.navigate('PlayUnit', { unitId: currentUnit.unitId });
-                                                }} */
-                                                onPress={() => navigateToUnitContent('UnitContent')}
+                                                onPress={() => navigateToUnitContent()}
                                             >
                                                 <Text className="text-lg text-black font-bold">Start Unit</Text>
                                             </TouchableOpacity>

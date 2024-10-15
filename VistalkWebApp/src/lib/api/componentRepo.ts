@@ -28,6 +28,6 @@ export async function saveQuestionMultipleChoice(question: QuestionMultipleDto) 
 }
 
 export async function save_questionMatch(question: QuestionMatchingTypeDto) {
-    return await post<CallResultDto<object>>(`/save_questionMatch`, {}, question);
+    return await post<CallResultDto<object>>(`/savequestionMatch`, {}, question);
 }
 

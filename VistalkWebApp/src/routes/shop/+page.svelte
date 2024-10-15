@@ -54,7 +54,8 @@
         description: '',
         filePath: '',
         file: null,
-        isActive: true
+        isActive: true,
+        isImplemented:false
     };
   
     let backgroundMusic: BackgroundMusic = {
@@ -120,7 +121,8 @@
             description: '',
             filePath: '',
             file: null,
-            isActive: true
+            isActive: true,
+            isImplemented:false
         };
   
         backgroundMusic = {

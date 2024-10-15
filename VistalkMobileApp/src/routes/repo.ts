@@ -1,5 +1,5 @@
 import { getFromBaseApi, getFromMainApi, postToBaseApi, postToMainApi, putFormBaseApi, putToBaseApi, putToMainApi } from "../../api/apiService";
-import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, Musics, SectionDetails, UnitDetails } from "./type";
+import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, Musics, SectionDetails, UnitDetails, QuestionDetails, UserPowerUp } from "./type";
 import CryptoJS from 'crypto-js';
 import { VITE_MAIN_API } from '@env';
 import { SectionListRenderItem } from "react-native";
@@ -190,3 +190,17 @@ export async function getUnits(sectionId:number)
     return await getFromMainApi<CallResultDto<UnitDetails[]>>('getUnits', {sectionId});
 }
 
+export async function getUnitQuestions(unitId:number)
+{
+    return await getFromMainApi<CallResultDto<QuestionDetails[]>>('getUnitQuestions', {unitId});
+}
+
+export function getQuestionFiles(fileName: string): string {
+    const timestamp = Date.now(); 
+    return `${baseUrl}/getQuestionFiles?fileName=${fileName}&t=${timestamp}`;
+}
+
+export async function getUserPowerUps(userID:string)
+{
+    return await getFromMainApi<CallResultDto<UserPowerUp[]>>('getUserPowerUp', {userID});
+}

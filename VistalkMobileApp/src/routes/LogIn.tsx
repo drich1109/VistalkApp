@@ -34,7 +34,7 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView className="flex-1">
-      <LinearGradient colors={['#6addd0', '#7fc188']} className="flex-1 justify-center items-center">
+      <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 justify-center items-center">
         <Image source={require('../assets/White.png')} className="w-44 h-44 mb-12" resizeMode="contain" />
 
         <TextInput

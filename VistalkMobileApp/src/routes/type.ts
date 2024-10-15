@@ -140,3 +140,75 @@ export type UnitDetails = {
     totalItems:number;
 };
 
+export type QuestionDetails = {
+    questionID: number;
+    questionText: string;
+    imagePath: string | null;
+    audioPath: string | null;
+    questionTypeID: number;
+    unitId: number;
+    isActive: boolean;
+  
+    questionChoiceID: number | null;
+    correctChoice: number | null;
+    choice1: number | null;
+    choice1ContentText: string | null;
+    choice1EnglishTranslation: string | null;
+    choice1AudioPath: string | null;
+    choice2: number | null;
+    choice2ContentText: string | null;
+    choice2EnglishTranslation: string | null;
+    choice2AudioPath: string | null;
+    choice3: number | null;
+    choice3ContentText: string | null;
+    choice3EnglishTranslation: string | null;
+    choice3AudioPath: string | null;
+    choice4: number | null;
+    choice4ContentText: string | null;
+    choice4EnglishTranslation: string | null;
+    choice4AudioPath: string | null;
+  
+    questionMatchingTypeID: number | null;
+    word1: number | null;
+    word1ContentText: string | null;
+    word1EnglishTranslation: string | null;
+    word1AudioPath: string | null;
+    match1: number | null;
+    match1ContentText: string | null;
+    match1EnglishTranslation: string | null;
+    match1AudioPath: string | null;
+    word2: number | null;
+    word2ContentText: string | null;
+    word2EnglishTranslation: string | null;
+    word2AudioPath: string | null;
+    match2: number | null;
+    match2ContentText: string | null;
+    match2EnglishTranslation: string | null;
+    match2AudioPath: string | null;
+    word3: number | null;
+    word3ContentText: string | null;
+    word3EnglishTranslation: string | null;
+    word3AudioPath: string | null;
+    match3: number | null;
+    match3ContentText: string | null;
+    match3EnglishTranslation: string | null;
+    match3AudioPath: string | null;
+    word4: number | null;
+    word4ContentText: string | null;
+    word4EnglishTranslation: string | null;
+    word4AudioPath: string | null;
+    match4: number | null;
+    match4ContentText: string | null;
+    match4EnglishTranslation: string | null;
+    match4AudioPath: string | null;
+};
+
+export type UserPowerUp = 
+{
+    itemId: number;
+    userPlayerId: number;
+    quantity: number;
+    filePath: string;
+    name: string;
+    description: string;
+}
