@@ -15,6 +15,7 @@ export async function savePowerup(powerUp: PowerUp) {
     formData.append('itemID', String(powerUp.itemID));
     formData.append('itemTypeID', powerUp.itemTypeID.toString());
     formData.append('isPremium', powerUp.isPremium.toString());
+    formData.append('isImplemented', powerUp.isImplemented.toString());
     formData.append('vcoinPrice', powerUp.vcoinPrice.toString());
     formData.append('name', powerUp.name);
     formData.append('description', powerUp.description);

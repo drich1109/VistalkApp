@@ -70,14 +70,12 @@ const Music: React.FC<MusicProps> = ({ vCoin, setVcoin }) => {
 
   const toggleSound = (fileUrl: string, trackId: number) => {
     if (currentTrack === trackId && isPlaying) {
-      // If the current track is already playing, pause it
       sound?.pause();
       setIsPlaying(false);
     } else {
-      // Play the sound if it is not playing or a new track is selected
       if (sound) {
-        sound.stop(); // Stop the sound without a callback
-        sound.release(); // Release the sound instance
+        sound.stop(); 
+        sound.release(); 
       }
   
       const newSound = new Sound(fileUrl, '', (error: Error | null) => {
@@ -86,18 +84,17 @@ const Music: React.FC<MusicProps> = ({ vCoin, setVcoin }) => {
           return;
         }
   
-        newSound.setVolume(1.0); // Set volume to max
+        newSound.setVolume(1.0); 
         newSound.play(() => {
-          // Callback when sound playback ends
           setIsPlaying(false);
-          setCurrentTrack(null); // Reset track after playback ends
-          newSound.release(); // Release the sound instance after playback
+          setCurrentTrack(null); 
+          newSound.release(); 
         });
       });
   
-      setSound(newSound); // Track the sound instance
-      setIsPlaying(true); // Set playing state
-      setCurrentTrack(trackId); // Track the current playing track
+      setSound(newSound); 
+      setIsPlaying(true); 
+      setCurrentTrack(trackId); 
     }
   };
 

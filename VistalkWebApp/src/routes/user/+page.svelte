@@ -54,11 +54,11 @@
     async function openViewModal(u:UserDto)
     {
         userView = u;
-        const fileBlob = await getItemFileByFileName(p.filePath, itemTypeID);
+ /*        const fileBlob = await getItemFileByFileName(p.filePath, itemTypeID);
             if (fileBlob != null) {
                 fileUrl = URL.createObjectURL(fileBlob);
                 powerUp.file = new File([fileBlob], powerUp.filePath, { type: fileBlob.type });
-            }
+            } */
         openModal = true;
     }
 </script>

@@ -27,7 +27,7 @@ def getUserImage():
     return user.getUserImage()
 
 @app.route('/getUserDetails', methods=['GET'])
-def getUserDetails():
+def get_user_details_route():
     return user.getUserDetails()
 
 @app.route('/addfeedback', methods=['POST'])
@@ -65,6 +65,10 @@ def getSyllablePronunciation():
 @app.route('/getPowerUps', methods=['GET'])
 def getPowerUps():
     return shop.getPowerUps()
+
+@app.route('/getUserPowerUp', methods=['GET'])
+def getUserPowerUps():
+    return user.getUserPowerUp()
 
 @app.route('/getItemImage', methods=['GET'])
 def getItemImage():
@@ -118,6 +122,14 @@ def getBackgroundMusic():
 @app.route('/getUnits', methods=['GET'])
 def getUnits():
     return section.get_Units()
+
+@app.route('/getUnitQuestions', methods=['GET'])
+def get_UnitQuestions():
+    return section.getUnitQuestions()
+
+@app.route('/getQuestionFiles', methods=['GET'])
+def get_QuestionFiles():
+    return section.getQuestionFiles()
 
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

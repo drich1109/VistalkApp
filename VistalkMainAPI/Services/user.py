@@ -22,7 +22,6 @@ def getUserDetails():
     values = [userID,]
     cursor.execute(query, values)
     userProfile = cursor.fetchone()
-    print(userProfile)
     if not userProfile:
         return jsonify({
             'isSuccess': True,
@@ -61,4 +60,59 @@ def add_feedback():
             'data': [],
             'data2': None,
             'totalCount': 0
-        }), 200        
+        }), 200
+
+def getUserPowerUp():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    userID = request.args.get('userID')
+
+    query = """
+            Select * from powerUp where isImplemented = 1"""
+    cursor.execute(query)
+    powerUps = cursor.fetchall()
+
+    query2 = """
+            Select ui.*, p.name, p.description, i.filePath from userItem ui 
+            inner join item i on i.itemId = ui.itemId 
+            inner join powerup p on p.itemId = i.itemId 
+            Where isActive = 1 and p.IsImplemented = 1 and i.itemTypeId = 1 and userPlayerId = %s"""
+    values = [userID,]
+    cursor.execute(query2, values)
+    userPowerUp = cursor.fetchall()
+    newUserPowerUp = checkUserPowerUps(cursor, userID, powerUps, userPowerUp)
+    conn.commit()
+    if not powerUps:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No sections found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': newUserPowerUp,
+        'data2':None,
+        'totalCount': 1
+    }), 200
+
+def checkUserPowerUps(cursor, userID, powerUps, userPowerUps):
+    userPowerUpIds = [up['itemId'] for up in userPowerUps]
+    for powerUp in powerUps:
+        if powerUp['itemID'] not in userPowerUpIds:
+            insert_query = """
+                INSERT INTO userItem (userPlayerId, itemId, quantity) 
+                VALUES (%s, %s, 0)
+            """
+            cursor.execute(insert_query, (userID, powerUp['itemId']))
+    cursor.execute("""
+        Select ui.*, p.name, p.description, i.filePath from userItem ui 
+        inner join item i on i.itemId = ui.itemId 
+        inner join powerup p on p.itemId = i.itemId 
+        Where isActive = 1 and p.IsImplemented = 1 and i.itemTypeId = 1 and userPlayerId = %s
+    """, [userID])
+    
+    return cursor.fetchall()

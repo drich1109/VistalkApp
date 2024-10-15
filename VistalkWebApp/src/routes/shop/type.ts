@@ -14,7 +14,8 @@ export type PowerUp =
     description:string,
     filePath:string,
     file:File | null,
-    isActive:boolean
+    isActive:boolean,
+    isImplemented:boolean;
 }
 
 export type BackgroundMusic = 

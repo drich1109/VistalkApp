@@ -29,7 +29,11 @@ def save_item():
 
         item_name = request.form.get('name')
         description = request.form.get('description')
-
+        isImplemented = request.form.get('isImplemented')
+        if(isImplemented == 'false'):
+            isImplemented = 0
+        else:
+            isImplemented = 1
         safe_filename = f"{item_name.replace(' ', '_')}.png"
         image_file = request.files.get('itemImageFile')
 
@@ -54,12 +58,13 @@ def save_item():
 
             sql_content = """
                 UPDATE powerUp
-                SET name = %s, description = %s
+                SET name = %s, description = %s, isImplemented = %s
                 WHERE itemID = %s
             """
             cursor.execute(sql_content, (
                 item_name,
                 description,
+                isImplemented,
                 item_id
             ))
 
@@ -79,13 +84,14 @@ def save_item():
             item_id = cursor.lastrowid
 
             sql_content = """
-                INSERT INTO powerUp (itemID, name, description)
-                VALUES (%s, %s, %s)
+                INSERT INTO powerUp (itemID, name, description, isImplemented)
+                VALUES (%s, %s, %s, %s)
             """
             cursor.execute(sql_content, (
                 item_id,
                 item_name,
-                description
+                description,
+                isImplemented
             ))
 
         conn.commit()
@@ -239,7 +245,7 @@ def get_items():
     if itemTypeID == '1':
         # Inner join with powerUp table
         query = """
-            SELECT i.*, pu.name, pu.description 
+            SELECT i.*, pu.name, pu.description, pu.isImplemented
             FROM item i
             INNER JOIN powerUp pu ON pu.itemID = i.itemID 
             WHERE i.isActive = true

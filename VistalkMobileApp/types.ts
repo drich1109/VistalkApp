@@ -20,7 +20,8 @@ export type RootStackParamList = {
   EditProfile:undefined;
   ChangePassword:undefined;
   Unit:{sectionId:number, sectionName:string};
-  UnitContent: undefined;
+  UnitContent: {unitId:number, sectionId:number};
+  WordMatchGame:undefined;
 };
 
 export type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -40,6 +41,7 @@ export type EditProfileScreenNavigationProp = NativeStackNavigationProp<RootStac
 export type ChangePasswordScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ChangePassword'>;
 export type UnitScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Unit'>;
 export type UnitContentScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'UnitContent'>;
+export type WordMatchGameScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'WordMatchGame'>;
 
 export type MenuScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, keyof RootStackParamList>;
 

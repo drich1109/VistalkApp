@@ -2,6 +2,7 @@
 from db import get_db_connection, QuestionFiles
 from flask import request, jsonify, send_from_directory
 import os
+import uuid
 
 QuestionFiles =  QuestionFiles
 
@@ -171,12 +172,12 @@ def save_questionMultiple():
             if image_path or audio_path:
 
                 if image_path:
-                    safe_filename = f"{question_text.replace(' ', '_')}.png"
+                    safe_filename = f"{uuid.uuid4().hex}.png"  # Generate a random filename for the image
                     cursor.execute('UPDATE question SET imagePath = %s WHERE questionId = %s', (safe_filename, question_id))
                     file_path = os.path.join(QuestionFiles, safe_filename)
                     file.save(file_path)
                 elif audio_path:
-                    safe_filename = f"{question_text.replace(' ', '_')}.mp3"
+                    safe_filename = f"{uuid.uuid4().hex}.mp3"
                     cursor.execute('UPDATE question SET audioPath = %s WHERE questionId = %s', (safe_filename, question_id))
                     file_path = os.path.join(QuestionFiles, safe_filename)
                     file.save(file_path)
@@ -190,7 +191,6 @@ def save_questionMultiple():
         )
         conn.commit()
     else:
-        # Update an existing question
         query = """UPDATE question SET questionText = %s, unitId = %s WHERE questionID = %s"""
         values = (question_text, unit_id, question_ID)
         cursor.execute(query, values)
@@ -205,6 +205,7 @@ def save_questionMultiple():
             (*choices, correct_choice, question_ID)
         )
         conn.commit()
+
         file = request.files.get('file')
 
         if file:
@@ -212,14 +213,14 @@ def save_questionMultiple():
 
                 if image_path:
                     print(question_ID)
-                    safe_filename = f"{question_text.replace(' ', '_')}.png"
+                    safe_filename = f"{uuid.uuid4().hex}.png"  # Random filename for updated image
                     cursor.execute('UPDATE question SET imagePath = %s, audioPath = null WHERE questionId = %s', (safe_filename, question_ID))
                     conn.commit()
                     file_path = os.path.join(QuestionFiles, safe_filename)
                     file.save(file_path)
                 elif audio_path:
                     print(question_ID)
-                    safe_filename = f"{question_text.replace(' ', '_')}.mp3"
+                    safe_filename = f"{uuid.uuid4().hex}.mp3"  # Random filename for updated audio
                     print(safe_filename)
                     cursor.execute('UPDATE question SET audioPath = %s, imagePath = null WHERE questionId = %s', (safe_filename, question_ID))
                     conn.commit()
@@ -294,6 +295,7 @@ def save_question_match():
     data = request.json
 
     question_text = data.get('questionText')
+    print(question_text)
     unit_id = data.get('unitId')
     question_type_id = data.get('questionTypeID')
     questionMatchingTypeId = data.get('questionMatchingTypeID')
