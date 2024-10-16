@@ -131,5 +131,9 @@ def get_UnitQuestions():
 def get_QuestionFiles():
     return section.getQuestionFiles()
 
+@app.route('/addreport', methods=['POST'])
+def addreport():
+    return user.add_report()
+
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
