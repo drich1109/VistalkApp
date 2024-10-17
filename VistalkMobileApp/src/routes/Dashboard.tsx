@@ -96,7 +96,7 @@ const Dashboard: React.FC<Props> = ({ navigation })=> {
   };
 
   return (
-      <LinearGradient colors={['#6addd0', '#7fc188']} className="flex-1 resize-cover justify-center">
+      <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 resize-cover justify-center">
       <View className="flex-row justify-between p-2 items-center">
         <TouchableOpacity className="w-10 h-10 rounded-full overflow-hidden bg-white justify-center items-center" onPress={() => navigation.navigate('UserProfile')}>
           {fileUrl ? (
