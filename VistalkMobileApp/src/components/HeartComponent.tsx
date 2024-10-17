@@ -8,7 +8,9 @@ interface HeartComponentProps {
 }
 
 const HeartComponent: React.FC<HeartComponentProps> = ({ hearts }) => {
-    const heartAnimation = useRef(new Animated.Value(1)).current; 
+    const heartAnimation = useRef(new Animated.Value(1)).current;
+    const textOpacity = useRef(new Animated.Value(1)).current;
+    const textTranslateY = useRef(new Animated.Value(0)).current;
     const previousHearts = useRef(hearts);
 
     useEffect(() => {
@@ -37,6 +39,34 @@ const HeartComponent: React.FC<HeartComponentProps> = ({ hearts }) => {
             heartAnimation.setValue(1);
         }
 
+        if (previousHearts.current !== hearts) {
+            Animated.parallel([
+                Animated.timing(textOpacity, {
+                    toValue: 0, 
+                    duration: 150, 
+                    useNativeDriver: true,
+                }),
+                Animated.timing(textTranslateY, {
+                    toValue: -10, 
+                    duration: 150, 
+                    useNativeDriver: true,
+                }),
+            ]).start(() => {
+                Animated.parallel([
+                    Animated.timing(textOpacity, {
+                        toValue: 1, 
+                        duration: 150, 
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(textTranslateY, {
+                        toValue: 0, 
+                        duration: 150, 
+                        useNativeDriver: true,
+                    }),
+                ]).start();
+            });
+        }
+
         previousHearts.current = hearts;
     }, [hearts]);
 
@@ -52,9 +82,17 @@ const HeartComponent: React.FC<HeartComponentProps> = ({ hearts }) => {
             ) : (
                 <BlackHeartIcon className="h-10 w-10 text-white" />
             )}
-            <Text className="text-white font-bold ml-1">
+
+            <Animated.Text
+                className="text-white font-bold ml-1"
+                style={{
+                    opacity: textOpacity,
+                    transform: [{ translateY: textTranslateY }],
+                    color: hearts > previousHearts.current ? 'yellow' : 'white', 
+                }}
+            >
                 {hearts}
-            </Text>
+            </Animated.Text>
         </View>
     );
 };

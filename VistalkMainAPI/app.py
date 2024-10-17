@@ -14,10 +14,6 @@ def getLanguages():
 def getSections():
     return section.get_Sections()
 
-@app.route('/checkPronunciation', methods=['POST'])
-def checkPronunciation():
-    return pronunciation.check_pronunciation()
-
 @app.route('/getUserLanguage', methods=['GET'])
 def getUserLanguage():
     return language.getUserLanguage()

@@ -6,7 +6,6 @@ import DashboardIcon from '../assets/svg/DashboardIcon';
 import ShopIcon from '../assets/svg/ShopIcon';
 import DictionaryIcon from '../assets/svg/DictionaryIcon';
 import PracticeIcon from '../assets/svg/PracticeIcon';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface MenuProps {
   activeScreen: keyof RootStackParamList | null;
@@ -17,15 +16,6 @@ const Menu: React.FC<MenuProps> = ({ activeScreen }) => {
   const navigateToScreen = (screen: keyof RootStackParamList) => {
     navigation.navigate(screen);
   };
-
- /*  const handleLogout = async () => {
-    try {
-      await AsyncStorage.removeItem('userToken');
-      navigation.navigate('LogIn');
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
-  }; */
 
   return (
     <View className="items-center justify-center">
@@ -42,12 +32,6 @@ const Menu: React.FC<MenuProps> = ({ activeScreen }) => {
         <TouchableOpacity onPress={() => navigateToScreen('Practice')}>
           <PracticeIcon className={`w-6 h-6`} isActive={activeScreen == 'Practice'}/>
         </TouchableOpacity>
-{/*         <TouchableOpacity
-          className="bg-red-500 p-2 rounded"
-          onPress={handleLogout}
-        >
-          <Text className="text-white font-bold">Logout</Text>
-        </TouchableOpacity> */}
       </Animated.View>
     </View>
   );
