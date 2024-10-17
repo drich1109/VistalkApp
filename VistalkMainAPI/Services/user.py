@@ -116,3 +116,27 @@ def checkUserPowerUps(cursor, userID, powerUps, userPowerUps):
     """, [userID])
     
     return cursor.fetchall()
+
+def add_report():
+    data = request.json
+    user_player_id = data.get('userId') 
+    report_text = data.get('report')
+    print(user_player_id)
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    report_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    query = """
+            INSERT INTO userreport (userPlayerID, reportDate, reportText)
+            VALUES (%s, %s, %s)
+        """
+        
+    cursor.execute(query, (user_player_id, report_date, report_text))
+    conn.commit()
+    return jsonify({
+            'isSuccess': True,
+            'message': 'Added Report Succesfully',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200

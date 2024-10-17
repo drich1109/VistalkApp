@@ -76,6 +76,10 @@ export async function sendFeedback(userId:number, feedback:string) {
     return await postToMainApi<CallResultDto<object>>('/addfeedback', {userId, feedback});
 }
 
+export async function sendReport(userId:number, report:string) {
+    return await postToMainApi<CallResultDto<object>>('/addreport', {userId, report});
+}
+
 export async function getContent(searchString: string,  offset:number, LIMIT:number)
 {
     return await getFromMainApi<CallResultDto<Content[]>>('getContent', {searchString, offset, LIMIT});
