@@ -8,6 +8,8 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { getContentById, getContentDefinitionById, getContentExampleById, getContentPronunciation, getContentSyllableById, getSyllablePronunciation } from "./repo";
 import { Content, ContentDefinition, ContentExample, ContentSyllable } from "./type";
 import Sound from 'react-native-sound';
+import LinearGradient from "react-native-linear-gradient";
+import BackIcon from "../assets/svg/BackIcon";
 
 type Props = StackScreenProps<RootStackParamList, 'DictionaryMeaning'>;
 
@@ -107,24 +109,10 @@ const DictionaryMeaning: React.FC<Props> = ({route, navigation}) => {
     };
 
     return (
-      <ImageBackground
-        source={require("../assets/bg.png")}
-        className="flex-1 items-center"
-        resizeMode="cover"
-      >
-        <View className="flex-row justify-between w-full px-5 absolute top-10">
+        <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 resize-cover items-center">
+            <View className="flex-row justify-between w-full px-5 absolute top-10">
           <TouchableOpacity onPress={() => navigation.navigate("Dictionary")}>
-            <Svg
-              width="30"
-              height="30"
-              className="bg-white text-[#99BC85] rounded-lg"
-              viewBox="0 0 24 24"
-            >
-              <Path
-                fill="currentColor"
-                d="M3.636 11.293a1 1 0 000 1.414l5.657 5.657a1 1 0 001.414-1.414L6.757 13H20a1 1 0 100-2H6.757l3.95-3.95a1 1 0 00-1.414-1.414z"
-              />
-            </Svg>
+            <BackIcon className=" w-8 h-8 text-white" />
           </TouchableOpacity>
         </View>
     
@@ -135,7 +123,7 @@ const DictionaryMeaning: React.FC<Props> = ({route, navigation}) => {
                 {content.contentText}
               </Text>
               <TouchableOpacity onPress={() => playSound(fileUrl)}>
-                <SpeakerIcon className="h-6 w-6 ml-2" />
+                <SpeakerIcon className="h-6 w-6 ml-2 text-white" />
               </TouchableOpacity>
             </View>
     
@@ -203,7 +191,7 @@ const DictionaryMeaning: React.FC<Props> = ({route, navigation}) => {
         {loading && (
           <Text className="text-white text-center mt-4">Loading...</Text>
         )}
-      </ImageBackground>
+        </LinearGradient>
     );    
 };
 

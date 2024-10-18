@@ -35,10 +35,14 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
   return (
     <SafeAreaView className="flex-1">
       <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 justify-center items-center">
-        <Image source={require('../assets/White.png')} className="w-44 h-44 mb-12" resizeMode="contain" />
-
+        <View className="items-center mb-8">
+          <Image source={require('../assets/White.png')} className="w-44 h-44" />
+          <Text className="text-white text-4xl font-bold" style={{ color: '#ffffff', fontFamily: 'cursive' }}>
+              Vistalk
+          </Text>
+        </View>
         <TextInput
-          className="w-4/5 h-13 border-2 border-white mb-5 px-3 rounded-lg bg-transparent text-white"
+          className="w-4/5 h-13 border-2 border-white mb-5 px-3 rounded-xl bg-transparent text-white"
           placeholder={emailPlaceholder}
           placeholderTextColor="white"
           onChangeText={setEmail}
@@ -51,7 +55,7 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
         />
 
         <TextInput
-          className="w-4/5 h-13 border-2 border-white mb-5 px-3 rounded-lg bg-transparent text-white"
+          className="w-4/5 h-13 border-2 border-white mb-5 px-3 rounded-xl bg-transparent text-white"
           placeholder={passwordPlaceholder}
           placeholderTextColor="white"
           secureTextEntry
@@ -61,8 +65,8 @@ const LogIn: React.FC<Props> = ({ navigation }) => {
           onBlur={() => setPasswordPlaceholder('Password')}
         />
 
-        <TouchableOpacity className="bg-white p-3 w-4/5 rounded-full items-center mb-4" onPress={handleLogin}>
-          <Text className="text-[#99BC85] text-xl font-bold">Login</Text>
+        <TouchableOpacity className="border border-2 border-white p-3 w-[80%] rounded-xl items-center mb-4" onPress={handleLogin}>
+          <Text className="text-white text-xl font-bold">Login</Text>
         </TouchableOpacity>
 
   {/*       <TouchableOpacity style={styles.googleButton} onPress={() => Alert.alert('Google Sign In')}>

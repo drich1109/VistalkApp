@@ -13,6 +13,7 @@ import {getLanguages, register} from './repo'; // Adjust the import path
 import type {Languages, UserDto} from './type'; // Adjust the import path
 import {StackScreenProps} from '@react-navigation/stack';
 import { RootStackParamList } from '../../types'; // Adjust the import path
+import LinearGradient from 'react-native-linear-gradient';
 
 type Props = StackScreenProps<RootStackParamList, 'Languages'>;
 
@@ -83,19 +84,16 @@ const LanguageList: React.FC<Props> = ({route, navigation}) => {
   console.log(languages);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ImageBackground
-        resizeMode={'stretch'}
-        source={require('../assets/bg.png')}
-        className="flex-1 p-4">
-        <Image source={require('../assets/logo.png')} className="w-44 h-44 mb-12" />
-        {languages.map((language, index) => (
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginVertical: 10,
-            }}>
+    <SafeAreaView className="flex-1">
+      <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 justify-center items-center">
+      <View className="items-center mb-8">
+          <Image source={require('../assets/White.png')} className="w-44 h-44" />
+          <Text className="text-white text-4xl font-bold" style={{ color: '#ffffff', fontFamily: 'cursive' }}>
+              Vistalk
+          </Text>
+        </View>
+      {languages.map((language, index) => (
+          <View className="flex-row items-center mt-4 px-4">
             <Image
               source={require('../assets/cebuano.png')}
               style={{width: 100, height: 100}}
@@ -110,7 +108,7 @@ const LanguageList: React.FC<Props> = ({route, navigation}) => {
             </TouchableOpacity>
           </View>
         ))}
-      </ImageBackground>
+      </LinearGradient>
     </SafeAreaView>
   );
 };

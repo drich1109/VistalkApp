@@ -3,7 +3,7 @@ import Svg, { Path, SvgProps } from "react-native-svg";
 const SearchIcon = (props: SvgProps) => (
   <Svg
     viewBox="0 0 18 20"
-    fill="none"
+    fill="currentColor"
     {...props}
   >
     <Path
