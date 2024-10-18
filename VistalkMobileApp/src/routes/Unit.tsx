@@ -13,6 +13,7 @@ import CorrectIcon from '../assets/svg/CorrectIcon';
 import IncorrectIcon from '../assets/svg/IncorrectIcon';
 import UnitIcon from '../assets/svg/UnitIcon';
 import Loader from '../components/Loader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Props = StackScreenProps<RootStackParamList, 'Unit'>;
 
@@ -27,7 +28,8 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
     useEffect(() => {
         const fetchUnits = async () => {
             try {
-                const result = await getUnits(sectionId);
+                const userID = await AsyncStorage.getItem('userID');
+                const result = await getUnits(sectionId, userID);
                 setUnits(result.data);
             } catch (error) {
                 console.error('Error fetching units:', error);
@@ -38,13 +40,11 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
 
         fetchUnits();
     }, [sectionId]);
-
     const navigateToUnitContent = () => {
-        if (currentUnit) {
-            const unitId = currentUnit?.unitID
-            closeModal();
-            //navigate.navigate('UnitContent', {unitId, sectionId});
-            navigate.navigate('WordMatchGame');
+        if(currentUnit){
+        const unitId = currentUnit?.unitID
+        closeModal();
+        navigate.navigate('UnitContent', {unitId, sectionId, sectionName});
         }
 
     };

@@ -38,19 +38,26 @@ def get_Sections():
 
 def get_Units():
     sectionID = request.args.get('sectionId')
-
+    userId = request.args.get('userId')
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    query = """
+
+    query_main = """
         SELECT * FROM unit
-        WHERE sectionID = %s and isActive = true
+        WHERE sectionID = %s AND isActive = true
     """
-    values = [sectionID]
+    cursor.execute(query_main, (sectionID,))
+    mainUnits = cursor.fetchall()
 
-    cursor.execute(query, tuple(values))
-    units = cursor.fetchall()
+    query_user = """
+        SELECT * FROM unit u
+        INNER JOIN userUnit uu ON uu.unitID = u.unitID
+        WHERE u.sectionID = %s AND u.isActive = true AND uu.userPlayerID = %s
+    """
+    cursor.execute(query_user, (sectionID, userId))
+    userUnits = cursor.fetchall()
 
-    if not units:
+    if not mainUnits:
         return jsonify({
             'isSuccess': True,
             'message': 'No units found',
@@ -58,14 +65,44 @@ def get_Units():
             'data2': None,
             'totalCount': 0
         }), 200
-    return jsonify({
-                'isSuccess': True,
-                'message': 'Successfully Retrieved',
-                'data': units,
-                'data2': None,
-                'totalCount': 1
-            }), 200
 
+    main_unit_ids = {unit['unitID'] for unit in mainUnits}
+    user_unit_ids = {unit['unitID'] for unit in userUnits}
+
+    if main_unit_ids != user_unit_ids:
+        update_user_unit(mainUnits, userId)
+        cursor.execute(query_user, (sectionID, userId))
+        userUnits = cursor.fetchall()
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': mainUnits,
+        'data2': userUnits,
+        'totalCount': 1
+    }), 200
+
+def update_user_unit(mainUnits, userId):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    for unit in mainUnits:
+        unitId = unit['unitID']
+
+        query_check = """
+            SELECT COUNT(*) FROM userUnit 
+            WHERE userPlayerID = %s AND unitID = %s
+        """
+        cursor.execute(query_check, (userId, unitId))
+        exists = cursor.fetchone()[0]
+        if exists == 0:
+            query_insert = """
+                INSERT INTO userUnit (userPlayerID, unitID, totalCorrectAnswers, totalScore) 
+                VALUES (%s, %s, %s, %s)
+            """
+            cursor.execute(query_insert, (userId, unitId, 0, 0))
+
+    conn.commit()
 
 def getUnitQuestions():
     unitId = request.args.get('unitId')

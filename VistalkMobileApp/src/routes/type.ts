@@ -212,3 +212,11 @@ export type UserPowerUp =
     name: string;
     description: string;
 }
+
+export type GamePlayDto = 
+{
+    userId: string;
+    unitId: number;
+    totalCorrectAnswer: number;
+    totalScore: number;
+}

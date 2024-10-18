@@ -8,8 +8,8 @@ import { useEffect, useRef, useState } from "react";
 import HeartIcon from "../assets/svg/HeartIcon";
 import { Vibration } from 'react-native';
 import SpeakerIcon from "../assets/svg/SpeakerIcon";
-import { PowerUp, QuestionDetails, UserPowerUp } from "./type";
-import { getContentPronunciation, getPowerupImage, getPowerUps, getQuestionFiles, getUnitQuestions, getUserPowerUps } from "./repo";
+import { GamePlayDto, PowerUp, QuestionDetails, UserPowerUp } from "./type";
+import { getContentPronunciation, getPowerupImage, getPowerUps, getQuestionFiles, getUnitQuestions, getUserPowerUps, saveGamePlay } from "./repo";
 import Sound from "react-native-sound";
 import Loader from "../components/Loader";
 import { useNavigation } from "@react-navigation/native";
@@ -17,6 +17,9 @@ import SpeakerIcon2 from "../assets/svg/SpeakerIcon2";
 import HeartComponent from "../components/HeartComponent";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SnowflakeComponent from "../components/SnowFlakeComponent";
+import MatchComponent from "../components/MatchComponent";
+import GameOver from "../components/GameOver";
+import Congratulations from "../components/Congratulations";
 
 type Props = StackScreenProps<RootStackParamList, 'UnitContent'>;
 
@@ -36,12 +39,16 @@ type PowerUpURL = {
     url: string;
   };
   
+interface Item {
+    id: number;  
+    name: string; 
+}
 
 const UnitContent: React.FC<Props> = ({ route, navigation }) => {
     const [timeLeft, setTimeLeft] = useState(15);
     const rotateAnimation = useRef(new Animated.Value(0)).current;
     const scaleAnimation = useRef(new Animated.Value(1)).current;
-    const { unitId, sectionId } = route.params;
+    const { unitId, sectionId, sectionName } = route.params;
     const [questionList, setQuestions] = useState<QuestionDetails[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [fileUrls, setFileUrls] = useState<FileUrl[]>([]);
@@ -65,12 +72,21 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
     const [showHeartPopup, setShowHeartPopup] = useState<boolean>(false);
     const [showSnowflakes, setShowSnowflakes] = useState(false);
     const [disabledChoiceIndex, setDisabledChoiceIndex] = useState<number[]>([]);
+    const [showCorrectAnswer, setCorrectAnswer] = useState<boolean>(false);
+    const [clairVoyanceUsed, setClairVoyance] = useState<boolean>(false);
+    const [showGameOver, setShowGameOver] = useState(false);
+    const [score, setScore] = useState<number>(0);
+    const [totalScore, setTotalScore] = useState<number>(0);
+    const [showCongratlulation, setShowCongratulation] = useState<boolean>(false);
+    const [totalCorrect, setTotalCorrect] = useState<number>(0);
+    const [loading, setLoading] = useState<boolean>(false);
 
     async function fetchQuestion() {
         try {
             setIsLoading(true)
             const result = await getUnitQuestions(unitId);
             setQuestions(result.data);
+            setTotalScore(result.data.length * 1000);
             const urls = await Promise.all(
                 result.data.map(async (q: QuestionDetails) => {
                     let audioUrl = null;
@@ -138,8 +154,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                 setDisabledChoiceIndex([]);
                 setHearts((prevHearts) => {
                     if (prevHearts <= 1) {
-                        Alert.alert("Game Over!", "You've lost all your hearts.");
-                        navigation.goBack();
+                        setShowGameOver(true);
                         return 0;
                     } else {
                         return prevHearts - 1;
@@ -226,22 +241,6 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
         }
     }
       };
-      
-        const moveUp = (index: number) => {
-          if (index > 0) {
-            const newMatches = [...matches];
-            [newMatches[index], newMatches[index - 1]] = [newMatches[index - 1], newMatches[index]];
-            setMatches(newMatches);
-          }
-        };
-      
-        const moveDown = (index: number) => {
-          if (index < matches.length - 1) {
-            const newMatches = [...matches];
-            [newMatches[index], newMatches[index + 1]] = [newMatches[index + 1], newMatches[index]];
-            setMatches(newMatches);
-          }
-        };
 
         const checkAnswer = (choiceId: number) => {
             const currentQuestion: QuestionDetails = questionList[currentQuestionIndex];
@@ -250,7 +249,16 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
             setSelectedChoice(choiceId);
             if (currentQuestion.questionTypeID === 1 || currentQuestion.questionTypeID === 2) {
                 if (choiceId === currentQuestion.correctChoice) {
+                    const currentScore = Math.round((1000 * timeLeft) / 15);
+                    setScore(prevScore => {
+                        const newScore = prevScore + currentScore;
+                        return newScore;
+                    });                
                     setIsCorrect(true);
+                    setTotalCorrect(prevScore => {
+                        const newScore = prevScore + 1;
+                        return newScore;
+                    }); 
                     setTimeout(() => {
                         proceedToNextQuestion();
                         setIsCorrect(null); 
@@ -261,8 +269,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                     setIsCorrect(false);
                     setHearts((prevHearts) => {
                         if (prevHearts <= 1) {
-                            Alert.alert("Game Over!", "You've lost all your hearts.");
-                            navigation.goBack();
+                            setShowGameOver(true);
                             return 0;
                         } else {
                             setTimeout(() => {
@@ -278,13 +285,20 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
             }
         };
 
-          const proceedToNextQuestion = () => {
+          const proceedToNextQuestion = async () => {
             if (currentQuestionIndex < questionList.length - 1) {
+                setLoading(false);
               setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
               setTimeLeft(15); 
               setTimerRunning(true);
             } else {
-              Alert.alert("Congratulations!", "You've completed all the questions!");
+                if(hearts > 0){
+                    await saveGameplayLocal();
+                    setShowCongratulation(true);
+                }
+            else if(hearts == 0){
+                setShowGameOver(true);
+            }
             }
           };
           
@@ -399,7 +413,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                     
                     const currentDisabledChoices = disabledChoiceIndex || [];
                 
-                    if (currentDisabledChoices.length < 2) {
+                    if (currentDisabledChoices.length < 1) {
                         const shuffledIncorrectChoices = incorrectChoices.sort(() => 0.5 - Math.random());
                         const availableChoices = shuffledIncorrectChoices.filter(choice => !currentDisabledChoices.includes(choice.index));
                         const choicesToDisable = availableChoices.slice(0, 2).map(choice => choice.index);
@@ -416,16 +430,113 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                     {
                         Vibration.vibrate([0, 100, 50, 100]);
                     }
-                }                
+                } 
+                if (p.itemId == 5) {
+                    setClairVoyance(true);
+                    setCorrectAnswer(true);
+                    const powerUpIndex = updatedPowerUps.findIndex(powerUp => powerUp.itemId === p.itemId);
+                    if (powerUpIndex !== -1) {
+                        updatedPowerUps[powerUpIndex].quantity -= 1; 
+                        setPowerUps(updatedPowerUps); 
+                    }
+                }                 
             } else {
                 // Add toggle music here like Dota 2 Memorp
                 Vibration.vibrate([0, 100, 50, 100]);
             }
         }
         
+        async function clairVoyageDone()
+        {
+            setClairVoyance(false);
+            setCorrectAnswer(false);
+        }
+        async function submit(items: Item[]) {
+            setTimerRunning(false);
+            setIsPlaying(true);
+            setLoading(true);
+            const currentQuestion = questionList[currentQuestionIndex];
+            const expectedMatches = [
+                currentQuestion.match1,
+                currentQuestion.match2,
+                currentQuestion.match3,
+                currentQuestion.match4,
+            ];
+        
+            const count = items.reduce((acc, item, index) => {
+                return acc + (expectedMatches[index] === item.id ? 1 : 0);
+            }, 0);
+        
+            if (count === 4) {
+                setIsCorrect(true);
+                const currentScore = Math.round((1000 * timeLeft) / 15);
+                setScore(prevScore => {
+                    const newScore = prevScore + currentScore;
+                    return newScore;
+                });                
+                setTotalCorrect(prevScore => {
+                    const newScore = prevScore + 1;
+                    return newScore;
+                }); 
+                setCorrectAnswer(true);
+                setTimeout(() => {
+                    proceedToNextQuestion();
+                    setCorrectAnswer(false);
+                    setIsCorrect(null);
+                    setSelectedChoice(null);
+                    setDisabledChoiceIndex([]);
+                }, 2000);
+            } else {
+                setIsCorrect(false);
+                setCorrectAnswer(true);
+                setHearts((prevHearts) => {
+                    if (prevHearts <= 1) {
+                        setShowGameOver(true);
+                        return 0;
+                    } else {
+                        setTimeout(() => {
+                            setDisabledChoiceIndex([]);
+                            setCorrectAnswer(false);
+                            setIsCorrect(null);
+                            setSelectedChoice(null);
+                            proceedToNextQuestion();
+                        }, 2000);
+                        return prevHearts - 1;
+                    }
+                });
+            }
+        }
+        
+        function onRestart()
+        {
 
+        }
+
+        function onHome()
+        {
+            navigation.navigate('Unit', {sectionId, sectionName})
+        }
+
+        async function saveGameplayLocal()
+        {
+            const userID = await AsyncStorage.getItem('userID');
+            if(userID){
+                let newGamePlay:GamePlayDto = 
+                {
+                    userId: userID,
+                    unitId:unitId,
+                    totalCorrectAnswer:totalCorrect,
+                    totalScore:totalScore
+                };
+                console.log(newGamePlay)
+                await saveGamePlay(newGamePlay)
+            }
+        }
     return (
         <SafeAreaView className="flex-1">
+                {showCongratlulation && ( <Congratulations  score ={score} onHome={onHome} onRestart={onRestart} isVisible = {showCongratlulation}/>)}
+                {!showGameOver?(
+
             <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 items-center">
             {isLoading ? ( 
                     <Loader />
@@ -464,9 +575,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
 
                         </View>
 
-                {questionList.length > 0 && (
-
-                    
+                {questionList.length > 0 && (      
                     <View className="mt-5">
                           {fileUrls[currentQuestionIndex]?.audioUrl && (
                                     <View className="items-center rounded-xl py-3 px-4 overflow-hidden"> 
@@ -593,63 +702,124 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                         </View>
                         )}
 
-                        {(questionList[currentQuestionIndex].questionTypeID === 3 || questionList[currentQuestionIndex].questionTypeID === 4) && (
-                            <View className="bg-white rounded-lg shadow-md p-3 mt-4">
-                                <Text className="text-center text-lg font-semibold mb-2">Choose the Correct Word</Text>
-                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                                    <View style={{ flex: 1, paddingRight: 10 }}>
-                                        {[
-                                            questionList[currentQuestionIndex].word1ContentText,
-                                            questionList[currentQuestionIndex].word2ContentText,
-                                            questionList[currentQuestionIndex].word3ContentText,
-                                            questionList[currentQuestionIndex].word4ContentText,
-                                        ].map((word, idx) => (
-                                            <TouchableOpacity key={idx} className="border border-gray-300 rounded-lg mb-1 bg-gray-100 hover:bg-gray-200 p-1">
-                                                <Text className="text-center text-sm text-black">{word}</Text>
-                                            </TouchableOpacity>
-                                        ))}
-                                    </View>
+                        {(questionList[currentQuestionIndex].questionTypeID === 3) && (
+                            <View className="flex-1 justify-center mt-6 mb-4">
+                            <MatchComponent 
+                                showCorrectAnswer = {showCorrectAnswer}
+                                clairVoyageDone={clairVoyageDone}
+                                questionList={questionList}
+                                clairVoyanceUsed = {clairVoyanceUsed}
+                                currentQuestionIndex={currentQuestionIndex}
+                                draggableItems={[
+                                    {
+                                        id: questionList[currentQuestionIndex].match1 ?? 0,
+                                        name: questionList[currentQuestionIndex].match1ContentText ?? ''
+                                    },
+                                    {
+                                        id: questionList[currentQuestionIndex].match2 ?? 0,
+                                        name: questionList[currentQuestionIndex].match2ContentText ?? ''
+                                    },
+                                    {
+                                        id: questionList[currentQuestionIndex].match3 ?? 0,
+                                        name: questionList[currentQuestionIndex].match3ContentText ?? ''
+                                    },
+                                    {
+                                        id: questionList[currentQuestionIndex].match4 ?? 0, 
+                                        name: questionList[currentQuestionIndex].match4ContentText ?? ''
+                                    }
+                                ]}
+                                fixedItems={[
+                                    questionList[currentQuestionIndex].word1EnglishTranslation ?? '',
+                                    questionList[currentQuestionIndex].word2EnglishTranslation ?? '',
+                                    questionList[currentQuestionIndex].word3EnglishTranslation ?? '',
+                                    questionList[currentQuestionIndex].word4EnglishTranslation ?? ''
+                                ]}
+                                isLoading = {isLoading}
+                                onSubmit={submit}
+                            />
+                        </View>
 
-                                    <View style={{ flex: 1 }}>
-                                        {matches.map((match, index) => (
-                                            <View key={index} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 5 }}>
-                                                <TouchableOpacity onPress={() => moveUp(index)} className="bg-blue-500 p-1 rounded-lg mr-1">
-                                                    <Text className="text-xs text-white">UP</Text>
-                                                </TouchableOpacity>
-                                                <Text style={{ marginHorizontal: 5, fontSize: 12, fontWeight: '500', color: '#333', padding: 2 }}>{match}</Text>
-                                                <TouchableOpacity onPress={() => moveDown(index)} className="bg-red-500 p-1 rounded-lg ml-1">
-                                                    <Text className="text-xs text-white">DOWN</Text>
-                                                </TouchableOpacity>
-                                            </View>
-                                        ))}
-                                    </View>
-                                </View>
-                            </View>
+                        )}
+                        {(questionList[currentQuestionIndex].questionTypeID === 4) && (
+                            <View className="flex-1 justify-center mt-6 mb-4">
+                            <MatchComponent 
+                                showCorrectAnswer = {showCorrectAnswer}
+                                questionList={questionList}
+                                clairVoyageDone={clairVoyageDone}
+                                clairVoyanceUsed = {clairVoyanceUsed}
+                                currentQuestionIndex={currentQuestionIndex}
+                                draggableItems={[
+                                    {
+                                        id: questionList[currentQuestionIndex].match1 ?? 0, 
+                                        name: questionList[currentQuestionIndex].match1EnglishTranslation ?? ''
+                                    },
+                                    {
+                                        id: questionList[currentQuestionIndex].match2 ?? 0, 
+                                        name: questionList[currentQuestionIndex].match2EnglishTranslation ?? ''
+                                    },
+                                    {
+                                        id: questionList[currentQuestionIndex].match3 ?? 0, 
+                                        name: questionList[currentQuestionIndex].match4EnglishTranslation ?? ''
+                                    },
+                                    {
+                                        id: questionList[currentQuestionIndex].match4 ?? 0, 
+                                        name: questionList[currentQuestionIndex].match1EnglishTranslation ?? ''
+                                    }
+                                ]} 
+                                fixedItems={[
+                                    questionList[currentQuestionIndex].word1ContentText ?? '',
+                                    questionList[currentQuestionIndex].word3ContentText ?? '',
+                                    questionList[currentQuestionIndex].word2ContentText ?? '',
+                                    questionList[currentQuestionIndex].word4ContentText ?? ''
+                                ]}
+                                onSubmit={submit}
+                                isLoading = {isLoading}
+                            />
+                        </View>
+
                         )}
                     </View>
                     )}
 
                 <View className="absolute bottom-5 rounded-xl" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
-                    <View className="flex-row justify-center gap-2 w-[100%]">
+                <View className="flex-row justify-center gap-2 w-[100%]">
                     {powerUps.map((powerUp, index) => {
-                            const imageUrl = getImageUrlByItemId(powerUp.itemId); 
-                            return (
-                                <TouchableOpacity key={index} onPress={() => usePowerUp(powerUp)} disabled={selectedChoice !== null}>
+                        const imageUrl = getImageUrlByItemId(powerUp.itemId);
+                        
+                        const isEnabled = (questionList[currentQuestionIndex].questionTypeID === 1 || questionList[currentQuestionIndex].questionTypeID === 2) 
+                            ? powerUp.itemId !== 5 
+                            : (questionList[currentQuestionIndex].questionTypeID === 3 || questionList[currentQuestionIndex].questionTypeID === 4) 
+                                ? (powerUp.itemId === 1 || powerUp.itemId === 2 || powerUp.itemId === 5) 
+                                : true; 
+
+                        return (
+                            <TouchableOpacity 
+                                key={index} 
+                                onPress={() => usePowerUp(powerUp)} 
+                                disabled={!isEnabled || selectedChoice !== null}
+                            >
                                 <View className="py-2 px-1 items-center relative">
                                     {imageUrl ? (
-                                    <Image
-                                        source={{ uri: imageUrl }} 
-                                        className = "w-10 h-10"
-                                    />
+                                        <Image
+                                            source={{ uri: imageUrl }} 
+                                            className="w-10 h-10"
+                                        />
                                     ) : null}
-                                    <Text className="text-center text-[10px] text-black font-bold bg-gray-200 p-1 rounded-full absolute right-1 bottom-1">
-                                    {powerUp.quantity}x
-                                    </Text>
+                                    <Text className="text-center text-[10px] text-black font-bold bg-gray-200 p-1 rounded-full absolute right-1 bottom-1 z-10">
+                                                        {powerUp.quantity}x
+                                                    </Text>
+
+                                    {!isEnabled && (
+                                                        <View className="absolute inset-0 bg-gray-500 opacity-50 justify-center items-center rounded-full p-2  mt-1 z-0">
+                                                            <Text className="text-red-600 font-bold text-xl">X</Text>
+                                                        </View>
+                                    )}
                                 </View>
-                                </TouchableOpacity>
-                            );
-                            })}
-                    </View>
+                            </TouchableOpacity>
+                        );
+                    })}
+                </View>
+
                     <Modal
                         transparent={true}
                         visible={showHeartPopup}
@@ -666,6 +836,8 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                 </>
             )}
             </LinearGradient>
+            ) :
+            (<GameOver score ={score} onHome={onHome} onRestart={onRestart}/>)}
         </SafeAreaView>
     )
 };
