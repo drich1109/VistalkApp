@@ -129,3 +129,16 @@ export async function getFromBaseApi<T>(url: string, params?: Record<string, unk
     const response = await mainAxiosInstance.delete<T>(url, config);
     return response.data;
   }
+
+  export async function putFormMainApi<T>(url: string, formData: FormData, config?: AxiosRequestConfig): Promise<T> {
+    const formConfig: AxiosRequestConfig = {
+        ...config,
+        headers: {
+            ...config?.headers,
+            'Content-Type': 'multipart/form-data',
+        },
+    };
+
+    const response = await mainAxiosInstance.put<T>(url, formData, formConfig);
+    return response.data;
+}
