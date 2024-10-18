@@ -1,5 +1,5 @@
-import { getFromBaseApi, getFromMainApi, postToBaseApi, postToMainApi, putFormBaseApi, putToBaseApi, putToMainApi } from "../../api/apiService";
-import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, Musics, SectionDetails, UnitDetails, QuestionDetails, UserPowerUp } from "./type";
+import { getFromBaseApi, getFromMainApi, postToBaseApi, postToMainApi, putFormBaseApi, putFormMainApi, putToBaseApi, putToMainApi } from "../../api/apiService";
+import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, Musics, SectionDetails, UnitDetails, QuestionDetails, UserPowerUp, GamePlayDto } from "./type";
 import CryptoJS from 'crypto-js';
 import { VITE_MAIN_API } from '@env';
 import { SectionListRenderItem } from "react-native";
@@ -189,9 +189,9 @@ export async function getSections(languageId:number)
     return await getFromMainApi<CallResultDto<SectionDetails[]>>('getSections', {languageId});
 }
 
-export async function getUnits(sectionId:number)
+export async function getUnits(sectionId:number, userId:string | null)
 {
-    return await getFromMainApi<CallResultDto<UnitDetails[]>>('getUnits', {sectionId});
+    return await getFromMainApi<CallResultDto<UnitDetails[]>>('getUnits', {sectionId, userId});
 }
 
 export async function getUnitQuestions(unitId:number)
@@ -207,4 +207,16 @@ export function getQuestionFiles(fileName: string): string {
 export async function getUserPowerUps(userID:string)
 {
     return await getFromMainApi<CallResultDto<UserPowerUp[]>>('getUserPowerUp', {userID});
+}
+
+export async function saveGamePlay(gamePlay:GamePlayDto)
+{
+    const formData = new FormData();
+
+    formData.append('userId', gamePlay.userId.toString());
+    formData.append('unitId', gamePlay.unitId.toString());
+    formData.append('totalCorrectAnswer', gamePlay.totalCorrectAnswer.toString());
+    formData.append('totalScore', gamePlay.totalScore.toString());
+
+    return await putFormMainApi<CallResultDto<object>>('saveGamePlay', formData);
 }

@@ -226,10 +226,18 @@ def unitInactive():
     unitID = int(request.args.get('unitID')) 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    query = """
-        UPDATE unit SET isActive = false where unitID = %s
+    
+    query_update = """
+        UPDATE unit SET isActive = false WHERE unitID = %s
     """
     values = [unitID,]
-    cursor.execute(query, values)
+    cursor.execute(query_update, values)
+
+    query_delete = """
+        DELETE FROM userUnit WHERE unitID = %s
+    """
+    cursor.execute(query_delete, values)
+
     conn.commit()
-    return jsonify({'isSuccess': True, "message": "Content updated successfully"}), 200
+
+    return jsonify({'isSuccess': True, "message": "Content updated and userUnit records deleted successfully"}), 200

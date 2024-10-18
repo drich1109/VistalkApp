@@ -139,3 +139,53 @@ def add_report():
             'data2': None,
             'totalCount': 0
         }), 200
+
+def saveGamePlay():
+    data = request.form
+    userId = int(data.get('userId'))
+    unitId = int(data.get('unitId'))
+    totalCorrectAnswer = int(data.get('totalCorrectAnswer'))
+    totalScore = int(data.get('totalScore')) 
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    query_select = """
+        SELECT totalScore FROM userunit WHERE userPlayerID = %s AND unitID = %s
+    """
+
+    cursor.execute(query_select, (userId, unitId))
+    current_total_score = cursor.fetchone()
+
+    if current_total_score is None:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'User or Unit not found.',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 404
+
+    existing_total_score = current_total_score[0]
+
+    if totalScore > existing_total_score:
+        query_update = """
+            UPDATE userunit SET totalCorrectAnswers = %s, totalScore = %s WHERE userPlayerID = %s AND unitID = %s
+        """
+        cursor.execute(query_update, (totalCorrectAnswer, totalScore, userId, unitId))
+        conn.commit()
+        return jsonify({
+            'isSuccess': True,
+            'message': 'Saved Successfully',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+    else:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Current totalScore is greater than or equal to the new totalScore. Update not performed.',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200

@@ -19,7 +19,6 @@ import EditProfile from './src/routes/EditProfile';
 import ChangePassword from './src/routes/ChangePassword';
 import Unit from './src/routes/Unit';
 import UnitContent from './src/routes/UnitContent';
-import WordMatchGame from './src/routes/WordMatchGame';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -110,11 +109,6 @@ const App: React.FC = () => {
         <Stack.Screen
           name="UnitContent"
           component={UnitContent}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="WordMatchGame"
-          component={WordMatchGame}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

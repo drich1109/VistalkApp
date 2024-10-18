@@ -131,5 +131,9 @@ def get_QuestionFiles():
 def addreport():
     return user.add_report()
 
+@app.route('/saveGamePlay', methods=['PUT'])
+def saveGamePlay():
+    return user.saveGamePlay()
+
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
