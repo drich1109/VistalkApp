@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.8)', // Fullscreen dark background
+        backgroundColor: 'rgba(0, 0, 0, 0.4)', // Fullscreen dark background
         position: 'absolute',
         width: Dimensions.get('window').width,
         height: Dimensions.get('window').height,

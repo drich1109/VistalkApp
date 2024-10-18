@@ -24,7 +24,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
 
         <View className="mt-4 items-center">
           <TouchableOpacity
-            className="border border-1 border-white p-3 w-[70%] rounded-xl items-center mb-3"
+            className="border border-2 border-white p-3 w-[80%] rounded-xl items-center mb-3"
             onPress={() => navigation.navigate('LogIn')}
           >
           <Text className="text-xl font-bold text-white">
@@ -33,7 +33,7 @@ const HomeScreen: React.FC<Props> = ({ navigation }) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="border border-1 border-white p-3 w-[70%] rounded-xl items-center mb-3"
+            className="border border-2 border-white p-3 w-[80%] rounded-xl items-center mb-3"
             onPress={() => navigation.navigate('Register')}
           >
             <Text className="text-xl font-bold text-white">

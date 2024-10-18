@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, Text, TouchableOpacity, View, ActivityIndicator, Modal } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import HexagonIcon from '../assets/svg/HexagonIcon';
 import StarIcon from '../assets/svg/StarIcon';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList, UnitContentScreenNavigationProp } from '../../types';
@@ -9,6 +8,11 @@ import BackIcon from '../assets/svg/BackIcon';
 import { UnitDetails } from './type';
 import { getUnits } from './repo';
 import { useNavigation } from '@react-navigation/native';
+import TotalIcon from '../assets/svg/TotalIcon';
+import CorrectIcon from '../assets/svg/CorrectIcon';
+import IncorrectIcon from '../assets/svg/IncorrectIcon';
+import UnitIcon from '../assets/svg/UnitIcon';
+import Loader from '../components/Loader';
 
 type Props = StackScreenProps<RootStackParamList, 'Unit'>;
 
@@ -36,11 +40,11 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
     }, [sectionId]);
 
     const navigateToUnitContent = () => {
-        if(currentUnit){
-        const unitId = currentUnit?.unitID
-        closeModal();
-        //navigate.navigate('UnitContent', {unitId, sectionId});
-        navigate.navigate('WordMatchGame');
+        if (currentUnit) {
+            const unitId = currentUnit?.unitID
+            closeModal();
+            //navigate.navigate('UnitContent', {unitId, sectionId});
+            navigate.navigate('WordMatchGame');
         }
 
     };
@@ -57,16 +61,14 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
 
     if (loading) {
         return (
-            <SafeAreaView className="flex-1 justify-center items-center">
-                <ActivityIndicator size="large" color="#0000ff" />
-            </SafeAreaView>
+            <Loader />
         );
     }
 
     return (
         <SafeAreaView className="flex-1">
             <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 justify-center items-center">
-                <View className="flex-row justify-between w-full px-5 absolute top-10">
+                <View className="flex-row justify-between w-full px-5 absolute top-8">
                     <TouchableOpacity onPress={() => navigation.goBack()}>
                         <BackIcon className=" w-8 h-8 text-white" />
                     </TouchableOpacity>
@@ -74,21 +76,52 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                 <View className="items-center mb-3 mt-8">
                     <Text className="text-4xl font-bold text-white">Section {sectionName}</Text>
                 </View>
-                <ScrollView contentContainerStyle={{ padding: 20 }} className="mb-8" showsVerticalScrollIndicator={false}>
+                <ScrollView contentContainerStyle={{ padding: 20 }} className="" showsVerticalScrollIndicator={false}>
                     <View className="justify-around mt-2">
                         {units.map((unit: UnitDetails, index: number) => (
-                            <View key={index} className="items-center justify-center mb-8">
+                            <View key={index} className="mb-8">
                                 <TouchableOpacity onPress={() => openModal(unit)}>
-                                    <View className="relative items-center justify-center h-24 w-24">
-                                        <HexagonIcon className="h-full w-full text-black" />
-                                        <Text className="absolute text-white text-xl font-bold">{unit.unitNumber}</Text>
+                                    <View className="border border-[#FAF9F6] rounded-2xl py-3 px-6" style={{
+                                        backgroundColor: 'rgba(240, 240, 240, 0.4)'
+                                    }}>
+                                        <View className="flex-row items-center justify-between gap-4">
+                                            <View className="flex-row items-center gap-1">
+                                                <UnitIcon className="h-6 w-6 text-black" />
+                                                <Text className="text-black text-xl font-bold">Unit {unit.unitNumber}</Text>
+                                            </View>
+                                            <View className="relative items-center">
+                                                <View className="flex-row">
+                                                    <StarIcon className="text-[#FFFF00] h-6 w-6 items-center" />
+                                                    <Text className="text-black text-lg font-bold">Score</Text>
+                                                </View>
+                                                <Text className="text-black text-3xl font-bold">100</Text>
+                                            </View>
+                                        </View>
+                                        <View className="border-t border-[#FAF9F6] flex-row items-center justify-between gap-2 mt-4">
+                                            <View className="relative items-center">
+                                                <View className="flex-row">
+                                                    <TotalIcon className="text-black h-6 w-6" />
+                                                    <Text className="text-black text-lg font-light">Total</Text>
+                                                </View>
+                                                <Text className="text-black text-lg font-bold">10</Text>
+                                            </View>
+                                            <View className="relative items-center border-l border-[#FAF9F6]">
+                                                <View className="flex-row">
+                                                    <CorrectIcon className="text-green-600 h-6 w-6" />
+                                                    <Text className="text-black text-lg font-light">Correct</Text>
+                                                </View>
+                                                <Text className="text-green-600 text-lg font-bold">6</Text>
+                                            </View>
+                                            <View className="relative items-center border-l border-[#FAF9F6]">
+                                                <View className="flex-row">
+                                                    <IncorrectIcon className="text-[#FF0000] h-6 w-6" />
+                                                    <Text className="text-black text-lg font-light">Wrong</Text>
+                                                </View>
+                                                <Text className="text-[#FF0000] text-lg font-bold">4</Text>
+                                            </View>
+                                        </View>
                                     </View>
                                 </TouchableOpacity>
-                                <View className="absolute bottom-[-12px] flex-row items-center gap-2 z-10">
-                                    <StarIcon className="w-8 h-8 text-gray-300" />
-                                    <StarIcon className="w-10 h-10 text-gray-300" />
-                                    <StarIcon className="w-8 h-8 text-gray-300" />
-                                </View>
                             </View>
                         ))}
                     </View>
@@ -102,22 +135,26 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                             style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
                             onPress={closeModal}
                         >
-                            <View className="bg-black rounded-t-xl w-full">
-                                <TouchableOpacity activeOpacity={1} className="bg-black rounded-t-xl">
-                                    <View className="p-10">
-                                        <Text className="text-4xl font-bold text-white mb-2 text-center">
-                                            Unit {currentUnit.unitNumber}
-                                        </Text>
-                                        <Text className="text-2xl text-white mb-5 text-center">{currentUnit.title}</Text>
-                                        <Text className="text-base text-white mb-5 text-center">
+                            <View className=" rounded-t-xl w-full">
+                                <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-t-xl">
+                                    <View className="p-8">
+                                        <View className="flex-row items-center mb-2">
+                                            <UnitIcon className="h-4 w-4 text-black" />
+                                            <Text className="text-xl font-bold text-black items-start">
+                                                Unit {currentUnit.unitNumber}
+                                            </Text>
+                                        </View>
+                                        <Text className="text-3xl text-black mb-2 text-center">{currentUnit.title}</Text>
+                                        <Text className="text-base text-black mb-5 text-center">
                                             {currentUnit.description}
                                         </Text>
                                         <View className="pb-10 px-10">
                                             <TouchableOpacity
-                                                className="bg-white py-2 px-10 rounded-full self-center"
                                                 onPress={() => navigateToUnitContent()}
                                             >
-                                                <Text className="text-lg text-black font-bold">Start Unit</Text>
+                                                <LinearGradient colors={['#6addd0', '#f7c188']} className="bg-gray-600 py-2 px-10 rounded-full self-center">
+                                                    <Text className="text-lg text-white font-bold">Start Unit</Text>
+                                                </LinearGradient>
                                             </TouchableOpacity>
                                         </View>
                                     </View>

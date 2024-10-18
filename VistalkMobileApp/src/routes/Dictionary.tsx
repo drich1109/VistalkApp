@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ImageBackground, TextInput, TouchableOpacity, ScrollView, SafeAreaView, ActivityIndicator } from 'react-native';
-import Menu from '../components/Menu'; 
+import Menu from '../components/Menu';
 import SearchIcon from '../assets/svg/SearchIcon';
 import ArrowIcon from '../assets/svg/ArrowIcon';
 import { useNavigation } from '@react-navigation/native';
 import { DictionaryMeaningScreenNavigationProp, RootStackParamList } from '../../types';
 import { Content } from './type';
 import { getContent } from './repo';
+import LinearGradient from 'react-native-linear-gradient';
 
 const Dictionary: React.FC = () => {
   const [searchString, setSearchText] = useState('');
@@ -21,23 +22,23 @@ const Dictionary: React.FC = () => {
   const fetchContents = async (reset = false) => {
     setLoading(true);
     try {
-      const result = await getContent(searchString, offset, 10); 
+      const result = await getContent(searchString, offset, 10);
       const newContents = result.data;
       if (reset) {
-        setContents(newContents); 
-        setOffset(10); 
+        setContents(newContents);
+        setOffset(10);
       } else {
-        setContents((prevContents) => [...prevContents, ...newContents]); 
+        setContents((prevContents) => [...prevContents, ...newContents]);
       }
 
-      
+
       if (newContents.length < 10) {
-        setHasMore(false); 
+        setHasMore(false);
       }
 
-      
+
       if (hasMore) {
-        setOffset((prevOffset) => prevOffset + 10); 
+        setOffset((prevOffset) => prevOffset + 10);
       }
     } catch (error) {
       setError('Failed to fetch contents');
@@ -47,14 +48,14 @@ const Dictionary: React.FC = () => {
   };
 
   useEffect(() => {
-    setOffset(0); 
-    setHasMore(true); 
-    fetchContents(true); 
+    setOffset(0);
+    setHasMore(true);
+    fetchContents(true);
   }, [searchString]);
 
   const loadMoreData = () => {
     if (!loading && hasMore) {
-      fetchContents(); 
+      fetchContents();
     }
   };
 
@@ -63,15 +64,15 @@ const Dictionary: React.FC = () => {
   };
 
   return (
-    <ImageBackground source={require('../assets/bg.png')} className="flex-1 justify-center items-center" resizeMode="cover">
+    <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 justify-center items-center resize-cover">
       <View className="items-center mb-3 mt-8">
-        <Text className="text-4xl font-bold text-white">Dictionary</Text>
+        <Text className="text-4xl font-bold text-black">Dictionary</Text>
       </View>
       <View className="flex flex-row items-center justify-start bg-white rounded-lg px-4 mb-5 w-4/5 h-10">
         <TextInput
           className="flex-1 h-full text-[#999] text-base"
           placeholder="Search for a word"
-          placeholderTextColor="#999"
+          placeholderTextColor="#000"
           value={searchString}
           onChangeText={setSearchText}
         />
@@ -83,28 +84,29 @@ const Dictionary: React.FC = () => {
       </View>
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 20 }}
-        className="mb-16"
         showsVerticalScrollIndicator={false}
         onScroll={({ nativeEvent }) => {
           const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
 
-          
+
           if (layoutMeasurement.height + contentOffset.y >= contentSize.height - 50) {
-            loadMoreData(); 
+            loadMoreData();
           }
         }}
-        scrollEventThrottle={16} 
+        scrollEventThrottle={16}
       >
         {loading && offset === 0 ? (
           <ActivityIndicator size="large" />
         ) : contents.length > 0 ? (
           contents.map((c, index) => (
             <TouchableOpacity key={index} onPress={() => navigateToMeaning(c.contentID)}>
-              <View className="bg-white rounded-lg py-3 px-5 mb-3">
+              <View className=" rounded-lg py-3 px-5 mb-3  border border-[#FAF9F6]" style={{
+                backgroundColor: 'rgba(240, 240, 240, 0.4)'
+              }}>
                 <View className="flex flex-row items-center gap-x-4">
-                  <Text className="text-xl text-center text-[#5B7200] w-[30%] font-bold">{c.contentText}</Text>
-                  <ArrowIcon className="w-8 h-8" />
-                  <Text className="text-xl text-center text-[#5B7200] w-[30%] font-light italic">{c.englishTranslation}</Text>
+                  <Text className="text-xl text-center text-black w-[30%] font-bold">{c.contentText}</Text>
+                  <ArrowIcon className="w-8 h-8 text-black" />
+                  <Text className="text-xl text-center text-black w-[30%] font-light italic">{c.englishTranslation}</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -117,7 +119,7 @@ const Dictionary: React.FC = () => {
         )}
       </ScrollView>
       <Menu activeScreen={activeScreen} />
-    </ImageBackground>
+    </LinearGradient>
   );
 };
 

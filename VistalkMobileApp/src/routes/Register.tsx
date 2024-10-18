@@ -42,12 +42,15 @@ const Register: React.FC<Props> = ({ navigation }) => {
 
   return (
     <SafeAreaView className="flex-1">
-      <LinearGradient colors={['#6addd0', '#7fc188']} className="flex-1 justify-center items-center">
-        <Image source={require('../assets/White.png')} className="w-44 h-44 mb-10" resizeMode="contain" />
-
-        <View className="w-[100%] px-5 items-center">
+      <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 justify-center items-center">
+      <View className="items-center mb-8">
+          <Image source={require('../assets/White.png')} className="w-44 h-44" />
+          <Text className="text-white text-4xl font-bold" style={{ color: '#ffffff', fontFamily: 'cursive' }}>
+              Vistalk
+          </Text>
+        </View>
           <TextInput
-            className="w-[100%] h-13 border-2 border-white mb-5 px-2.5 rounded-lg bg-transparent text-white"
+            className="w-[80%] h-13 border-2 border-white mb-5 px-2.5 rounded-xl bg-transparent text-white"
             placeholder="Full Name"
             placeholderTextColor="white"
             onChangeText={setName}
@@ -55,7 +58,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
           />
 
           <TextInput
-            className="w-[100%] h-13 border-2 border-white mb-5 px-2.5 rounded-lg bg-transparent text-white"
+            className="w-[80%] h-13 border-2 border-white mb-5 px-2.5 rounded-xl bg-transparent text-white"
             placeholder="Email"
             placeholderTextColor="white"
             onChangeText={setEmail}
@@ -66,7 +69,7 @@ const Register: React.FC<Props> = ({ navigation }) => {
           />
 
           <TextInput
-            className="w-[100%] h-13 border-2 border-white mb-5 px-2.5 rounded-lg bg-transparent text-white"
+            className="w-[80%] h-13 border-2 border-white mb-5 px-2.5 rounded-xl bg-transparent text-white"
             placeholder="Password"
             placeholderTextColor="white"
             secureTextEntry
@@ -74,26 +77,25 @@ const Register: React.FC<Props> = ({ navigation }) => {
             value={password}
           />
           <TextInput
-            className="w-[100%] h-13 border-2 border-white mb-5 px-2.5 rounded-lg bg-transparent text-white"
+            className="w-[80%] h-13 border-2 border-white mb-5 px-2.5 rounded-xl bg-transparent text-white"
             placeholder="Confirm Password"
             placeholderTextColor="white"
             secureTextEntry
             onChangeText={handleConfirmPasswordChange}
             value={confirmPassword}
           />
-          {!passwordMatch && password.length > 0 && confirmPassword.length > 0 && <Text className="text-red mb-2 text-center">Passwords do not match</Text>}
+          {!passwordMatch && password.length > 0 && confirmPassword.length > 0 && <Text className="text-red-500 mb-4 text-center">Passwords do not match</Text>}
 
-          <TouchableOpacity className="bg-white w-[100%] rounded-3xl items-center p-3 mb-3" onPress={clickRegister}>
-            <Text className="text-[#99BC85] font-bold text-xl">Create</Text>
+          <TouchableOpacity className="border border-2 border-white p-3 w-[80%] rounded-xl items-center mb-3" onPress={clickRegister}>
+            <Text className="text-white font-bold text-xl">Create</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="w-[100%] items-end"
+            className="w-[80%] items-end"
             onPress={() => navigation.navigate('LogIn')}
           >
-            <Text className="text-white mt-4 text-center font-bold text-base">Already have an account?</Text>
+            <Text className="text-white mt-3 text-center font-bold text-base">Already have an account?</Text>
           </TouchableOpacity>
-        </View>
         </LinearGradient>
     </SafeAreaView>
   );
