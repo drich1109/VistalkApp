@@ -37,11 +37,11 @@ type FileUrl = {
 type PowerUpURL = {
     id: number;
     url: string;
-  };
-  
+};
+
 interface Item {
-    id: number;  
-    name: string; 
+    id: number;
+    name: string;
 }
 
 const UnitContent: React.FC<Props> = ({ route, navigation }) => {
@@ -53,15 +53,15 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
     const [fileUrls, setFileUrls] = useState<FileUrl[]>([]);
     const [sound, setSound] = useState<Sound | null>(null);
-    const [isPlaying, setIsPlaying] = useState<boolean>(false); 
-    const [currentTrack, setCurrentTrack] = useState<number | null>(null); 
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const [currentTrack, setCurrentTrack] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [matches, setMatches] = useState([
         '', // Match 1
         '', // Match 2
         '', // Match 3
         '', // Match 4
-      ]);
+    ]);
     const [hearts, setHearts] = useState(3);
     const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
@@ -95,15 +95,15 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                     let choice2AudioUrl = null;
                     let choice3AudioUrl = null;
                     let choice4AudioUrl = null;
-    
+
                     if (q.audioPath != null) {
                         audioUrl = await getQuestionFiles(q.audioPath);
                     }
-    
+
                     if (q.imagePath != null) {
                         imageUrl = await getQuestionFiles(q.imagePath);
                     }
-    
+
                     if (q.choice1AudioPath != null) {
                         choice1AudioUrl = await getContentPronunciation(q.choice1AudioPath);
                     }
@@ -116,7 +116,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                     if (q.choice4AudioPath != null) {
                         choice4AudioUrl = await getContentPronunciation(q.choice4AudioPath);
                     }
-    
+
                     return {
                         id: q.questionID,
                         audioUrl,
@@ -128,7 +128,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                     };
                 })
             );
-    
+
             setFileUrls(urls as FileUrl[]);
         } catch (error) {
             console.error('Error fetching questions:', error);
@@ -161,9 +161,9 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                     }
                 });
                 if (sound) {
-                    sound.stop(); 
-                    sound.release(); 
-                  }
+                    sound.stop();
+                    sound.release();
+                }
                 setCurrentQuestionIndex(prevIndex => prevIndex + 1);
                 setTimeLeft(15);
             }
@@ -211,284 +211,62 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
     });
 
     const toggleSound = (fileUrl: string | undefined, trackId: number) => {
-        if(fileUrl){
-        if (currentTrack === trackId && isPlaying) {
-          sound?.pause();
-          setIsPlaying(false);
-        } else {
-          if (sound) {
-            sound.stop(); 
-            sound.release(); 
-          }
-      
-          const newSound = new Sound(fileUrl, '', (error: Error | null) => {
-            if (error) {
-              console.error('Failed to load sound', error);
-              return;
-            }
-      
-            newSound.setVolume(1.0); 
-            newSound.play(() => {
-              setIsPlaying(false);
-              setCurrentTrack(null); 
-              newSound.release(); 
-            });
-          });
-      
-          setSound(newSound); 
-          setIsPlaying(true); 
-          setCurrentTrack(trackId); 
-        }
-    }
-      };
+        if (fileUrl) {
+            if (currentTrack === trackId && isPlaying) {
+                sound?.pause();
+                setIsPlaying(false);
+            } else {
+                if (sound) {
+                    sound.stop();
+                    sound.release();
+                }
 
-        const checkAnswer = (choiceId: number) => {
-            const currentQuestion: QuestionDetails = questionList[currentQuestionIndex];
-            setTimerRunning(false);
-            setIsPlaying(true);
-            setSelectedChoice(choiceId);
-            if (currentQuestion.questionTypeID === 1 || currentQuestion.questionTypeID === 2) {
-                if (choiceId === currentQuestion.correctChoice) {
-                    const currentScore = Math.round((1000 * timeLeft) / 15);
-                    setScore(prevScore => {
-                        const newScore = prevScore + currentScore;
-                        return newScore;
-                    });                
-                    setIsCorrect(true);
-                    setTotalCorrect(prevScore => {
-                        const newScore = prevScore + 1;
-                        return newScore;
-                    }); 
-                    setTimeout(() => {
-                        proceedToNextQuestion();
-                        setIsCorrect(null); 
-                        setSelectedChoice(null); 
-                        setDisabledChoiceIndex([]);
-                    }, 2000);
-                } else {
-                    setIsCorrect(false);
-                    setHearts((prevHearts) => {
-                        if (prevHearts <= 1) {
-                            setShowGameOver(true);
-                            return 0;
-                        } else {
-                            setTimeout(() => {
-                                setDisabledChoiceIndex([]);
-                                setIsCorrect(null); 
-                                setSelectedChoice(null); 
-                                proceedToNextQuestion();
-                            }, 2000);
-                            return prevHearts - 1;
-                        }
+                const newSound = new Sound(fileUrl, '', (error: Error | null) => {
+                    if (error) {
+                        console.error('Failed to load sound', error);
+                        return;
+                    }
+
+                    newSound.setVolume(1.0);
+                    newSound.play(() => {
+                        setIsPlaying(false);
+                        setCurrentTrack(null);
+                        newSound.release();
                     });
-                }
-            }
-        };
+                });
 
-          const proceedToNextQuestion = async () => {
-            if (currentQuestionIndex < questionList.length - 1) {
-                setLoading(false);
-              setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
-              setTimeLeft(15); 
-              setTimerRunning(true);
-            } else {
-                if(hearts > 0){
-                    await saveGameplayLocal();
-                    setShowCongratulation(true);
-                }
-            else if(hearts == 0){
-                setShowGameOver(true);
-            }
-            }
-          };
-          
-          useEffect(() => {
-            const fetchPowerUps = async () => {
-              const userID = await AsyncStorage.getItem('userID');
-              if (userID) {
-                const result = await getUserPowerUps(userID);
-                setPowerUps(result.data);
-                const imageUrls = await Promise.all(
-                  result.data.map(async (powerUp) => {
-                    if (powerUp.itemId !== 0) {
-                      const url = getPowerupImage(powerUp.filePath); 
-                      return { id: powerUp.itemId, url };
-                    }
-                    return null;
-                  })
-                );
-        
-                setPowerUpUrl(imageUrls.filter((url) => url !== null)); 
-              }
-            };
-        
-            fetchPowerUps();
-          }, []);
-        
-          const getImageUrlByItemId = (itemId:number) => {
-            const powerUpUrlObj = powerUpUrls.find((powerUp) => powerUp.id === itemId);
-            return powerUpUrlObj ? powerUpUrlObj.url : null;
-          };
-
-          async function usePowerUp(p: UserPowerUp) {
-            if (p.quantity >= 1) {
-                const updatedPowerUps = [...powerUps];
-        
-                if (p.itemId == 1) {
-                    if (hearts < 3 || hearts <= 1) {
-                        setHearts(hearts + 1);
-                        setShowHeartPopup(true);
-                        setTimeout(() => {
-                            setShowHeartPopup(false);
-                        }, 1000);
-                                        
-                        const powerUpIndex = updatedPowerUps.findIndex(powerUp => powerUp.itemId === p.itemId);
-                        if (powerUpIndex !== -1) {
-                            updatedPowerUps[powerUpIndex].quantity -= 1; 
-                            setPowerUps(updatedPowerUps); 
-                            }
-                    } else {
-                        Vibration.vibrate([0, 100, 50, 100]);
-                    }
-                }
-                
-                if (p.itemId == 2) {
-                    if (timerRunning) {
-                        setTimerRunning(false);
-                        setShowSnowflakes(true);
-                        setTimeout(() => {
-                            setTimerRunning(true);
-                            setShowSnowflakes(false);
-                        }, 15000);
-                        const powerUpIndex = updatedPowerUps.findIndex(powerUp => powerUp.itemId === p.itemId);
-                        if (powerUpIndex !== -1) {
-                            updatedPowerUps[powerUpIndex].quantity -= 1; 
-                            setPowerUps(updatedPowerUps); 
-                            }
-                    }
-                    else {
-                        Vibration.vibrate([0, 100, 50, 100]);
-                    }
-                }
-                
-                if (p.itemId === 3) {
-                    const allChoices = [
-                        { id: questionList[currentQuestionIndex].choice1, index: 1 },
-                        { id: questionList[currentQuestionIndex].choice2, index: 2 },
-                        { id: questionList[currentQuestionIndex].choice3, index: 3 },
-                        { id: questionList[currentQuestionIndex].choice4, index: 4 },
-                    ];
-                    
-                    const correctChoice = questionList[currentQuestionIndex].correctChoice;
-                    const incorrectChoices = allChoices.filter(choice => choice.id !== correctChoice);
-                    const currentDisabledChoices = disabledChoiceIndex || [];
-                    
-                    if (currentDisabledChoices.length < 2) {
-                        const availableChoices = incorrectChoices.filter(choice => !currentDisabledChoices.includes(choice.index));
-                        
-                        if (availableChoices.length > 0) {
-                            const randomChoice = availableChoices[Math.floor(Math.random() * availableChoices.length)];
-                            setDisabledChoiceIndex([...currentDisabledChoices, randomChoice.index]);
-                        }
-                        const powerUpIndex = updatedPowerUps.findIndex(powerUp => powerUp.itemId === p.itemId);
-                        if (powerUpIndex !== -1) {
-                            updatedPowerUps[powerUpIndex].quantity -= 1; 
-                            setPowerUps(updatedPowerUps); 
-                        }
-                    }
-                    else
-                    {
-                        Vibration.vibrate([0, 100, 50, 100]);
-                    }
-                } 
-                if (p.itemId == 4) {
-                    const allChoices = [
-                        { id: questionList[currentQuestionIndex].choice1, index: 1 },
-                        { id: questionList[currentQuestionIndex].choice2, index: 2 },
-                        { id: questionList[currentQuestionIndex].choice3, index: 3 },
-                        { id: questionList[currentQuestionIndex].choice4, index: 4 },
-                    ];
-                    const correctChoice = questionList[currentQuestionIndex].correctChoice;
-                    const incorrectChoices = allChoices.filter(choice => choice.id !== correctChoice);
-                    
-                    const currentDisabledChoices = disabledChoiceIndex || [];
-                
-                    if (currentDisabledChoices.length < 1) {
-                        const shuffledIncorrectChoices = incorrectChoices.sort(() => 0.5 - Math.random());
-                        const availableChoices = shuffledIncorrectChoices.filter(choice => !currentDisabledChoices.includes(choice.index));
-                        const choicesToDisable = availableChoices.slice(0, 2).map(choice => choice.index);
-                        
-                        setDisabledChoiceIndex([...currentDisabledChoices, ...choicesToDisable]);
-                        
-                        const powerUpIndex = updatedPowerUps.findIndex(powerUp => powerUp.itemId === p.itemId);
-                        if (powerUpIndex !== -1) {
-                            updatedPowerUps[powerUpIndex].quantity -= 1; 
-                            setPowerUps(updatedPowerUps); 
-                        }
-                    }
-                    else
-                    {
-                        Vibration.vibrate([0, 100, 50, 100]);
-                    }
-                } 
-                if (p.itemId == 5) {
-                    setClairVoyance(true);
-                    setCorrectAnswer(true);
-                    const powerUpIndex = updatedPowerUps.findIndex(powerUp => powerUp.itemId === p.itemId);
-                    if (powerUpIndex !== -1) {
-                        updatedPowerUps[powerUpIndex].quantity -= 1; 
-                        setPowerUps(updatedPowerUps); 
-                    }
-                }                 
-            } else {
-                // Add toggle music here like Dota 2 Memorp
-                Vibration.vibrate([0, 100, 50, 100]);
+                setSound(newSound);
+                setIsPlaying(true);
+                setCurrentTrack(trackId);
             }
         }
-        
-        async function clairVoyageDone()
-        {
-            setClairVoyance(false);
-            setCorrectAnswer(false);
-        }
-        async function submit(items: Item[]) {
-            setTimerRunning(false);
-            setIsPlaying(true);
-            setLoading(true);
-            const currentQuestion = questionList[currentQuestionIndex];
-            const expectedMatches = [
-                currentQuestion.match1,
-                currentQuestion.match2,
-                currentQuestion.match3,
-                currentQuestion.match4,
-            ];
-        
-            const count = items.reduce((acc, item, index) => {
-                return acc + (expectedMatches[index] === item.id ? 1 : 0);
-            }, 0);
-        
-            if (count === 4) {
-                setIsCorrect(true);
+    };
+
+    const checkAnswer = (choiceId: number) => {
+        const currentQuestion: QuestionDetails = questionList[currentQuestionIndex];
+        setTimerRunning(false);
+        setIsPlaying(true);
+        setSelectedChoice(choiceId);
+        if (currentQuestion.questionTypeID === 1 || currentQuestion.questionTypeID === 2) {
+            if (choiceId === currentQuestion.correctChoice) {
                 const currentScore = Math.round((1000 * timeLeft) / 15);
                 setScore(prevScore => {
                     const newScore = prevScore + currentScore;
                     return newScore;
-                });                
+                });
+                setIsCorrect(true);
                 setTotalCorrect(prevScore => {
                     const newScore = prevScore + 1;
                     return newScore;
-                }); 
-                setCorrectAnswer(true);
+                });
                 setTimeout(() => {
                     proceedToNextQuestion();
-                    setCorrectAnswer(false);
                     setIsCorrect(null);
                     setSelectedChoice(null);
                     setDisabledChoiceIndex([]);
                 }, 2000);
             } else {
                 setIsCorrect(false);
-                setCorrectAnswer(true);
                 setHearts((prevHearts) => {
                     if (prevHearts <= 1) {
                         setShowGameOver(true);
@@ -496,7 +274,6 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                     } else {
                         setTimeout(() => {
                             setDisabledChoiceIndex([]);
-                            setCorrectAnswer(false);
                             setIsCorrect(null);
                             setSelectedChoice(null);
                             proceedToNextQuestion();
@@ -506,50 +283,279 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                 });
             }
         }
-        
-        function onRestart()
-        {
+    };
 
-        }
-
-        function onHome()
-        {
-            navigation.navigate('Unit', {sectionId, sectionName})
-        }
-
-        async function saveGameplayLocal()
-        {
-            const userID = await AsyncStorage.getItem('userID');
-            if(userID){
-                let newGamePlay:GamePlayDto = 
-                {
-                    userId: userID,
-                    unitId:unitId,
-                    totalCorrectAnswer:totalCorrect,
-                    totalScore:totalScore
-                };
-                console.log(newGamePlay)
-                await saveGamePlay(newGamePlay)
+    const proceedToNextQuestion = async () => {
+        if (currentQuestionIndex < questionList.length - 1) {
+            setLoading(false);
+            setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
+            setTimeLeft(15);
+            setTimerRunning(true);
+        } else {
+            if (hearts > 0) {
+                await saveGameplayLocal();
+                setShowCongratulation(true);
+            }
+            else if (hearts == 0) {
+                setShowGameOver(true);
             }
         }
+    };
+
+    useEffect(() => {
+        const fetchPowerUps = async () => {
+            const userID = await AsyncStorage.getItem('userID');
+            if (userID) {
+                const result = await getUserPowerUps(userID);
+                setPowerUps(result.data);
+                const imageUrls = await Promise.all(
+                    result.data.map(async (powerUp) => {
+                        if (powerUp.itemId !== 0) {
+                            const url = getPowerupImage(powerUp.filePath);
+                            return { id: powerUp.itemId, url };
+                        }
+                        return null;
+                    })
+                );
+
+                setPowerUpUrl(imageUrls.filter((url) => url !== null));
+            }
+        };
+
+        fetchPowerUps();
+    }, []);
+
+    const getImageUrlByItemId = (itemId: number) => {
+        const powerUpUrlObj = powerUpUrls.find((powerUp) => powerUp.id === itemId);
+        return powerUpUrlObj ? powerUpUrlObj.url : null;
+    };
+
+    async function usePowerUp(p: UserPowerUp) {
+        if (p.quantity >= 1) {
+            const updatedPowerUps = [...powerUps];
+
+            if (p.itemId == 1) {
+                if (hearts < 3 || hearts <= 1) {
+                    setHearts(hearts + 1);
+                    setShowHeartPopup(true);
+                    setTimeout(() => {
+                        setShowHeartPopup(false);
+                    }, 1000);
+
+                    const powerUpIndex = updatedPowerUps.findIndex(powerUp => powerUp.itemId === p.itemId);
+                    if (powerUpIndex !== -1) {
+                        updatedPowerUps[powerUpIndex].quantity -= 1;
+                        setPowerUps(updatedPowerUps);
+                    }
+                } else {
+                    Vibration.vibrate([0, 100, 50, 100]);
+                }
+            }
+
+            if (p.itemId == 2) {
+                if (timerRunning) {
+                    setTimerRunning(false);
+                    setShowSnowflakes(true);
+                    setTimeout(() => {
+                        setTimerRunning(true);
+                        setShowSnowflakes(false);
+                    }, 15000);
+                    const powerUpIndex = updatedPowerUps.findIndex(powerUp => powerUp.itemId === p.itemId);
+                    if (powerUpIndex !== -1) {
+                        updatedPowerUps[powerUpIndex].quantity -= 1;
+                        setPowerUps(updatedPowerUps);
+                    }
+                }
+                else {
+                    Vibration.vibrate([0, 100, 50, 100]);
+                }
+            }
+
+            if (p.itemId === 3) {
+                const allChoices = [
+                    { id: questionList[currentQuestionIndex].choice1, index: 1 },
+                    { id: questionList[currentQuestionIndex].choice2, index: 2 },
+                    { id: questionList[currentQuestionIndex].choice3, index: 3 },
+                    { id: questionList[currentQuestionIndex].choice4, index: 4 },
+                ];
+
+                const correctChoice = questionList[currentQuestionIndex].correctChoice;
+                const incorrectChoices = allChoices.filter(choice => choice.id !== correctChoice);
+                const currentDisabledChoices = disabledChoiceIndex || [];
+
+                if (currentDisabledChoices.length < 2) {
+                    const availableChoices = incorrectChoices.filter(choice => !currentDisabledChoices.includes(choice.index));
+
+                    if (availableChoices.length > 0) {
+                        const randomChoice = availableChoices[Math.floor(Math.random() * availableChoices.length)];
+                        setDisabledChoiceIndex([...currentDisabledChoices, randomChoice.index]);
+                    }
+                    const powerUpIndex = updatedPowerUps.findIndex(powerUp => powerUp.itemId === p.itemId);
+                    if (powerUpIndex !== -1) {
+                        updatedPowerUps[powerUpIndex].quantity -= 1;
+                        setPowerUps(updatedPowerUps);
+                    }
+                }
+                else {
+                    Vibration.vibrate([0, 100, 50, 100]);
+                }
+            }
+            if (p.itemId == 4) {
+                const allChoices = [
+                    { id: questionList[currentQuestionIndex].choice1, index: 1 },
+                    { id: questionList[currentQuestionIndex].choice2, index: 2 },
+                    { id: questionList[currentQuestionIndex].choice3, index: 3 },
+                    { id: questionList[currentQuestionIndex].choice4, index: 4 },
+                ];
+                const correctChoice = questionList[currentQuestionIndex].correctChoice;
+                const incorrectChoices = allChoices.filter(choice => choice.id !== correctChoice);
+
+                const currentDisabledChoices = disabledChoiceIndex || [];
+
+                if (currentDisabledChoices.length < 1) {
+                    const shuffledIncorrectChoices = incorrectChoices.sort(() => 0.5 - Math.random());
+                    const availableChoices = shuffledIncorrectChoices.filter(choice => !currentDisabledChoices.includes(choice.index));
+                    const choicesToDisable = availableChoices.slice(0, 2).map(choice => choice.index);
+
+                    setDisabledChoiceIndex([...currentDisabledChoices, ...choicesToDisable]);
+
+                    const powerUpIndex = updatedPowerUps.findIndex(powerUp => powerUp.itemId === p.itemId);
+                    if (powerUpIndex !== -1) {
+                        updatedPowerUps[powerUpIndex].quantity -= 1;
+                        setPowerUps(updatedPowerUps);
+                    }
+                }
+                else {
+                    Vibration.vibrate([0, 100, 50, 100]);
+                }
+            }
+            if (p.itemId == 5) {
+                setClairVoyance(true);
+                setCorrectAnswer(true);
+                const powerUpIndex = updatedPowerUps.findIndex(powerUp => powerUp.itemId === p.itemId);
+                if (powerUpIndex !== -1) {
+                    updatedPowerUps[powerUpIndex].quantity -= 1;
+                    setPowerUps(updatedPowerUps);
+                }
+            }
+        } else {
+            // Add toggle music here like Dota 2 Memorp
+            Vibration.vibrate([0, 100, 50, 100]);
+        }
+    }
+
+    async function clairVoyageDone() {
+        setClairVoyance(false);
+        setCorrectAnswer(false);
+    }
+    async function submit(items: Item[]) {
+        setTimerRunning(false);
+        setIsPlaying(true);
+        setLoading(true);
+        const currentQuestion = questionList[currentQuestionIndex];
+        const expectedMatches = [
+            currentQuestion.match1,
+            currentQuestion.match2,
+            currentQuestion.match3,
+            currentQuestion.match4,
+        ];
+
+        const count = items.reduce((acc, item, index) => {
+            return acc + (expectedMatches[index] === item.id ? 1 : 0);
+        }, 0);
+
+        if (count === 4) {
+            setIsCorrect(true);
+            const currentScore = Math.round((1000 * timeLeft) / 15);
+            setScore(prevScore => {
+                const newScore = prevScore + currentScore;
+                return newScore;
+            });
+            setTotalCorrect(prevScore => {
+                const newScore = prevScore + 1;
+                return newScore;
+            });
+            setCorrectAnswer(true);
+            setTimeout(() => {
+                proceedToNextQuestion();
+                setCorrectAnswer(false);
+                setIsCorrect(null);
+                setSelectedChoice(null);
+                setDisabledChoiceIndex([]);
+            }, 2000);
+        } else {
+            setIsCorrect(false);
+            setCorrectAnswer(true);
+            setHearts((prevHearts) => {
+                if (prevHearts <= 1) {
+                    setShowGameOver(true);
+                    return 0;
+                } else {
+                    setTimeout(() => {
+                        setDisabledChoiceIndex([]);
+                        setCorrectAnswer(false);
+                        setIsCorrect(null);
+                        setSelectedChoice(null);
+                        proceedToNextQuestion();
+                    }, 2000);
+                    return prevHearts - 1;
+                }
+            });
+        }
+    }
+
+    function onRestart() {
+        setCurrentQuestionIndex(0);
+        setTimeLeft(15);
+        setHearts(3);
+        setScore(0);
+        setTotalCorrect(0);
+        setDisabledChoiceIndex([]);
+        setIsCorrect(null);
+        setSelectedChoice(null);
+        setShowGameOver(false);
+        setShowCongratulation(false);
+        setTimerRunning(true);
+        fetchQuestion();
+    }
+
+
+    function onHome() {
+        navigation.navigate('Unit', { sectionId, sectionName })
+    }
+
+    async function saveGameplayLocal() {
+        const userID = await AsyncStorage.getItem('userID');
+        if (userID) {
+            let newGamePlay: GamePlayDto =
+            {
+                userId: userID,
+                unitId: unitId,
+                totalCorrectAnswer: totalCorrect,
+                totalScore: totalScore
+            };
+            console.log(newGamePlay)
+            await saveGamePlay(newGamePlay)
+        }
+    }
     return (
         <SafeAreaView className="flex-1">
-                {showCongratlulation && ( <Congratulations  score ={score} onHome={onHome} onRestart={onRestart} isVisible = {showCongratlulation}/>)}
-                {!showGameOver?(
+            {showCongratlulation && (<Congratulations score={score} onHome={onHome} onRestart={onRestart} isVisible={showCongratlulation} />)}
+            {!showGameOver ? (
 
-            <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 items-center">
-            {isLoading ? ( 
-                    <Loader />
-                ):( 
-                <>
-                        {showSnowflakes && ( <SnowflakeComponent />)}
-                       
-                        <View className="flex-row justify-between items-center mt-2 w-full">
-                            <TouchableOpacity className="ml-4" onPress = {() => navigation.goBack()}>
-                                <Text className="text-white">Back</Text>
-                            </TouchableOpacity>
+                <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 items-center">
+                    {isLoading ? (
+                        <Loader />
+                    ) : (
+                        <>
+                            {showSnowflakes && (<SnowflakeComponent />)}
 
-                            <View className="relative items-center justify-center">
+                            <View className="flex-row justify-between items-center mt-2 w-full">
+                                <TouchableOpacity className="ml-4" onPress={() => navigation.goBack()}>
+                                    <BackIcon className=" w-8 h-8 text-white" />
+                                </TouchableOpacity>
+
+                                <View className="relative items-center justify-center">
                                     <Animated.View
                                         className="relative items-center justify-center"
                                         style={[
@@ -573,271 +579,275 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
 
                                 </View>
 
-                        </View>
+                            </View>
 
-                {questionList.length > 0 && (      
-                    <View className="mt-5">
-                          {fileUrls[currentQuestionIndex]?.audioUrl && (
-                                    <View className="items-center rounded-xl py-3 px-4 overflow-hidden"> 
-                                <TouchableOpacity onPress={() => toggleSound(fileUrls[currentQuestionIndex].audioUrl, questionList[currentQuestionIndex].questionID)}
-                                disabled={isPlaying} 
-                                style={{ opacity: isPlaying ? 0.5 : 1 }}
-                                >
-                                    <SpeakerIcon2 className="w-24 h-24" />
-                                </TouchableOpacity>
+                            {questionList.length > 0 && (
+                                <View className="mt-5 mb-32">
+                                    <View className="flex-1 items-center justify-center w-[85%]">
+                                        {fileUrls[currentQuestionIndex]?.audioUrl && (
+                                            <View className="items-center rounded-xl py-3 px-4 overflow-hidden">
+                                                <TouchableOpacity onPress={() => toggleSound(fileUrls[currentQuestionIndex].audioUrl, questionList[currentQuestionIndex].questionID)}
+                                                    disabled={isPlaying}
+                                                    style={{ opacity: isPlaying ? 0.5 : 1 }}
+                                                >
+                                                    <View className="border-2 border-white rounded-full p-4">
+                                                        <SpeakerIcon className="w-24 h-24 text-white" />
+                                                    </View>
+                                                </TouchableOpacity>
+                                            </View>
+                                        )}
+
+                                        {fileUrls[currentQuestionIndex]?.imageUrl && (
+                                            <View className="items-center rounded-xl py-3 px-4 overflow-hidden">
+                                                <Image
+                                                    source={{ uri: fileUrls[currentQuestionIndex]?.imageUrl }}
+                                                    className="w-48 h-32 rounded-xl mr-2"
+                                                    resizeMode="contain"
+                                                />
+                                            </View>
+                                        )}
+
+                                        <View className="items-center mb-2 w-[85%] shadow-lg">
+                                            <Text className="text-white text-center font-bold text-xl">
+                                                {questionList[currentQuestionIndex].questionText}
+                                            </Text>
+                                        </View>
+
+                                        {(questionList[currentQuestionIndex].questionTypeID === 1 || questionList[currentQuestionIndex].questionTypeID === 2) && (
+                                            <View className="mt-6 mb-4 items-center">
+                                                {!disabledChoiceIndex.includes(1) && (
+                                                    <View className="flex-row items-center py-2 px-4 border border-1 rounded-lg mb-4 w-[100%] border-white">
+
+                                                        <TouchableOpacity
+                                                            onPress={() => checkAnswer(questionList[currentQuestionIndex].choice1 ?? 0)}
+                                                            className={`flex-1 py-2 px-4 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice1
+                                                                ? isCorrect
+                                                                    ? 'bg-green-600 border border-1 border-green-600'
+                                                                    : 'bg-[#FF0000] border border-1 border-[#FF0000]'
+                                                                : 'border-white'} ${disabledChoiceIndex.includes(1) || selectedChoice !== null ? 'opacity-50' : ''}`}
+                                                            disabled={selectedChoice !== null || disabledChoiceIndex.includes(1)}
+                                                        >
+
+                                                            <Text className={`text-center text-sm font-semibold ${disabledChoiceIndex.includes(1) ? 'text-gray-400' : 'text-white'}`}>{questionList[currentQuestionIndex].choice1ContentText}</Text>
+                                                        </TouchableOpacity>
+                                                        {fileUrls[currentQuestionIndex]?.choice1AudioUrl && questionList[currentQuestionIndex].choice1AudioPath !== null && (
+                                                            <TouchableOpacity onPress={() => { toggleSound(fileUrls[currentQuestionIndex].choice1AudioUrl, questionList[currentQuestionIndex].questionID) }}
+                                                                disabled={isPlaying}
+                                                                style={{ opacity: isPlaying ? 0.5 : 1 }}>
+                                                                <SpeakerIcon className="h-5 w-5 ml-2 text-white" />
+                                                            </TouchableOpacity>
+                                                        )}
+                                                    </View>
+                                                )}
+                                                {!disabledChoiceIndex.includes(2) && (
+                                                    <View className="flex-row items-center py-2 px-4 border border-1 rounded-lg mb-4 w-[100%] border-white">
+                                                        <TouchableOpacity
+                                                            onPress={() => checkAnswer(questionList[currentQuestionIndex].choice2 ?? 0)}
+                                                            className={`flex-1 py-2 px-4 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice2
+                                                                ? isCorrect
+                                                                    ? 'bg-green-600 border border-1 border-green-600'
+                                                                    : 'bg-[#FF0000] border border-1 border-[#FF0000]'
+                                                                : 'border-white'}  ${selectedChoice !== null ? 'opacity-50' : ''}`}
+                                                            disabled={selectedChoice !== null || disabledChoiceIndex.includes(2)}
+                                                        >
+
+                                                            <Text className={`text-center text-sm font-semibold ${disabledChoiceIndex.includes(2) ? 'text-gray-400' : 'text-white'}`}>{questionList[currentQuestionIndex].choice2ContentText}</Text>
+                                                        </TouchableOpacity>
+                                                        {fileUrls[currentQuestionIndex]?.choice2AudioUrl && questionList[currentQuestionIndex].choice2AudioPath !== null && (
+                                                            <TouchableOpacity onPress={() => { toggleSound(fileUrls[currentQuestionIndex].choice2AudioUrl, questionList[currentQuestionIndex].questionID) }}
+                                                                disabled={isPlaying}
+                                                                style={{ opacity: isPlaying ? 0.5 : 1 }}>
+                                                                <SpeakerIcon className="h-5 w-5 ml-2 text-white" />
+                                                            </TouchableOpacity>
+                                                        )}
+                                                    </View>
+                                                )}
+                                                {!disabledChoiceIndex.includes(3) && (
+                                                    <View className="flex-row items-center py-2 px-4 border border-1 rounded-lg mb-4 w-[100%] border-white">
+                                                        <TouchableOpacity
+                                                            onPress={() => checkAnswer(questionList[currentQuestionIndex].choice3 ?? 0)}
+                                                            className={`flex-1 py-2 px-4 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice3
+                                                                ? isCorrect
+                                                                    ? 'bg-green-600 border border-1 border-green-600'
+                                                                    : 'bg-[#FF0000] border border-1 border-[#FF0000]'
+                                                                : 'border-white'}  ${disabledChoiceIndex.includes(3) || selectedChoice !== null ? 'opacity-50' : ''} `}
+                                                            disabled={selectedChoice !== null || disabledChoiceIndex.includes(3)}
+                                                        >
+
+                                                            <Text className={`text-center text-sm font-semibold ${disabledChoiceIndex.includes(3) ? 'text-gray-400' : 'text-white'}`}>{questionList[currentQuestionIndex].choice3ContentText}</Text>
+                                                        </TouchableOpacity>
+                                                        {fileUrls[currentQuestionIndex]?.choice3AudioUrl && questionList[currentQuestionIndex].choice3AudioPath !== null && (
+                                                            <TouchableOpacity onPress={() => { toggleSound(fileUrls[currentQuestionIndex].choice3AudioUrl, questionList[currentQuestionIndex].questionID) }}
+                                                                disabled={isPlaying}
+                                                                style={{ opacity: isPlaying ? 0.5 : 1 }}>
+                                                                <SpeakerIcon className="h-5 w-5 ml-2 text-white" />
+                                                            </TouchableOpacity>
+                                                        )}
+                                                    </View>
+                                                )}
+                                                {!disabledChoiceIndex.includes(4) && (
+                                                    <View className="flex-row items-center py-2 px-4 border border-1 rounded-lg mb-4 w-[100%] border-white">
+                                                        <TouchableOpacity
+                                                            onPress={() => checkAnswer(questionList[currentQuestionIndex].choice4 ?? 0)}
+                                                            className={`flex-1 py-2 px-4 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice4
+                                                                ? isCorrect
+                                                                    ? 'bg-green-600 border border-1 border-green-600'
+                                                                    : 'bg-[#FF0000] border border-1 border-[#FF0000]'
+                                                                : 'border-white'}  ${disabledChoiceIndex.includes(4) || selectedChoice !== null ? 'opacity-50' : ''} `}
+                                                            disabled={selectedChoice !== null || disabledChoiceIndex.includes(4)}
+                                                        >
+
+                                                            <Text className={`text-center text-sm font-semibold ${disabledChoiceIndex.includes(4) ? 'text-gray-400' : 'text-white'}`}>{questionList[currentQuestionIndex].choice4ContentText}</Text>
+                                                        </TouchableOpacity>
+                                                        {fileUrls[currentQuestionIndex]?.choice4AudioUrl && questionList[currentQuestionIndex].choice4AudioPath !== null && (
+                                                            <TouchableOpacity onPress={() => { toggleSound(fileUrls[currentQuestionIndex].choice4AudioUrl, questionList[currentQuestionIndex].questionID) }}
+                                                                disabled={isPlaying}
+                                                                style={{ opacity: isPlaying ? 0.5 : 1 }}>
+                                                                <SpeakerIcon className="h-5 w-5 ml-2 text-white" />
+                                                            </TouchableOpacity>
+                                                        )}
+                                                    </View>
+                                                )}
+                                            </View>
+                                        )}
+                                    
+                                    {(questionList[currentQuestionIndex].questionTypeID === 3) && (
+                                        <View className="flex-1">
+                                            <MatchComponent
+                                                showCorrectAnswer={showCorrectAnswer}
+                                                clairVoyageDone={clairVoyageDone}
+                                                questionList={questionList}
+                                                clairVoyanceUsed={clairVoyanceUsed}
+                                                currentQuestionIndex={currentQuestionIndex}
+                                                draggableItems={[
+                                                    {
+                                                        id: questionList[currentQuestionIndex].match1 ?? 0,
+                                                        name: questionList[currentQuestionIndex].match1ContentText ?? ''
+                                                    },
+                                                    {
+                                                        id: questionList[currentQuestionIndex].match2 ?? 0,
+                                                        name: questionList[currentQuestionIndex].match2ContentText ?? ''
+                                                    },
+                                                    {
+                                                        id: questionList[currentQuestionIndex].match3 ?? 0,
+                                                        name: questionList[currentQuestionIndex].match3ContentText ?? ''
+                                                    },
+                                                    {
+                                                        id: questionList[currentQuestionIndex].match4 ?? 0,
+                                                        name: questionList[currentQuestionIndex].match4ContentText ?? ''
+                                                    }
+                                                ]}
+                                                fixedItems={[
+                                                    questionList[currentQuestionIndex].word1EnglishTranslation ?? '',
+                                                    questionList[currentQuestionIndex].word2EnglishTranslation ?? '',
+                                                    questionList[currentQuestionIndex].word3EnglishTranslation ?? '',
+                                                    questionList[currentQuestionIndex].word4EnglishTranslation ?? ''
+                                                ]}
+                                                isLoading={isLoading}
+                                                onSubmit={submit}
+                                            />
+                                        </View>
+
+                                    )}
+                                    
+                                    {(questionList[currentQuestionIndex].questionTypeID === 4) && (
+                                        <View className="flex-1">
+                                            <MatchComponent
+                                                showCorrectAnswer={showCorrectAnswer}
+                                                questionList={questionList}
+                                                clairVoyageDone={clairVoyageDone}
+                                                clairVoyanceUsed={clairVoyanceUsed}
+                                                currentQuestionIndex={currentQuestionIndex}
+                                                draggableItems={[
+                                                    {
+                                                        id: questionList[currentQuestionIndex].match1 ?? 0,
+                                                        name: questionList[currentQuestionIndex].match1EnglishTranslation ?? ''
+                                                    },
+                                                    {
+                                                        id: questionList[currentQuestionIndex].match2 ?? 0,
+                                                        name: questionList[currentQuestionIndex].match2EnglishTranslation ?? ''
+                                                    },
+                                                    {
+                                                        id: questionList[currentQuestionIndex].match3 ?? 0,
+                                                        name: questionList[currentQuestionIndex].match4EnglishTranslation ?? ''
+                                                    },
+                                                    {
+                                                        id: questionList[currentQuestionIndex].match4 ?? 0,
+                                                        name: questionList[currentQuestionIndex].match1EnglishTranslation ?? ''
+                                                    }
+                                                ]}
+                                                fixedItems={[
+                                                    questionList[currentQuestionIndex].word1ContentText ?? '',
+                                                    questionList[currentQuestionIndex].word3ContentText ?? '',
+                                                    questionList[currentQuestionIndex].word2ContentText ?? '',
+                                                    questionList[currentQuestionIndex].word4ContentText ?? ''
+                                                ]}
+                                                onSubmit={submit}
+                                                isLoading={isLoading}
+                                            />
+                                        </View>
+                                    )}
+                                    </View>
                                 </View>
                             )}
 
-                        {fileUrls[currentQuestionIndex]?.imageUrl && (
-                            <View className="items-center rounded-xl py-3 px-4 overflow-hidden"> 
-                                 <Image
-                                    source={{ uri: fileUrls[currentQuestionIndex]?.imageUrl }}
-                                    className="w-48 h-32 rounded-xl mr-2"
-                                    resizeMode="contain"
-                                />
-                            </View>
-                        )}
+                            <View className="absolute bottom-5 rounded-xl" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+                                <View className="flex-row justify-center gap-2 w-[100%]">
+                                    {powerUps.map((powerUp, index) => {
+                                        const imageUrl = getImageUrlByItemId(powerUp.itemId);
 
-                       <View className="items-center mb-2 w-[85%] shadow-lg">
-                            <Text className="text-white text-center font-bold text-xl">
-                                {questionList[currentQuestionIndex].questionText}
-                            </Text>
-                        </View>
-                      
-                        { (questionList[currentQuestionIndex].questionTypeID === 1 || questionList[currentQuestionIndex].questionTypeID === 2) && (
-                        <View className="mt-6 mb-4 items-center">
-                        {!disabledChoiceIndex.includes(1) && (
-                            <View className="flex-row items-center py-2 px-4 border border-1 rounded-lg mb-4 w-[100%] border-white">
+                                        const isEnabled = (questionList[currentQuestionIndex].questionTypeID === 1 || questionList[currentQuestionIndex].questionTypeID === 2)
+                                            ? powerUp.itemId !== 5
+                                            : (questionList[currentQuestionIndex].questionTypeID === 3 || questionList[currentQuestionIndex].questionTypeID === 4)
+                                                ? (powerUp.itemId === 1 || powerUp.itemId === 2 || powerUp.itemId === 5)
+                                                : true;
 
-                                <TouchableOpacity 
-                                onPress={() => checkAnswer(questionList[currentQuestionIndex].choice1 ?? 0)} 
-                                className={`flex-1 py-2 px-4 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice1
-                                    ? isCorrect
-                                    ? 'bg-green-500'
-                                    : 'bg-red-500'
-                                    : 'border-white'} ${disabledChoiceIndex.includes(1)|| selectedChoice !== null ? 'opacity-50' : ''}`}
-                                disabled={selectedChoice !== null || disabledChoiceIndex.includes(1) }
-                                >
-
-                                    <Text className={`text-center text-sm font-semibold ${disabledChoiceIndex.includes(1)? 'text-gray-400' : 'text-white'}`}>{questionList[currentQuestionIndex].choice1ContentText}</Text>                             
-                                </TouchableOpacity>
-                            {fileUrls[currentQuestionIndex]?.choice1AudioUrl && questionList[currentQuestionIndex].choice1AudioPath !== null && (
-                                <TouchableOpacity onPress={() => {toggleSound(fileUrls[currentQuestionIndex].choice1AudioUrl, questionList[currentQuestionIndex].questionID)}}
-                                disabled={isPlaying} 
-                                style={{ opacity: isPlaying ? 0.5 : 1 }}>
-                                <SpeakerIcon className="h-5 w-5 ml-2 text-black" />
-                                </TouchableOpacity>
-                            )}
-                            </View>
-                            )}
-                            {!disabledChoiceIndex.includes(2) && (
-                            <View className="flex-row items-center py-2 px-4 border border-1 rounded-lg mb-4 w-[100%] border-white">
-                                <TouchableOpacity 
-                                onPress={() => checkAnswer(questionList[currentQuestionIndex].choice2 ?? 0)} 
-                                className={`flex-1 py-2 px-4 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice2
-                                    ? isCorrect
-                                    ? 'bg-green-500'
-                                    : 'bg-red-500'
-                                    : 'border-white'}  ${selectedChoice !== null ? 'opacity-50' : ''}`}
-                                disabled={selectedChoice !== null || disabledChoiceIndex.includes(2)}
-                                >
-
-                                <Text className={`text-center text-sm font-semibold ${disabledChoiceIndex.includes(2)? 'text-gray-400' : 'text-white'}`}>{questionList[currentQuestionIndex].choice2ContentText}</Text>
-                                </TouchableOpacity>
-                                {fileUrls[currentQuestionIndex]?.choice2AudioUrl && questionList[currentQuestionIndex].choice2AudioPath !== null && (
-                                        <TouchableOpacity onPress={() => {toggleSound(fileUrls[currentQuestionIndex].choice2AudioUrl, questionList[currentQuestionIndex].questionID)}}
-                                        disabled={isPlaying} 
-                                        style={{ opacity: isPlaying ? 0.5 : 1 }}>
-                                        <SpeakerIcon className="h-5 w-5 ml-2 text-black" />
-                                        </TouchableOpacity>
-                                        )}
-                            </View>
-                            )}
-                            {!disabledChoiceIndex.includes(3) && (
-                            <View className="flex-row items-center py-2 px-4 border border-1 rounded-lg mb-4 w-[100%] border-white">
-                                <TouchableOpacity 
-                                onPress={() => checkAnswer(questionList[currentQuestionIndex].choice3 ?? 0)} 
-                                className={`flex-1 py-2 px-4 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice3
-                                    ? isCorrect
-                                    ? 'bg-green-500'
-                                    : 'bg-red-500'
-                                    : 'border-white'}  ${disabledChoiceIndex.includes(3) || selectedChoice !== null ? 'opacity-50' : ''} `}
-                                disabled={selectedChoice !== null ||disabledChoiceIndex.includes(3) }
-                                >
-
-                                <Text className={`text-center text-sm font-semibold ${disabledChoiceIndex.includes(3)? 'text-gray-400' : 'text-white'}`}>{questionList[currentQuestionIndex].choice3ContentText}</Text>
-                                </TouchableOpacity>
-                                {fileUrls[currentQuestionIndex]?.choice3AudioUrl && questionList[currentQuestionIndex].choice3AudioPath !== null && (
-                                <TouchableOpacity onPress={() => {toggleSound(fileUrls[currentQuestionIndex].choice3AudioUrl, questionList[currentQuestionIndex].questionID)}}
-                                disabled={isPlaying} 
-                                style={{ opacity: isPlaying ? 0.5 : 1 }}>
-                                <SpeakerIcon className="h-5 w-5 ml-2 text-black" />
-                                </TouchableOpacity>
-                                )}
-                            </View>
-                            )}
-                            {!disabledChoiceIndex.includes(4) && (
-                              <View className="flex-row items-center py-2 px-4 border border-1 rounded-lg mb-4 w-[100%] border-white">
-                                <TouchableOpacity 
-                                onPress={() => checkAnswer(questionList[currentQuestionIndex].choice4 ?? 0)} 
-                                className={`flex-1 py-2 px-4 border border-1 rounded-lg ${selectedChoice === questionList[currentQuestionIndex].choice4
-                                    ? isCorrect
-                                    ? 'bg-green-500'
-                                    : 'bg-red-500'
-                                    : 'border-white'}  ${disabledChoiceIndex.includes(4) || selectedChoice !== null ? 'opacity-50' : ''} `}
-                                disabled={selectedChoice !== null || disabledChoiceIndex.includes(4) }
-                                >
-
-                                <Text className={`text-center text-sm font-semibold ${disabledChoiceIndex.includes(4)? 'text-gray-400' : 'text-white'}`}>{questionList[currentQuestionIndex].choice4ContentText}</Text>
-                                </TouchableOpacity>
-                                {fileUrls[currentQuestionIndex]?.choice4AudioUrl && questionList[currentQuestionIndex].choice4AudioPath !== null && (
-                                <TouchableOpacity onPress={() => {toggleSound(fileUrls[currentQuestionIndex].choice4AudioUrl, questionList[currentQuestionIndex].questionID)}}
-                                disabled={isPlaying} 
-                                style={{ opacity: isPlaying ? 0.5 : 1 }}>
-                                <SpeakerIcon className="h-5 w-5 ml-2 text-black" />
-                                </TouchableOpacity>
-                                )}
-                            </View>
-                            )}
-                        </View>
-                        )}
-
-                        {(questionList[currentQuestionIndex].questionTypeID === 3) && (
-                            <View className="flex-1 justify-center mt-6 mb-4">
-                            <MatchComponent 
-                                showCorrectAnswer = {showCorrectAnswer}
-                                clairVoyageDone={clairVoyageDone}
-                                questionList={questionList}
-                                clairVoyanceUsed = {clairVoyanceUsed}
-                                currentQuestionIndex={currentQuestionIndex}
-                                draggableItems={[
-                                    {
-                                        id: questionList[currentQuestionIndex].match1 ?? 0,
-                                        name: questionList[currentQuestionIndex].match1ContentText ?? ''
-                                    },
-                                    {
-                                        id: questionList[currentQuestionIndex].match2 ?? 0,
-                                        name: questionList[currentQuestionIndex].match2ContentText ?? ''
-                                    },
-                                    {
-                                        id: questionList[currentQuestionIndex].match3 ?? 0,
-                                        name: questionList[currentQuestionIndex].match3ContentText ?? ''
-                                    },
-                                    {
-                                        id: questionList[currentQuestionIndex].match4 ?? 0, 
-                                        name: questionList[currentQuestionIndex].match4ContentText ?? ''
-                                    }
-                                ]}
-                                fixedItems={[
-                                    questionList[currentQuestionIndex].word1EnglishTranslation ?? '',
-                                    questionList[currentQuestionIndex].word2EnglishTranslation ?? '',
-                                    questionList[currentQuestionIndex].word3EnglishTranslation ?? '',
-                                    questionList[currentQuestionIndex].word4EnglishTranslation ?? ''
-                                ]}
-                                isLoading = {isLoading}
-                                onSubmit={submit}
-                            />
-                        </View>
-
-                        )}
-                        {(questionList[currentQuestionIndex].questionTypeID === 4) && (
-                            <View className="flex-1 justify-center mt-6 mb-4">
-                            <MatchComponent 
-                                showCorrectAnswer = {showCorrectAnswer}
-                                questionList={questionList}
-                                clairVoyageDone={clairVoyageDone}
-                                clairVoyanceUsed = {clairVoyanceUsed}
-                                currentQuestionIndex={currentQuestionIndex}
-                                draggableItems={[
-                                    {
-                                        id: questionList[currentQuestionIndex].match1 ?? 0, 
-                                        name: questionList[currentQuestionIndex].match1EnglishTranslation ?? ''
-                                    },
-                                    {
-                                        id: questionList[currentQuestionIndex].match2 ?? 0, 
-                                        name: questionList[currentQuestionIndex].match2EnglishTranslation ?? ''
-                                    },
-                                    {
-                                        id: questionList[currentQuestionIndex].match3 ?? 0, 
-                                        name: questionList[currentQuestionIndex].match4EnglishTranslation ?? ''
-                                    },
-                                    {
-                                        id: questionList[currentQuestionIndex].match4 ?? 0, 
-                                        name: questionList[currentQuestionIndex].match1EnglishTranslation ?? ''
-                                    }
-                                ]} 
-                                fixedItems={[
-                                    questionList[currentQuestionIndex].word1ContentText ?? '',
-                                    questionList[currentQuestionIndex].word3ContentText ?? '',
-                                    questionList[currentQuestionIndex].word2ContentText ?? '',
-                                    questionList[currentQuestionIndex].word4ContentText ?? ''
-                                ]}
-                                onSubmit={submit}
-                                isLoading = {isLoading}
-                            />
-                        </View>
-
-                        )}
-                    </View>
-                    )}
-
-                <View className="absolute bottom-5 rounded-xl" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
-                <View className="flex-row justify-center gap-2 w-[100%]">
-                    {powerUps.map((powerUp, index) => {
-                        const imageUrl = getImageUrlByItemId(powerUp.itemId);
-                        
-                        const isEnabled = (questionList[currentQuestionIndex].questionTypeID === 1 || questionList[currentQuestionIndex].questionTypeID === 2) 
-                            ? powerUp.itemId !== 5 
-                            : (questionList[currentQuestionIndex].questionTypeID === 3 || questionList[currentQuestionIndex].questionTypeID === 4) 
-                                ? (powerUp.itemId === 1 || powerUp.itemId === 2 || powerUp.itemId === 5) 
-                                : true; 
-
-                        return (
-                            <TouchableOpacity 
-                                key={index} 
-                                onPress={() => usePowerUp(powerUp)} 
-                                disabled={!isEnabled || selectedChoice !== null}
-                            >
-                                <View className="py-2 px-1 items-center relative">
-                                    {imageUrl ? (
-                                        <Image
-                                            source={{ uri: imageUrl }} 
-                                            className="w-10 h-10"
-                                        />
-                                    ) : null}
-                                    <Text className="text-center text-[10px] text-black font-bold bg-gray-200 p-1 rounded-full absolute right-1 bottom-1 z-10">
+                                        return (
+                                            <TouchableOpacity
+                                                key={index}
+                                                onPress={() => usePowerUp(powerUp)}
+                                                disabled={!isEnabled || selectedChoice !== null}
+                                            >
+                                                <View className="py-2 px-1 items-center relative">
+                                                    {imageUrl ? (
+                                                        <Image
+                                                            source={{ uri: imageUrl }}
+                                                            className="w-10 h-10"
+                                                        />
+                                                    ) : null}
+                                                    <Text className="text-center text-[10px] text-black font-bold bg-gray-200 p-1 rounded-full absolute right-1 bottom-1 z-10">
                                                         {powerUp.quantity}x
                                                     </Text>
 
-                                    {!isEnabled && (
+                                                    {!isEnabled && (
                                                         <View className="absolute inset-0 bg-gray-500 opacity-50 justify-center items-center rounded-full p-2  mt-1 z-0">
                                                             <Text className="text-red-600 font-bold text-xl">X</Text>
                                                         </View>
-                                    )}
+                                                    )}
+                                                </View>
+                                            </TouchableOpacity>
+                                        );
+                                    })}
                                 </View>
-                            </TouchableOpacity>
-                        );
-                    })}
-                </View>
 
-                    <Modal
-                        transparent={true}
-                        visible={showHeartPopup}
-                        animationType="fade"
-                        onRequestClose={() => setShowHeartPopup(false)}
-                    >
-                        <View className="flex-1 justify-center items-center bg-black/40">
-                            <View className="bg-white p-6 rounded-full shadow-lg scale-105">
-                                <HeartIcon className="h-12 w-12 text-red-500" />
+                                <Modal
+                                    transparent={true}
+                                    visible={showHeartPopup}
+                                    animationType="fade"
+                                    onRequestClose={() => setShowHeartPopup(false)}
+                                >
+                                    <View className="flex-1 justify-center items-center bg-black/40">
+                                        <View className="p-6 rounded-full shadow-lg scale-105">
+                                            <HeartIcon className="h-12 w-12 text-red-500" />
+                                        </View>
+                                    </View>
+                                </Modal>
                             </View>
-                        </View>
-                    </Modal>
-                </View>
-                </>
-            )}
-            </LinearGradient>
+                        </>
+                    )}
+                </LinearGradient>
             ) :
-            (<GameOver score ={score} onHome={onHome} onRestart={onRestart}/>)}
+                (<GameOver score={score} onHome={onHome} onRestart={onRestart} />)}
         </SafeAreaView>
     )
 };
