@@ -38,7 +38,12 @@ export type UserProfileDto = {
     currentLanguageId: string;
     totalScoreWeekly: number;
     vcoin: number;
-  }
+    unitsUnlocked: number | null;
+    highestScore: number | null;
+    isSubscribed: boolean;
+    expirationDate: Date | null;
+    weeklyScoreGraph: { [key: string]: number }; 
+};
   
 export type EditProfileVista = {
     name: string;
@@ -138,6 +143,9 @@ export type UnitDetails = {
     title: string;
     description: string;
     totalItems:number;
+    totalScore:number;
+    totalCorrect:number;
+    totalWrong:number
 };
 
 export type QuestionDetails = {
@@ -219,4 +227,12 @@ export type GamePlayDto =
     unitId: number;
     totalCorrectAnswer: number;
     totalScore: number;
+}
+
+export type LeaderBoardDto = 
+{
+    id:number;
+    name: string;
+    totalScoreWeekly: number;
+    imagePath: string;
 }

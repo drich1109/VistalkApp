@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from db import SECRET_KEY, DEBUG, HOST, PORT
 from flask_cors import CORS
-from Services import user, section, content, question, shop, emailService, feedback, report, dailytask
+from Services import user, section, content, question, shop, emailService, feedback, report, dailytask,dashboard
 from functools import wraps
 import jwt
 
@@ -148,7 +148,6 @@ def questionInactive():
     return question.questionInactive()
 
 @app.route('/registerUser', methods=['POST'])
-@token_required
 def registerVista():
     return user.createVista()
 
@@ -258,6 +257,42 @@ def getDailyTaskTypes():
 def saveDailyTask():
     return dailytask.save_dailyTask()
 
+@app.route('/getUserDetails', methods=['GET'])
+@token_required
+def getUserDetails():
+    return user.getUserDetails()
+
+@app.route('/getUserImage', methods=['GET'])
+def getUserImage():
+    return user.getUserImage()
+
+@app.route('/reActivateVista', methods=['PUT'])
+def reActivateVista():
+    return user.reActivateVista()
+
+@app.route('/resetLeaderBoard', methods=['PUT'])
+def resetLeaderBoard():
+    return dashboard.resetLeaderBoard()
+
+@app.route('/getLeaderBoard', methods=['GET'])
+def getLeaderBoard():
+    return dashboard.getLeaderBoards()
+
+@app.route('/getStatusVista', methods=['GET'])
+def getStatusVista():
+    return dashboard.getStatusVista()
+
+@app.route('/getLanguageUsers', methods=['GET'])
+def getLanguageUsers():
+    return dashboard.getLanguageUsers()
+
+@app.route('/getSubscriptionData', methods=['GET'])
+def getSubscriptionData():
+    return dashboard.getSubscriptionData()
+
+@app.route('/deleteDailyTask', methods=['PUT'])
+def deleteDailyTask():
+    return dailytask.deleteDailyTask()
 
 if __name__ == "__main__":
     app.run(debug=DEBUG, host=HOST, port=PORT)

@@ -1,8 +1,8 @@
 # user.py
 import jwt
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date
 from db import get_db_connection, UserImages, SECRET_KEY
-from flask import request, jsonify
+from flask import request, jsonify, send_from_directory
 import hashlib
 from Services import emailService
 import os
@@ -100,33 +100,33 @@ def createVista():
         userId = cursor.lastrowid
 
         vistaQuery = """
-        INSERT INTO vista (userPlayerId, vCoin, totalScoreWeekly, currentLanguageId) 
+        INSERT INTO vista (userPlayerId, vCoin, currentLanguageId) 
         VALUES (%s, %s, %s, %s)
         """
-        cursor.execute(vistaQuery, (userId, 0, 0, languageId))
+        cursor.execute(vistaQuery, (userId, 0, languageId))
         conn.commit()
 
         sectionQuery = """
         SELECT u.unitId 
         FROM unit u 
         INNER JOIN section s ON s.sectionId = u.sectionID 
-        WHERE s.languageID = %s
+        WHERE s.languageID = %s and u.isActive = 1
         """
         cursor.execute(sectionQuery, (languageId,))
         unitIds = cursor.fetchall()
 
         for unit in unitIds:
             userUnitQuery = """
-            INSERT INTO userunit (userPlayerId, unitId, totalCorrectAnswers, viStars, totalScore) 
-            VALUES (%s, %s, %s, %s, %s)
+            INSERT INTO userunit (userPlayerId, unitId, totalCorrectAnswers, totalScore) 
+            VALUES (%s, %s, %s, %s)
             """
-            cursor.execute(userUnitQuery, (userId, unit['unitId'], 0, 0, 0))
+            cursor.execute(userUnitQuery, (userId, unit['unitId'], 0, 0))
         conn.commit()
 
         itemQuery = """
         SELECT i.itemId 
         FROM powerUp p 
-        INNER JOIN item i ON i.itemID = p.itemId
+        INNER JOIN item i ON i.itemID = p.itemId WHERE i.isActive = true
         """
         cursor.execute(itemQuery)
         itemIds = cursor.fetchall()
@@ -149,7 +149,7 @@ def createVista():
         The Vistalk Team
         """
         emailService.send_email(email, subject, message)
-        return jsonify({'isSuccess': True, "message": "User registered successfully"}), 201
+        return jsonify({'isSuccess': True, "message": "User registered successfully"}), 200
 
     except Exception as e:
         conn.rollback()
@@ -192,9 +192,9 @@ def loginVista():
     
     try:
         cursor.execute("""
-            SELECT userID as id, name, encryptedpassword, failedlogins, isAccountLocked, logInTimeLockOut
+            SELECT userID as id, name, encryptedpassword, failedlogins, isAccountLocked, logInTimeLockOut, isActive
             FROM user
-            WHERE email = %s AND isPlayer = true AND isActive = true
+            WHERE email = %s AND isPlayer = true
         """, (email,))
         user = cursor.fetchone()
 
@@ -207,6 +207,15 @@ def loginVista():
                 'totalCount': None
             }), 200
         
+        if user['isActive'] == False:
+            return jsonify({
+                'isSuccess': False,
+                'message': 'Inactive',
+                'data': None,
+                'data2': None,
+                'totalCount': None
+            }), 201
+
         if user['isAccountLocked']:
             if datetime.now() < user['logInTimeLockOut']:
                 return jsonify({
@@ -418,7 +427,7 @@ def get_Users():
 def get_UserPowerUps(userID):
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    query = "SELECT p.name, ui.itemId, ui.quantity FROM powerUp p inner join userItem ui on ui.itemId = p.itemID WHERE userplayerID = %s;"
+    query = "SELECT p.name, ui.itemId, ui.quantity, i.filePath FROM powerUp p inner join userItem ui on ui.itemId = p.itemID inner join item i on i.itemID = ui.itemID WHERE userplayerID = %s AND isImplemented = true;"
     values = (userID,)
     cursor.execute(query, values)
     powerUps = cursor.fetchall()
@@ -516,6 +525,105 @@ def deactivateVistaAccount():
             'data': None
         }), 500
 
-    finally:
-        cursor.close()
-        conn.close()
+def reActivateVista():
+    data = request.json
+    email = data.get('email')
+    if not email:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'User ID is required',
+            'data': None
+        }), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("""
+            UPDATE user
+            SET IsActive = 1
+            WHERE email = %s
+        """, (email,))
+        conn.commit()
+
+        return jsonify({
+            'isSuccess': True,
+            'message': 'Account reactivated successfully',
+            'data': None
+        }), 200
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({
+            'isSuccess': False,
+            'message': str(e),
+            'data': None
+        }), 500
+
+def getUserDetails():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    userID = request.args.get('userID')
+
+    today = date.today()
+    start_of_week = today - timedelta(days=today.weekday())  
+    end_of_week = start_of_week + timedelta(days=6)  
+    query = """SELECT u.UserID as id, u.name, u.email, u.imagePath, v.vCoin, v.currentLanguageId, 
+                        v.vcoin, v.isPremium as isSubscribed, v.premiumExpiry as expirationDate,
+                      (SELECT COUNT(*) FROM userunit uu 
+                       INNER JOIN user u ON u.userId = uu.userPlayerID
+                       WHERE u.isActive = true AND u.isPlayer = true AND u.userID = %s AND uu.isLocked = false) unitsUnlocked,
+                      (SELECT MAX(totalScore) FROM userunit uu  
+                       INNER JOIN user u ON u.userId = uu.userPlayerID
+                       WHERE u.isActive = true AND u.isPlayer = true AND u.userID = %s AND uu.isLocked = false) highestScore
+               FROM user u 
+               INNER JOIN vista v ON u.userID = v.userPlayerID 
+               WHERE u.isActive = true AND u.isPlayer = true AND u.userID = %s"""
+    values = [userID, userID, userID]
+    cursor.execute(query, values)
+    userProfile = cursor.fetchone()
+
+    if not userProfile:
+        return jsonify({
+            'isSuccess': True,
+            'message': 'No sections found',
+            'data': [],
+            'data2': None,
+            'totalCount': 0
+        }), 200
+
+    
+    score_query = """
+        SELECT dateDaily, score FROM dailyScore
+        WHERE userPlayerId = %s AND dateDaily BETWEEN %s AND %s
+        ORDER BY dateDaily ASC
+    """
+    cursor.execute(score_query, (userID, start_of_week, end_of_week))
+    weekly_scores = cursor.fetchall()
+    total_weekly_score = 0
+    
+    week_scores = { (start_of_week + timedelta(days=i)).strftime("%A"): 0 for i in range(7) }
+
+    
+    for record in weekly_scores:
+        day_name = record['dateDaily'].strftime("%A")  
+        week_scores[day_name] = record['score']
+        total_weekly_score += record['score'] 
+
+    userProfile['weeklyScoreGraph'] = week_scores
+    userProfile['totalWeeklyScore'] = total_weekly_score
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': userProfile,
+        'data2': None,
+        'totalCount': None 
+    }), 200
+
+def getUserImage():
+    fileName = request.args.get('fileName')
+    try:
+        return send_from_directory(UserImages, fileName)
+    except FileNotFoundError:
+        return None

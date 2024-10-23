@@ -1,4 +1,4 @@
-import { get, post, postForm } from "$lib/api/baseRepo";
+import { get, post, postForm, put } from "$lib/api/baseRepo";
 import { da } from "date-fns/locale";
 import type { CallResultDto } from "../../types/types";
 import type { DailyTaskDto, DailyTaskType } from "./type";
@@ -28,3 +28,7 @@ export async function saveDailyTask(daily: DailyTaskDto) {
 	return await post<CallResultDto<object>>(`/saveDailyTask`, {}, daily);
 }
  */
+
+export async function deleteDailyTask(taskID:number) {
+    return await put<CallResultDto<object>>(`/deleteDailyTask`, {taskID});
+}

@@ -9,7 +9,7 @@ export type RootStackParamList = {
   Register:undefined;
   Languages: { userDto?: UserDto };
   Dashboard:undefined;
-  Shop:undefined;
+  Shop:{selectedItemDefault:string};
   Dictionary:undefined;
   DictionaryMeaning:{contentId:number};
   Practice:undefined;

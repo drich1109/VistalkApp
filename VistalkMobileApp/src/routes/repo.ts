@@ -1,5 +1,5 @@
 import { getFromBaseApi, getFromMainApi, postToBaseApi, postToMainApi, putFormBaseApi, putFormMainApi, putToBaseApi, putToMainApi } from "../../api/apiService";
-import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, Musics, SectionDetails, UnitDetails, QuestionDetails, UserPowerUp, GamePlayDto } from "./type";
+import { LoggedInUser, CallResultDto, Languages, UserDto, UserProfileDto, EditProfileVista, Content, ContentDefinition, ContentExample, ContentSyllable, PowerUp, SubscriptionDto, CoinBag, Musics, SectionDetails, UnitDetails, QuestionDetails, UserPowerUp, GamePlayDto, LeaderBoardDto } from "./type";
 import CryptoJS from 'crypto-js';
 import { VITE_MAIN_API } from '@env';
 import { SectionListRenderItem } from "react-native";
@@ -219,4 +219,24 @@ export async function saveGamePlay(gamePlay:GamePlayDto)
     formData.append('totalScore', gamePlay.totalScore.toString());
 
     return await putFormMainApi<CallResultDto<object>>('saveGamePlay', formData);
+}
+
+export async function getLeaderBoards(){
+    return await getFromMainApi<CallResultDto<LeaderBoardDto[]>>('getLeaderBoards');
+}
+
+export async function updateScore(userId:string, score:number){
+    return await putToMainApi<CallResultDto<object>>('updateDailyScore', {userId, score});
+}
+
+export async function reActivateVista(email:string){
+    return await putToBaseApi<CallResultDto<object>>('reActivateVista', {email});
+}
+
+export async function getSelfRank(userId:number){
+    return await getFromMainApi<CallResultDto<number>>('getLeaderBoards', {userId});
+}
+
+export async function addrating(userId:number, rating:number){
+    return await postToMainApi<CallResultDto<object>>('addRating', {userId, rating});
 }

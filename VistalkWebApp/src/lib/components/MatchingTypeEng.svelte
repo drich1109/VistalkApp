@@ -16,7 +16,6 @@
   let dropdownVisibility = Array(leftQueries.length).fill(false);
 
   function closeModal() {
-    modelOpen = false
     dispatch('close');
   }
 

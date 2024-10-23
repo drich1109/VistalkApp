@@ -114,9 +114,6 @@ def buyPowerUp():
 
     conn.commit()
 
-    cursor.close()
-    conn.close()
-
     return jsonify({
         'isSuccess': True,
         'message': 'Successfully bought the item',
@@ -193,9 +190,6 @@ def buySubscription():
 
     conn.commit()
     
-    cursor.close()
-    conn.close()
-
     return jsonify({
         'isSuccess': True,
         'message': 'Successfully bought the subscription',
@@ -284,9 +278,6 @@ def buyCoinBag():
     cursor.execute(updateVCoinQuery, (new_vCoin_balance, user_player_id))
     
     conn.commit()
-    
-    cursor.close()
-    conn.close()
 
     return jsonify({
         'isSuccess': True,
@@ -383,9 +374,6 @@ def buyMusic():
     cursor.execute(updateVCoinQuery, (price, user_player_id))
 
     conn.commit()
-
-    cursor.close()
-    conn.close()
 
     return jsonify({
         'isSuccess': True,

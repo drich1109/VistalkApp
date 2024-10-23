@@ -288,7 +288,7 @@
         </thead>
         <tbody class="text-center text-sm ">
             {#if isloading}
-            <Loader isLoading={isloading}></Loader> 
+            <Loader isVisible={isloading} message= {"Loading..."}></Loader> 
             {:else if contents && contents.length > 2}
                 {#each contents as c}
                     <tr class="border-t-2 mx-4">

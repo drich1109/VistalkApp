@@ -15,7 +15,7 @@
   let filteredChoices: Content[] = [];
   let dropdownVisibility = Array(leftQueries.length).fill(false);
 
-  function closeModal() {
+  async function closeModal() {
     dispatch('close');
   }
 
@@ -51,7 +51,7 @@
     mainQuestion.match3 = mainQuestion.word3;
     mainQuestion.match4 = mainQuestion.word4;
     await save_questionMatch(mainQuestion);
-    closeModal();
+    await closeModal();
   }
 
   function handleInputChange(index: number, side: 'left' | 'right', event: Event) {

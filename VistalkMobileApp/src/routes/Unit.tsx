@@ -61,7 +61,7 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
 
     if (loading) {
         return (
-            <Loader />
+            <Loader message='loading' isVisible={loading} />
         );
     }
 
@@ -94,7 +94,7 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                                                     <StarIcon className="text-[#FFFF00] h-6 w-6 items-center" />
                                                     <Text className="text-black text-lg font-bold">Score</Text>
                                                 </View>
-                                                <Text className="text-black text-3xl font-bold">100</Text>
+                                                <Text className="text-black text-3xl font-bold">{unit.totalScore}</Text>
                                             </View>
                                         </View>
                                         <View className="border-t border-[#FAF9F6] flex-row items-center justify-between gap-2 mt-4">
@@ -103,21 +103,21 @@ const Unit: React.FC<Props> = ({ route, navigation }) => {
                                                     <TotalIcon className="text-black h-6 w-6" />
                                                     <Text className="text-black text-lg font-light">Total</Text>
                                                 </View>
-                                                <Text className="text-black text-lg font-bold">10</Text>
+                                                <Text className="text-black text-lg font-bold">{unit.totalItems}</Text>
                                             </View>
                                             <View className="relative items-center border-l border-[#FAF9F6]">
                                                 <View className="flex-row">
                                                     <CorrectIcon className="text-green-600 h-6 w-6" />
                                                     <Text className="text-black text-lg font-light">Correct</Text>
                                                 </View>
-                                                <Text className="text-green-600 text-lg font-bold">6</Text>
+                                                <Text className="text-green-600 text-lg font-bold">{unit.totalCorrect}</Text>
                                             </View>
                                             <View className="relative items-center border-l border-[#FAF9F6]">
                                                 <View className="flex-row">
                                                     <IncorrectIcon className="text-[#FF0000] h-6 w-6" />
                                                     <Text className="text-black text-lg font-light">Wrong</Text>
                                                 </View>
-                                                <Text className="text-[#FF0000] text-lg font-bold">4</Text>
+                                                <Text className="text-[#FF0000] text-lg font-bold">{unit.totalWrong}</Text>
                                             </View>
                                         </View>
                                     </View>

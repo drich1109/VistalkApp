@@ -291,6 +291,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
               setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
               setTimeLeft(15); 
               setTimerRunning(true);
+              setCorrectAnswer(false);
             } else {
                 if(hearts > 0){
                     await saveGameplayLocal();
@@ -539,7 +540,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
 
             <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 items-center">
             {isLoading ? ( 
-                    <Loader />
+                    <Loader isVisible = {isLoading}/>
                 ):( 
                 <>
                         {showSnowflakes && ( <SnowflakeComponent />)}

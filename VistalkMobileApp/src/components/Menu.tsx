@@ -14,7 +14,7 @@ interface MenuProps {
 const Menu: React.FC<MenuProps> = ({ activeScreen }) => {
   const navigation = useNavigation<MenuScreenNavigationProp>();
   const navigateToScreen = (screen: keyof RootStackParamList) => {
-    navigation.navigate(screen);
+    navigation.navigate(screen, 'PowerUps');
   };
 
   return (

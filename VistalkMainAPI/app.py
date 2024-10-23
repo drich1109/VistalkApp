@@ -135,5 +135,21 @@ def addreport():
 def saveGamePlay():
     return user.saveGamePlay()
 
+@app.route('/getLeaderBoards', methods=['GET'])
+def getLeaderBoards():
+    return user.getLeaderBoards()
+
+@app.route('/updateDailyScore', methods=['PUT'])
+def updateDailyScore():
+    return user.updateDailyScore()
+
+@app.route('/getSelfRank', methods=['GET'])
+def getSelfRank():
+    return user.getSelfRank()
+
+@app.route('/addRating', methods=['POST'])
+def addRating():
+    return user.addRating()
+
 if __name__ == "__main__":
     app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)

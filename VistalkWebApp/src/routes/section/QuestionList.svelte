@@ -138,6 +138,7 @@
         showNativeMultiple = false;
         showMatchingType = false;
         showMatchingTypeEng = false;
+        initalizeQuestion();
         refresh();
     }
 

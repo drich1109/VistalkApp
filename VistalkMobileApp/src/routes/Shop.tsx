@@ -9,10 +9,22 @@ import { RootStackParamList } from '../../types';
 import { getUserVCoin } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
+import { StackScreenProps } from '@react-navigation/stack';
 
-const Shop: React.FC = () => {
+type Props = StackScreenProps<RootStackParamList, 'Shop'>;
+
+interface Shop {
+  route: {
+    params: {
+      selectedItemDefault?: string; 
+    };
+  };
+}
+
+const Shop: React.FC<Props> = ({ route }) => {
+  const selectedItemDefault = route.params.selectedItemDefault || 'Power Ups'; 
   const [activeScreen, setActiveScreen] = useState<keyof RootStackParamList | null>('Shop');
-  const [selectedItem, setSelectedItem] = useState<string>('Power Ups');
+  const [selectedItem, setSelectedItem] = useState<string>(selectedItemDefault); 
   const [vCoin, setVcoin] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +38,7 @@ const Shop: React.FC = () => {
       case 'Currency':
         return <Currency vCoin={vCoin} setVcoin={setVcoin} />;
       case 'Music':
-        return <Music vCoin={vCoin} setVcoin={setVcoin}/>;
+        return <Music vCoin={vCoin} setVcoin={setVcoin}/>; 
       default:
         return null;
     }
@@ -57,10 +69,8 @@ const Shop: React.FC = () => {
     fetchVcoin();
   }, []);
 
-
   return (
-      <LinearGradient colors={['#6addd0', '#7fc188']} className="flex-1 justify-center items-center">
-           {/* Top Vcoin display */}
+    <LinearGradient colors={['#6addd0', '#7fc188']} className="flex-1 justify-center items-center">
       <TouchableOpacity className="absolute top-0 right-0 mr-4 mt-4 bg-white rounded-md py-2 px-3">
         <View className="flex flex-row gap-2">
           <Image source={require('../assets/Vcoin.png')} className="w-6 h-6" />
@@ -106,13 +116,11 @@ const Shop: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Scrollable Content */}
       <ScrollView horizontal contentContainerStyle={{ padding: 4 }} className="mb-4 flex-1">
         {renderContent()}
       </ScrollView>
       <Menu activeScreen={activeScreen} />
-      </LinearGradient>
-     
+    </LinearGradient>
   );
 };
 
