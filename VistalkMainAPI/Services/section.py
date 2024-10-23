@@ -50,9 +50,41 @@ def get_Units():
     mainUnits = cursor.fetchall()
 
     query_user = """
-        SELECT * FROM unit u
-        INNER JOIN userUnit uu ON uu.unitID = u.unitID
-        WHERE u.sectionID = %s AND u.isActive = true AND uu.userPlayerID = %s
+          SELECT 
+                u.*, 
+                uu.totalCorrectAnswers AS totalCorrect, 
+                CASE 
+                    WHEN uu.totalScore = 0 THEN 0 
+                    ELSE u.totalItems - uu.totalCorrectAnswers 
+                END AS totalWrong, 
+                uu.totalScore,
+                CASE 
+                    WHEN prev_uu.totalScore IS NULL OR prev_uu.totalScore = 0 THEN TRUE 
+                    ELSE FALSE 
+                END AS isLock
+            FROM 
+                unit u
+            INNER JOIN 
+                userUnit uu ON uu.unitID = u.unitID
+            LEFT JOIN (
+                SELECT 
+                    prev_u.unitNumber,
+                    prev_u.sectionID,
+                    prev_uu.userPlayerID,
+                    prev_uu.totalScore
+                FROM 
+                    unit prev_u
+                INNER JOIN 
+                    userUnit prev_uu ON prev_uu.unitID = prev_u.unitID
+            ) prev_uu ON prev_uu.unitNumber = u.unitNumber - 1 
+                    AND prev_uu.sectionID = u.sectionID 
+                    AND prev_uu.userPlayerID = uu.userPlayerID
+            WHERE 
+                u.sectionID = %s 
+                AND u.isActive = true 
+                AND uu.userPlayerID = %s
+            ORDER BY 
+                u.unitNumber;
     """
     cursor.execute(query_user, (sectionID, userId))
     userUnits = cursor.fetchall()
@@ -77,8 +109,8 @@ def get_Units():
     return jsonify({
         'isSuccess': True,
         'message': 'Successfully Retrieved',
-        'data': mainUnits,
-        'data2': userUnits,
+        'data': userUnits,
+        'data2': [],
         'totalCount': 1
     }), 200
 

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Home from './src/routes/Home';
 import LogIn from './src/routes/LogIn'; 
 import Register from './src/routes/Register';
-import Languages  from './src/routes/Languages'; 
+import Languages from './src/routes/Languages'; 
 import { RootStackParamList } from './types'; // Ensure this import path is correct
 import Dashboard from './src/routes/Dashboard';
 import Dictionary from './src/routes/Dictionary';
@@ -19,13 +20,37 @@ import EditProfile from './src/routes/EditProfile';
 import ChangePassword from './src/routes/ChangePassword';
 import Unit from './src/routes/Unit';
 import UnitContent from './src/routes/UnitContent';
+import Loader from './src/components/Loader';
+import { updateScore } from './src/routes/repo';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const App: React.FC = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); 
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() =>   {
+    const checkLoginStatus = async () => {
+      const token = await AsyncStorage.getItem('userToken');
+      const userID = await AsyncStorage.getItem('userID');
+      if(userID)
+        await updateScore(userID,0);
+      setIsLoggedIn(token != null);
+      setLoading(false);
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  if (loading) {
+    return (
+      <Loader isVisible={loading} message='Loading... Please Wait!' />
+    );
+  }
+
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName={isLoggedIn ? "Dashboard" : "Home"}>
         <Stack.Screen
           name="Home"
           component={Home}
@@ -47,6 +72,17 @@ const App: React.FC = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="ForgotPassword"
+          component={ForgotPassword}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SetNewPassword"
+          component={SetNewPassword}
+          options={{ headerShown: false }}
+        />
+        
+        <Stack.Screen
           name="Dashboard"
           component={Dashboard}
           options={{ headerShown: false }}
@@ -61,27 +97,17 @@ const App: React.FC = () => {
           component={DictionaryMeaning}
           options={{ headerShown: false }}
         />
-                <Stack.Screen
+        <Stack.Screen
           name="Practice"
           component={Practice}
           options={{ headerShown: false }}
         />
-                <Stack.Screen
+        <Stack.Screen
           name="Shop"
           component={Shop}
           options={{ headerShown: false }}
         />
-          <Stack.Screen
-          name="ForgotPassword"
-          component={ForgotPassword}
-          options={{ headerShown: false }}
-        />
-          <Stack.Screen
-          name="SetNewPassword"
-          component={SetNewPassword}
-          options={{ headerShown: false }}
-        />
-          <Stack.Screen
+        <Stack.Screen
           name="UserProfile"
           component={UserProfile}
           options={{ headerShown: false }}

@@ -8,21 +8,28 @@ import {
   ImageBackground,
   Image,
   TouchableOpacity,
+  Modal,
 } from 'react-native';
-import {getLanguages, register} from './repo'; // Adjust the import path
+import {getLanguages, loginUser, register, updateScore} from './repo'; // Adjust the import path
 import type {Languages, UserDto} from './type'; // Adjust the import path
 import {StackScreenProps} from '@react-navigation/stack';
 import { RootStackParamList } from '../../types'; // Adjust the import path
 import LinearGradient from 'react-native-linear-gradient';
+import Visayas from '../assets/svg/Visayas';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Loader from '../components/Loader';
 
 type Props = StackScreenProps<RootStackParamList, 'Languages'>;
 
 const LanguageList: React.FC<Props> = ({route, navigation}) => {
   const {userDto} = route.params;
-
   const [languages, setLanguages] = useState<Languages[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState<Languages>();
+  const [isModalVisible, setModalVisible] = useState<boolean>(false);
+  const [showError, setShowError] = useState<boolean>(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null); 
 
   useEffect(() => {
     const fetchLanguages = async () => {
@@ -47,68 +54,159 @@ const LanguageList: React.FC<Props> = ({route, navigation}) => {
       console.error('UserDto is not provided');
       return;
     }
-
-    // Update userDto with the selected language ID
     const updatedUserDto: UserDto = {...userDto, languageId};
 
     try {
       const result = await register(updatedUserDto);
       if (result.isSuccess) {
-        // Navigate to the Languages screen with updated userDto
-        navigation.navigate('Dashboard');
+        handleLogin();
       } else {
-        // Handle registration failure
-        console.log('Registration failed:', result.message);
+        setError(result.message)
+        setShowError(true);
       }
     } catch (error) {
       console.error('Error during registration:', error);
     }
   };
 
+  async function warayclick()
+  {
+    const languageId = 3;
+    setSelectedLanguage(languages.find(lang => lang.languageID === languageId));
+    setModalVisible(true);
+
+  }
+  async function cebuanoclick()
+  {
+    const languageId = 1; 
+    setSelectedLanguage(languages.find(lang => lang.languageID === languageId));
+    setModalVisible(true);
+
+  }
+  async function hiligaynonclick()
+  {
+    const languageId = 2; 
+    setSelectedLanguage(languages.find(lang => lang.languageID === languageId));
+    setModalVisible(true);
+  }
+
+  function closeModal()
+  {
+    setModalVisible(false);
+  }
+
+  const handleLogin = async () => {
+        if(userDto){
+          setLoading(true);
+        const response = await loginUser(userDto?.email, userDto.password);
+
+        if (response.isSuccess === true) {
+          await AsyncStorage.setItem('userToken', response.data.token);
+          await AsyncStorage.setItem('userID', response.data.id);
+          checkLoginStatus();
+          navigation.navigate('Dashboard')
+        } else {
+          setError(response.message)
+          setShowError(true);
+        }
+      }
+  };
+
+  const checkLoginStatus = async () => {
+    const token = await AsyncStorage.getItem('userToken');
+    const userID = await AsyncStorage.getItem('userID');
+    if(userID)
+      await updateScore(userID,0);
+    setIsLoggedIn(token != null); 
+    setLoading(false);
+    if(isLoggedIn)
+      navigation.navigate('Dashboard')
+  };
+
+
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </SafeAreaView>
+      <Loader isVisible={loading} message='Logging In...' />
     );
   }
-
-  if (error) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.errorText}>{error}</Text>
-      </SafeAreaView>
-    );
-  }
-
-  console.log(languages);
 
   return (
-    <SafeAreaView className="flex-1">
-      <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 justify-center items-center">
-      <View className="items-center mb-8">
-          <Image source={require('../assets/White.png')} className="w-44 h-44" />
-          <Text className="text-white text-4xl font-bold" style={{ color: '#ffffff', fontFamily: 'cursive' }}>
-              Vistalk
+    <SafeAreaView className="flex-1"> 
+     <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 items-center justify-center p-6">
+        <View 
+          className="flex-row items-center justify-center rounded-2xl py-4 px-6 border border-[#FAF9F6] mb-8" 
+          style={{
+            backgroundColor: 'rgba(240, 240, 240, 0.6)', 
+          }}
+        >
+          <Text className="text-sm text-gray-800 text-center"> 
+            Note: You are not registered yet. Please select a region to choose the language you will be learning.
           </Text>
         </View>
-      {languages.map((language, index) => (
-          <View className="flex-row items-center mt-4 px-4">
-            <Image
-              source={require('../assets/cebuano.png')}
-              style={{width: 100, height: 100}}
-            />
-            <TouchableOpacity
-              key={index}
-              style={{flex: 1}}
-              onPress={() => selectLanguage(userDto, language.languageID)}>
-              <View style={styles.languageContainer}>
-                <Text style={styles.languageText}>{language.name}</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        ))}
+
+        <Text className="text-3xl text-white text-center font-semibold mb-8">
+          Click on a Region to Select!
+        </Text>
+
+        <Visayas className="h-64 w-64 text-white mb-4" onClickCebuano={cebuanoclick} onClickHiligaynon={hiligaynonclick} onClickWaray={warayclick} />
       </LinearGradient>
+
+        {selectedLanguage && (
+                    <Modal visible={isModalVisible} transparent={true} animationType="none" onRequestClose={closeModal}>
+                        <TouchableOpacity
+                            className="flex-1 justify-end"
+                            style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
+                            onPress={closeModal}
+                        >
+                            <View className=" rounded-t-xl w-full">
+                                <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-t-xl">
+                                    <View className="p-8">
+                                    <Text className="text-small text-black mb-5 text-left">
+                                            Note: {selectedLanguage.native_name} is a commonly used term for this language and may not represent its official name.
+                                        </Text>
+                                        <Text className="text-3xl text-black mb-2 text-center">{selectedLanguage.native_name}</Text>
+                                        <Text className="text-lg text-black mb-2 text-left">
+                                          Specific Language to Learn: <Text className="font-bold">{selectedLanguage.name}</Text>
+                                        </Text>                                        
+                                        <Text className="text-small text-black mb-5 text-left">
+                                            {selectedLanguage.description}
+                                        </Text>
+                                        
+                                    </View>
+                                    <View className="pb-10 px-10">
+                                            <TouchableOpacity
+                                                onPress={() => selectLanguage(userDto, selectedLanguage.languageID)}
+                                            >
+                                                <LinearGradient colors={['#6addd0', '#f7c188']} className="bg-gray-600 py-2 px-10 rounded-full self-center">
+                                                    <Text className="text-lg text-white font-bold">Select</Text>
+                                                </LinearGradient>
+                                            </TouchableOpacity>
+                                        </View>
+                                </TouchableOpacity>
+                            </View>
+                        </TouchableOpacity>
+                    </Modal>
+                )}
+
+        <Modal
+          transparent={true}
+          visible={showError}
+          animationType="slide"
+        >
+          
+          <View className="flex-1 justify-center items-center bg-[#00000080]">
+            <LinearGradient colors={['#6addd0', '#f7c188']} className="w-4/5 p-5 rounded-lg items-center">
+              <Text className="text-xl font-bold mb-4 text-white">{error}
+              </Text>
+
+              <View className="flex-row items-center justify-between w-[100%] gap-2">
+                <TouchableOpacity className="flex-1 p-2 bg-white rounded-md items-center" onPress={() => navigation.navigate('Register')}>
+                  <Text className="text-base text-black">Okay</Text>
+                </TouchableOpacity>
+              </View>
+            </LinearGradient>
+          </View>
+        </Modal>
     </SafeAreaView>
   );
 };

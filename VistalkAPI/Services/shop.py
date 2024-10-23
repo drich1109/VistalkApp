@@ -1,4 +1,4 @@
-from db import get_db_connection, ItemImage, BackGroundMusicDirectory
+from db import get_db_connection, ItemImage, BackGroundMusicDirectory, UserImages
 from flask import request, jsonify, send_from_directory
 import os
 

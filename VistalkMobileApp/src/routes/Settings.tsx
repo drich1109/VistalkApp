@@ -5,7 +5,7 @@ import { SafeAreaView, Text, TouchableOpacity, View, Modal, StyleSheet, Alert, T
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParamList } from '../../types'; // Adjust the import path
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { deactivateVistaAccount, sendFeedback, sendReport } from './repo'; // Ensure sendFeedback is imported from the repo
+import { addrating, deactivateVistaAccount, sendFeedback, sendReport } from './repo'; // Ensure sendFeedback is imported from the repo
 import { Path, Svg } from 'react-native-svg';
 
 type Props = StackScreenProps<RootStackParamList, 'Settings'>;
@@ -16,6 +16,8 @@ const Settings: React.FC<Props> = ({ navigation }) => {
   const [isReportModalVisible, setIsReportModalVisible] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
   const [reportText, setReportText] = useState('');
+  const [isRateModalVisible, setIsRateModalVisible] = useState(false);
+  const [rating, setRating] = useState(0);
 
   const handleDeactivateAccount = () => {
     setIsModalVisible(true);
@@ -27,7 +29,7 @@ const Settings: React.FC<Props> = ({ navigation }) => {
     const result = await deactivateVistaAccount(Number(userID));
     if(result.isSuccess){
         Alert.alert('Account Deactivated', 'Your account has been deactivated successfully.');
-        navigation.navigate('LogIn');
+        await handleSignOut();
     } else {
         Alert.alert(result.message);
     }
@@ -39,9 +41,7 @@ const Settings: React.FC<Props> = ({ navigation }) => {
 
   const handleSignOut = async () => {
     try {
-      await AsyncStorage.removeItem('userID');
-      await AsyncStorage.removeItem('token');
-      navigation.navigate('LogIn');
+      setIsRateModalVisible(true);
     } catch (error) {
       console.error('Failed to clear storage:', error);
     }
@@ -93,6 +93,28 @@ const Settings: React.FC<Props> = ({ navigation }) => {
 
   const handleCancelReport = () => {
     setIsReportModalVisible(false);
+  };
+
+  const handleSubmitRating = async () => {
+    const userID = await AsyncStorage.getItem('userID');
+    await addrating(Number(userID), rating);
+    await AsyncStorage.removeItem('userID');
+    await AsyncStorage.removeItem('userToken');
+    setIsRateModalVisible(false);
+    navigation.navigate('LogIn');
+  };
+
+
+  const renderStars = () => {
+    return [...Array(5)].map((_, index) => {
+      return (
+        <TouchableOpacity key={index} onPress={() => setRating(index + 1)}>
+          <Text style={{ fontSize: 40, color: index < rating ? '#ffd700' : '#ccc' }}>
+            {index < rating ? '★' : '☆'}
+          </Text>
+        </TouchableOpacity>
+      );
+    });
   };
 
   return (
@@ -154,7 +176,6 @@ const Settings: React.FC<Props> = ({ navigation }) => {
         </View>
       </Modal>
 
-      {/* Feedback Modal */}
       <Modal
         transparent={true}
         visible={isFeedbackModalVisible}
@@ -211,6 +232,24 @@ const Settings: React.FC<Props> = ({ navigation }) => {
             </View>
           </View>
         </Modal>
+
+        <Modal
+          transparent={true}
+          visible={isRateModalVisible}
+          animationType="slide"
+        >
+          <View className="flex-1 items-center justify-center bg-[#00000080]">
+            <View className="bg-[#99BC85] p-6 w-[80%] rounded-lg items-center">
+              <Text className="text-xl font-bold mb-3">Rate Our Platform</Text>
+              <Text className="text-base mb-4 text-center">Please rate your experience with our platform</Text>
+              <View className="flex-row mb-4">{renderStars()}</View>
+              <TouchableOpacity className="p-3 bg-white rounded-md items-center" onPress={handleSubmitRating}>
+                <Text className="text-lg text-black">Submit Rating</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
       </ImageBackground>
     </SafeAreaView>
   );

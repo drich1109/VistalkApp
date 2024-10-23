@@ -24,14 +24,14 @@
 
 {#if $loggedInUser}
     <aside class="sidebar {isExpanded ? 'expanded' : 'collapsed'}">
-        <div class="sidebar-content">
+        <div class="sidebar-content bg-gradient-to-b from-[#6addd0] to-[#f7c188]">
             <div class="sidebar-header">
                 <div class="flex items-justify justify-center">
-                    <img src="logo-white.png" alt="Logo" class="sidebar-logo" />
+                    <img src="FinalLogo.png" alt="Logo" class="sidebar-logo" />
 
                     {#if isExpanded}
                         <span
-                            class="title text-white text-4xl text-center font-bold mt-3 ml-3"
+                            class="text-3xl text-center font-bold mt-3 ml-3" style = "color: #ffffff; font-family: 'Dancing Script', cursive;"
                             >Vistalk</span
                         >
                     {/if}
@@ -81,7 +81,7 @@
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <nav class="navigation">
                 <a class="nav-link" on:click={() => goto("/dashboard")}>
-                    <i class="fas fa-tachometer-alt"></i>
+                    <i class="fas fa-chart-line"></i>
                     {#if isExpanded}
                         <span class="nav-text">Dashboard</span>
                     {/if}
@@ -90,7 +90,7 @@
                     class="nav-link {activePage === '/user' ? 'active' : ''}"
                     on:click={() => goto("/user")}
                 >
-                    <i class="fas fa-box"></i>
+                    <i class="fas fa-user"></i>
                     {#if isExpanded}
                         <span class="nav-text">User</span>
                     {/if}
@@ -110,8 +110,8 @@
                     class="nav-link {activePage === '/section' ? 'active' : ''}"
                     on:click={() => goto("/section")}
                 >
-                    <i class="fas fa-list"></i>
-                    {#if isExpanded}
+                <i class="fas fa-folder"></i>
+                {#if isExpanded}
                         <span class="nav-text">Section</span>
                     {/if}
                 </a>
@@ -144,7 +144,7 @@
                         : ''}"
                     on:click={() => goto("/feedback")}
                 >
-                    <i class="fas fa-comments"></i>
+                    <i class="fas fa-comments text-black"></i>
                     {#if isExpanded}
                         <span class="nav-text">Feedbacks</span>
                     {/if}
@@ -161,12 +161,12 @@
             </nav>
 
             <button
-                class="button is-light logout-button"
+                class="bg-white font-bold py-2 rounded-full mt-4 flex justify-center relative overflow-hidden group transition duration-300 ease-in-out logout-button"
                 on:click={handleLogout}
             >
-                <i class="fas fa-sign-out-alt"></i>
+                <i class="fas fa-sign-out-alt text-black"></i>
                 {#if isExpanded}
-                    <span class="logout-text">Log Out</span>
+                    <span class="text-black transition duration-300 ease-in-out group-hover:text-transparent bg-gradient-to-r from-[#99BC85] to-[#f7c188] bg-clip-text ml-4">Log Out</span>
                 {/if}
             </button>
         </div>
@@ -179,7 +179,6 @@
         position: fixed;
         top: 0;
         left: 0;
-        background-color: #99bc85;
         overflow: visible;
         z-index: 1000;
         transition:
@@ -220,14 +219,14 @@
     }
 
     .toggle-button {
-        background: none;
+        background-color: rgba(247, 193, 136, 0.7); 
         border: none;
-        color: white;
+        color: rgba(255, 255, 255, 0.7);
         font-size: 1.5em;
         cursor: pointer;
-        transition: color 0.3s ease;
+        transition: color 0.3s ease, background-color 0.3s ease; 
         position: absolute;
-        right: -15px; /* Adjust based on how much you want to hang */
+        right: -15px; 
         top: 7%;
         transform: translateY(-50%);
         display: flex;
@@ -235,10 +234,11 @@
         justify-content: center;
         width: 30px;
         height: 30px;
-        background-color: #99bc85; /* Match with sidebar color */
         border-radius: 50%;
         z-index: 9999;
+        
     }
+
 
     .toggle-button:hover {
         color: #e0e0e0;
@@ -269,41 +269,24 @@
     .nav-link i {
         font-size: 1.2em;
         margin-right: 10px;
+        color: white;
     }
 
     .nav-text {
         display: inline;
+        color: white;
     }
 
     .nav-link:hover {
-        background-color: #8aab72;
+        background-color: rgba(255,255,255,0.1);
     }
 
     .logout-button {
         display: flex;
         align-items: center;
         margin-top: auto;
-        background-color: white;
-        color: #99bc85;
         border: none;
         padding: 10px;
-        cursor: pointer;
-        border-radius: 4px;
-        font-size: 1em;
-        transition: background-color 0.3s ease;
-    }
-
-    .logout-button i {
-        font-size: 1.2em;
-        margin-right: 10px;
-    }
-
-    .logout-text {
-        display: inline;
-    }
-
-    .logout-button:hover {
-        background-color: #e0e0e0;
     }
 
     /* Responsive Design */
@@ -324,12 +307,12 @@
     }
 
     .nav-link.active {
-        background-color: #151515; /* Bright green color */
+        background-color: rgba(255,255,255,0.2);
     }
 
     .sidebar-logo {
-        width: 40px;
-        height: 40px;
+        width: 56px;
+        height: auto;
         display: block;
         margin: 10px auto;
         object-fit: contain;

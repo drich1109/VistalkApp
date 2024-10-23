@@ -14,7 +14,7 @@ def get_dailytask():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     
-    # Base query
+    
     query = """
         SELECT dt.*, dtt.typeName FROM dailytask dt
         INNER JOIN dailytasktype dtt on dtt.id = dt.taskTypeId
@@ -22,15 +22,15 @@ def get_dailytask():
     """
     values = []
 
-    # Add search filter
+    
     if searchString:
         query += " AND (dtt.typeName LIKE %s)"
         likePattern = f"%{searchString}%"
         values.extend([likePattern])
-    # Add date range filter
+    
     if startDate and endDate:
         try:
-            # Validate dates
+            
             start_date = datetime.strptime(startDate, '%Y-%m-%d')
             end_date = datetime.strptime(endDate, '%Y-%m-%d')
             query += " AND dt.taskDate BETWEEN %s AND %s"
@@ -43,18 +43,18 @@ def get_dailytask():
                 'totalCount': 0
             }), 400
 
-    # Add ordering, limit, and offset
+    
     query += """
         ORDER BY dt.taskDate DESC
         LIMIT %s OFFSET %s
     """
     values.extend([pageSize, offset])
 
-    # Execute query
+    
     cursor.execute(query, tuple(values))
     tasks = cursor.fetchall()
 
-    # Count total entries for pagination
+    
     count_query = """
         SELECT COUNT(*) AS total
         FROM dailytask dt
@@ -74,7 +74,7 @@ def get_dailytask():
     cursor.execute(count_query, tuple(count_values))
     total_count = cursor.fetchone()['total']
 
-    # Close database connection
+    
     cursor.close()
     conn.close()
 
@@ -119,7 +119,7 @@ def save_dailyTask():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Retrieve form data
+    
     task_typeId = int(request.form.get('taskTypeId'))
     task_ID = request.form.get('taskID')
     is_update = task_ID is not None and task_ID != '0'
@@ -134,7 +134,7 @@ def save_dailyTask():
     quantity = request.form.get('quantity')
 
     if is_update:
-        # Update the existing dailytask
+        
         sql_content = """
             UPDATE dailytask
             SET rewardCoins = %s, taskDate = %s, taskTypeId = %s, quantity = %s
@@ -149,7 +149,6 @@ def save_dailyTask():
         ))
 
     else:
-        # Insert a new dailytask
         sql_content = """
             INSERT INTO dailytask (rewardCoins, taskDate, taskTypeId, quantity)
             VALUES (%s, %s, %s, %s)
@@ -160,7 +159,75 @@ def save_dailyTask():
             task_typeId,
             quantity
         ))
-        conn.commit()
+
+        task_id = cursor.lastrowid  
+
+        selectUser = """
+            SELECT userPlayerId FROM vista
+        """
+        cursor.execute(selectUser)
+        users = cursor.fetchall()  
+ 
+        sql_content_playerdailytask = """
+            INSERT INTO playerdailytask (userPlayerID, taskID, isCompleted)
+            VALUES (%s, %s, %s)
+        """
+
+        for user in users:
+            user_player_id = user[0]
+            cursor.execute(sql_content_playerdailytask, (
+                user_player_id,  
+                task_id,         
+                False            
+            ))
 
     conn.commit()
-    return jsonify({'isSuccess': True, "message": "Daily Task saved successfully"}), 201
+    return jsonify({'isSuccess': True, "message": "Daily Task saved successfully"}), 200
+
+def deleteDailyTask():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    task_id = int(request.args.get('taskID')) 
+
+    print(task_id)
+    try:     
+        sql_delete_playerdailytask = """
+            DELETE FROM playerdailytask
+            WHERE taskID = %s
+        """
+        cursor.execute(sql_delete_playerdailytask, (task_id,))
+        if cursor.rowcount == 0:
+            print(f"No records found in playerdailytask for taskID {task_id}")
+        
+        
+        sql_delete_dailytask = """
+            DELETE FROM dailytask
+            WHERE taskID = %s
+        """
+        cursor.execute(sql_delete_dailytask, (task_id,))
+
+        
+        if cursor.rowcount == 0:
+            return jsonify({'isSuccess': False, "message": "No record found for the provided taskID in dailytask"}), 404
+
+        
+        conn.commit()
+
+        
+        return jsonify({'isSuccess': True, "message": "Daily Task deleted successfully"}), 200
+
+    except Exception as e:
+        
+        conn.rollback()
+        print(f"Error deleting daily task with ID {task_id}: {e}")
+        
+        
+        return jsonify({'isSuccess': False, "message": "Error deleting Daily Task", "error": str(e)}), 500
+
+    finally:
+        
+        cursor.close()
+        conn.close()
+
+
+    

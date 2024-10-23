@@ -215,6 +215,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
             if (currentTrack === trackId && isPlaying) {
                 sound?.pause();
                 setIsPlaying(false);
+
             } else {
                 if (sound) {
                     sound.stop();
@@ -540,6 +541,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
     }
     return (
         <SafeAreaView className="flex-1">
+
             {showCongratlulation && (<Congratulations score={score} onHome={onHome} onRestart={onRestart} isVisible={showCongratlulation} />)}
             {!showGameOver ? (
 
@@ -556,6 +558,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
                                 </TouchableOpacity>
 
                                 <View className="relative items-center justify-center">
+
                                     <Animated.View
                                         className="relative items-center justify-center"
                                         style={[

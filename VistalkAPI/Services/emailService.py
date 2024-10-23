@@ -136,7 +136,13 @@ def verify_code():
             'totalCount': None
         }), 200
     else:
-        return "Invalid code"
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Invalid Code',
+            'data': None,
+            'data2': None,
+            'totalCount': None
+        }), 200
     
 
 def is_email_used():

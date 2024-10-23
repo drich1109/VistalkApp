@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react';
-import { View, Text, ImageBackground, TouchableOpacity, Image, ScrollView, Modal, SectionList } from 'react-native';
+import { View, Text, ImageBackground, TouchableOpacity, Image, ScrollView, Modal, BackHandler } from 'react-native';
 import Menu from '../components/Menu';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { RootStackParamList, UnitScreenNavigationProp } from '../../types';
@@ -11,6 +11,7 @@ import { StackScreenProps } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import UnitIcon from '../assets/svg/UnitIcon';
+import Leaderboard from '../components/LeaderBoard';
 
 type Props = StackScreenProps<RootStackParamList, 'Dashboard'>;
 
@@ -28,6 +29,18 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
   const [sections, setSections] = useState<SectionDetails[]>([]);
 
   let progressnumber = 17;
+
+    const handleBackPress = () => {
+      BackHandler.exitApp();
+      return true;
+    };
+
+    useEffect(() => {
+      const backHandler = BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+
+      return () => backHandler.remove();
+    }, []);
+
 
 
   const fetchUserData = async () => {
@@ -85,6 +98,7 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
   };
 
   const closeLeaderBoard = () => {
+    console.log('close')
     setLeaderBoardVisible(false);
   };
 
@@ -278,61 +292,10 @@ const Dashboard: React.FC<Props> = ({ navigation }) => {
         </TouchableOpacity>
       </Modal>
 
-      {/* Leaderboard Modal */}
-      <Modal
-        visible={leaderBoardVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={closeLeaderBoard}
-      >
-
-        <TouchableOpacity className="flex-1 justify-center items-center bg-[#00000080]"
-          onPress={closeLeaderBoard}
-        >
-          <View className="w-4/5 bg-[#99BC85] rounded-xl p-3">
-            <View className="border border-white rounded-md border-1 p-2">
-              <Text className="text-center text-xl font-bold mb-4 text-white">LEADERBOARD</Text>
-
-              {/* Leaderboard header */}
-              <View className="flex-row justify-between items-center mb-2">
-                <Text className="text-sm  font-bold text-white w-1/2  pl-24 ">Vistas</Text>
-                <Text className="text-sm  font-bold text-white w-1/2 text-right">WeeklyScore</Text>
-              </View>
-
-              {/* Leaderboard entries */}
-              <ScrollView>
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((rank) => (
-                  <View
-                    key={rank}
-                    className={`flex-row justify-between items-center p-1 mb-1 rounded-lg border border-2 border-gray-300 rounded-md px-3 py-2 `}
-                  >
-                    {/* Rank icon */}
-                    <Text className="text-white font-bold w-1/6 text-center">
-                      {rank === 1 && '🥇'}
-                      {rank === 2 && '🥈'}
-                      {rank === 3 && '🥉'}
-                      {rank > 3 && rank}
-                    </Text>
-
-                    {/* User image and name */}
-                    <View className="flex-row items-center ">
-                      <Image
-                        source={{ uri: 'https://via.placeholder.com/40' }}
-                        className="w-8 h-8 rounded-full mr-2"
-                      />
-                      <Text className="text-white">Paul C. Ramos</Text>
-                    </View>
-
-                    {/* Score */}
-                    <Text className="text-white w-1/4 text-right pr-1">500</Text>
-                  </View>
-                ))}
-              </ScrollView>
-            </View>
-          </View>
-        </TouchableOpacity>
-      </Modal>
-
+      {leaderBoardVisible && (
+        <Leaderboard onCloseLeaderBoard={closeLeaderBoard} />
+      )}
+      
       {/* Notification Modal */}
       <Modal
         visible={notificationVisible}

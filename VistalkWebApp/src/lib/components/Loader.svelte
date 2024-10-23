@@ -1,18 +1,43 @@
 <script lang="ts">
-  export let isLoading: boolean;
+  export let isVisible: boolean;
+  export let message: string; // Optional message
+  
+  let spinValue = 0; // Initial spin value
+  let interval: number; // Store interval ID
+
+  // Function to start the spinning animation
+  function startSpinning() {
+    interval = setInterval(() => {
+      spinValue = (spinValue + 1) % 360; // Increment spin value
+    }, 10); // Update every 10ms for smoother animation
+  }
+
+  // Function to stop the spinning animation
+  function stopSpinning() {
+    clearInterval(interval);
+  }
+
+  // Start or stop spinning based on visibility
+  $: if (isVisible) {
+    startSpinning();
+  } else {
+    stopSpinning();
+  }
+
 </script>
 
-{#if isLoading}
+{#if isVisible}
   <tr>
     <td colspan="4" class="loader-cell"> <!-- Adjust the colspan based on your table structure -->
-      <div class="loader-container">
-
-            <div class="dots">
-              <div class="dot"></div>
-              <div class="dot"></div>
-              <div class="dot"></div>
-            </div>
-          </div>
+      <div class="items-center justify-center">
+        <div class="donut-container" style="transform: rotate({spinValue}deg);">
+          <div class="donut"></div>
+          <div class="inner-circle"></div>
+        </div>
+        {#if message}
+          <div class="message-text">{message}</div>
+        {/if}
+      </div>
     </td>
   </tr>
 {/if}
@@ -75,5 +100,37 @@
 
   .action-btn:hover {
     background-color: #45a049; /* Darker green on hover */
+  }
+
+  .donut-container {
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%; /* Make sure it's a circle */
+    position: relative;
+  }
+  .donut {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%; /* Ensure the donut is circular */
+    border: 1px transparent; /* Use transparent for the other sides */
+    border-top-color: transparent; /* Top border is transparent */
+    background: conic-gradient(#6addd0, #f7c188); /* Gradient fill */
+  }
+  .inner-circle {
+    position: absolute;
+    top: 10px; /* Adjusted for inner circle */
+    left: 10px; /* Adjusted for inner circle */
+    width: 60px;
+    height: 60px;
+    border-radius: 50%; /* Ensure the inner circle is circular */
+    background-color: white;
+  }
+  .message-text {
+    margin-top: 10px;
+    color: black;
+    font-size: 16px;
+    text-align: center;
   }
 </style>
