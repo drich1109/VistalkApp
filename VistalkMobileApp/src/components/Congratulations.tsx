@@ -20,23 +20,26 @@ const Congratulations: React.FC<CongratulationsProps> = ({ score, onRestart, onH
               style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
               onPress={onHome}
             >
-              <View className="bg-black rounded-t-xl w-full">
-                <TouchableOpacity activeOpacity={1} className="bg-black rounded-t-xl">
-                  <View className="p-10">
-                    <Text className="text-4xl font-bold text-green-500 mb-8">Congratulations!</Text>
-                    <Text className="text-2xl font-semibold text-white mb-4">Your Score: {score}</Text>
-                    <View className="pb-10 px-10">
-                      <TouchableOpacity
-                        className="bg-blue-500 px-6 py-3 rounded-full"
-                        onPress={onRestart}
-                      >
-                        <Text className="text-white text-lg font-bold">Play Again</Text>
+              <View className="bg-[#FAF9F6] rounded-t-xl w-full">
+                <TouchableOpacity activeOpacity={1} className="bg-[#FAF9F6] rounded-t-xl">
+                  <View className="p-10 items-center">
+                    <Text className="text-3xl font-bold text-green-500 mb-6 uppercase">Congratulations!</Text>
+                    <View className="relative items-center mb-2">
+                      <Text className="text-2xl font-semibold text-gray-600 mb-2 uppercase">Your Score</Text>
+                      <View className="w-[80%] border rounded-xl py-2 px-8">
+                        <Text className="text-2xl font-semibold text-black">{score}</Text>
+                      </View>
+                    </View>
+                    <View className="pb-4 px-10">
+                      <TouchableOpacity onPress={onRestart}>
+                        <LinearGradient colors={['#6addd0', '#f7c188']} className="bg-blue-500 px-6 py-3 rounded-full mb-2">
+                          <Text className="text-white text-lg font-bold">Play Again</Text>
+                        </LinearGradient>
                       </TouchableOpacity>
-                      <TouchableOpacity
-                        className="bg-gray-600 px-6 py-3 rounded-full"
-                        onPress={onHome}
-                      >
-                        <Text className="text-white text-lg font-bold">Go Home</Text>
+                      <TouchableOpacity onPress={onHome}>
+                        <LinearGradient colors={['#6addd0', '#f7c188']} className="bg-gray-600 px-6 py-3 rounded-full">
+                          <Text className="text-white text-lg font-bold">Go Home</Text>
+                        </LinearGradient>
                       </TouchableOpacity>
                     </View>
                   </View>
