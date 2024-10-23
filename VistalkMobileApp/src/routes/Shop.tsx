@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ImageBackground, TouchableOpacity, ScrollView, Image } from 'react-native';
-import Menu from '../components/Menu'; 
+import Menu from '../components/Menu';
 import PowerUps from './PowerUps';
 import Subscription from './Subscription';
 import Currency from './Currency';
@@ -9,6 +9,10 @@ import { RootStackParamList } from '../../types';
 import { getUserVCoin } from './repo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
+import MusicIcon from '../assets/svg/MusicIcon';
+import PotionIcon from '../assets/svg/PotionIcon';
+import SubscriptionIcon from '../assets/svg/SubscriptionIcon';
+import CurrencyIcon from '../assets/svg/CurrencyIcon';
 
 const Shop: React.FC = () => {
   const [activeScreen, setActiveScreen] = useState<keyof RootStackParamList | null>('Shop');
@@ -26,7 +30,7 @@ const Shop: React.FC = () => {
       case 'Currency':
         return <Currency vCoin={vCoin} setVcoin={setVcoin} />;
       case 'Music':
-        return <Music vCoin={vCoin} setVcoin={setVcoin}/>;
+        return <Music vCoin={vCoin} setVcoin={setVcoin} />;
       default:
         return null;
     }
@@ -36,11 +40,11 @@ const Shop: React.FC = () => {
     const fetchVcoin = async () => {
       try {
         const userID = await AsyncStorage.getItem('userID');
-        
+
         if (userID) {
           const result = await getUserVCoin(userID);
           if (result.isSuccess) {
-            setVcoin(result.data);  
+            setVcoin(result.data);
           } else {
             setError('Failed to fetch vCoin');
           }
@@ -59,8 +63,7 @@ const Shop: React.FC = () => {
 
 
   return (
-      <LinearGradient colors={['#6addd0', '#7fc188']} className="flex-1 justify-center items-center">
-           {/* Top Vcoin display */}
+    <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 justify-center items-center">
       <TouchableOpacity className="absolute top-0 right-0 mr-4 mt-4 bg-white rounded-md py-2 px-3">
         <View className="flex flex-row gap-2">
           <Image source={require('../assets/Vcoin.png')} className="w-6 h-6" />
@@ -70,40 +73,32 @@ const Shop: React.FC = () => {
       <View className="items-center mt-20 mb-3">
         <Text className="text-4xl font-bold text-white">Shop</Text>
       </View>
-      <View className="flex flex-wrap gap-2 items-center">
-        <View className="flex flex-row gap-x-2 w-full">
+      <View>
+        <View className="flex flex-row gap-x-2 items-center flex-wrap w-full">
           <TouchableOpacity
             className={`p-2 px-3 rounded-full ${selectedItem === 'Power Ups' ? 'bg-white' : 'bg-transparent'}`}
             onPress={() => setSelectedItem('Power Ups')}>
-            <Text className={`text-base font-${selectedItem === 'Power Ups' ? 'bold' : 'light'} ${selectedItem === 'Power Ups' ? 'text-black' : 'text-white'}`}>
-              Power Ups
-            </Text>
+            <PotionIcon className={`text-base h-8 w-8 font-${selectedItem === 'Power Ups' ? 'bold' : 'light'} ${selectedItem === 'Power Ups' ? 'text-black' : 'text-white'}`} />
           </TouchableOpacity>
 
           <TouchableOpacity
             className={`py-2 px-3 rounded-full ${selectedItem === 'Subscription' ? 'bg-white' : 'bg-transparent'}`}
             onPress={() => setSelectedItem('Subscription')}>
-            <Text className={`text-base font-${selectedItem === 'Subscription' ? 'bold' : 'light'} ${selectedItem === 'Subscription' ? 'text-black' : 'text-white'}`}>
-              Subscription
-            </Text>
+            <SubscriptionIcon className={`text-base h-8 w-8 font-${selectedItem === 'Subscription' ? 'bold' : 'light'} ${selectedItem === 'Subscription' ? 'text-black' : 'text-white'}`} />
           </TouchableOpacity>
 
           <TouchableOpacity
             className={`py-2 px-3 rounded-full ${selectedItem === 'Currency' ? 'bg-white' : 'bg-transparent'}`}
             onPress={() => setSelectedItem('Currency')}>
-            <Text className={`text-base font-${selectedItem === 'Currency' ? 'bold' : 'light'} ${selectedItem === 'Currency' ? 'text-black' : 'text-white'}`}>
-              Currency
-            </Text>
+            <CurrencyIcon className={`text-white h-8 w-8 font-${selectedItem === 'Currency' ? 'bold' : 'light'} ${selectedItem === 'Currency' ? 'text-black' : 'text-white'}`} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            className={`py-2 px-3 rounded-full ${selectedItem === 'Music' ? 'bg-white' : 'bg-transparent'}`}
+            onPress={() => setSelectedItem('Music')}>
+            <MusicIcon className={`text-base h-8 w-8 font-${selectedItem === 'Music' ? 'bold' : 'light'} ${selectedItem === 'Music' ? 'text-black' : 'text-white'}`} />
           </TouchableOpacity>
         </View>
-
-        <TouchableOpacity
-          className={`w-full py-2 px-3 rounded-full ${selectedItem === 'Music' ? 'bg-white' : 'bg-transparent'}`}
-          onPress={() => setSelectedItem('Music')}>
-          <Text className={`text-base font-${selectedItem === 'Music' ? 'bold' : 'light'} ${selectedItem === 'Music' ? 'text-black' : 'text-white'}`}>
-            Music
-          </Text>
-        </TouchableOpacity>
       </View>
 
       {/* Scrollable Content */}
@@ -111,8 +106,8 @@ const Shop: React.FC = () => {
         {renderContent()}
       </ScrollView>
       <Menu activeScreen={activeScreen} />
-      </LinearGradient>
-     
+    </LinearGradient>
+
   );
 };
 
