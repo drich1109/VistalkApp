@@ -240,7 +240,7 @@ def saveGamePlay():
             SET vCoin = vCoin + %s 
             WHERE userPlayerID = %s
         """
-        cursor.execute(query_update2, (totalScore, vCoin, userId))
+        cursor.execute(query_update2, (vCoin, userId))
 
         conn.commit()
         return jsonify({

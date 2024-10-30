@@ -63,7 +63,6 @@ def getContentByID():
     cursor.execute(query, (contentId,))
     
     results = cursor.fetchone()
-    conn.close()
 
     if results:
         return jsonify({
@@ -97,7 +96,6 @@ def getContentSyllableByID():
     cursor.execute(query, (contentId,))
     
     results = cursor.fetchall()
-    conn.close()
 
     if results:
         return jsonify({
@@ -131,7 +129,6 @@ def getContentExampleByID():
     cursor.execute(query, (contentId,))
     
     results = cursor.fetchall()
-    conn.close()
 
     if results:
         return jsonify({
@@ -165,7 +162,6 @@ def getContentDefinitionByID():
     cursor.execute(query, (contentId,))
     
     results = cursor.fetchall()
-    conn.close()
 
     if results:
         return jsonify({
