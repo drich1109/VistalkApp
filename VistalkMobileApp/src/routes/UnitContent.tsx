@@ -547,7 +547,7 @@ const UnitContent: React.FC<Props> = ({ route, navigation }) => {
 
                 <LinearGradient colors={['#6addd0', '#f7c188']} className="flex-1 items-center">
                     {isLoading ? (
-                        <Loader />
+                        <Loader isVisible={isLoading}/>
                     ) : (
                         <>
                             {showSnowflakes && (<SnowflakeComponent />)}

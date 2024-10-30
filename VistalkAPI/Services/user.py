@@ -101,7 +101,7 @@ def createVista():
 
         vistaQuery = """
         INSERT INTO vista (userPlayerId, vCoin, currentLanguageId) 
-        VALUES (%s, %s, %s, %s)
+        VALUES (%s, %s, %s)
         """
         cursor.execute(vistaQuery, (userId, 0, languageId))
         conn.commit()
