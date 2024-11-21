@@ -41,6 +41,14 @@ def checkPronunciation():
     
     temp_audio_path = save_audio_file(audio_file)
     transcription, average_confidence = pronounciate(temp_audio_path)
+    
+    if transcription is None or average_confidence is None:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Error processing audio file or no transcription available.',
+            'data': None
+        }), 400
+        
     transcription = re.sub(r'[^a-zA-Z0-9]', '', transcription).lower()
 
     score = 1 if transcription == ctext and average_confidence >= 0.75 else 0
