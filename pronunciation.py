@@ -8,7 +8,6 @@ from google.oauth2 import service_account
 from google.cloud import speech
 from db import get_db_connection
 from datetime import date
-import simpleaudio as sa
 from pydub import AudioSegment
 
 def checkPronunciation():
