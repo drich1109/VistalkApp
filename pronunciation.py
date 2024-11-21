@@ -14,142 +14,107 @@ import json
 def checkPronunciation():
     data = request.form
     content_id = int(data.get('contentId', 0))
-    userId = int(data.get('userId', 0))
+    user_id = int(data.get('userId', 0))
     audio_file = request.files.get('audioFile')
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    
-    
-    cursor.execute("SELECT numberPronounced FROM vista WHERE userPlayerId = %s", (userId,))
+
+    # Check remaining credits
+    cursor.execute("SELECT numberPronounced FROM vista WHERE userPlayerId = %s", (user_id,))
     result = cursor.fetchone()
-    if result['numberPronounced'] != None and result['numberPronounced'] <= 0:
+    if not result or (result['numberPronounced'] is not None and result['numberPronounced'] <= 0):
         return jsonify({
             'isSuccess': False,
             'message': 'No credits remaining. Please subscribe or try again tomorrow.',
             'data': None
-        }), 403  
+        }), 403
 
-    
+    # Fetch content text
     cursor.execute("SELECT contenttext FROM content WHERE contentID = %s", (content_id,))
     ctext_row = cursor.fetchone()
-    if ctext_row:
-        ctext = re.sub(r'[^a-zA-Z0-9]', '', ctext_row['contenttext']).lower()
+    if not ctext_row:
+        return jsonify({'error': 'Invalid content ID'}), 400
 
-    
+    ctext = re.sub(r'[^a-zA-Z0-9]', '', ctext_row['contenttext']).lower()
+
+    # Handle audio file
     if not audio_file:
         return jsonify({'error': 'No audio file provided'}), 400
 
-    
     temp_audio_path = save_audio_file(audio_file)
-    transcription, average_confidence = pronounciate(temp_audio_path)
-    transcription = re.sub(r'[^a-zA-Z0-9]', '', transcription).lower()
+    transcription, average_confidence = transcribe_audio(temp_audio_path)
 
+    if transcription is None:
+        return jsonify({'error': 'Failed to transcribe audio'}), 400
+
+    transcription = re.sub(r'[^a-zA-Z0-9]', '', transcription).lower()
     score = 1 if transcription == ctext and average_confidence >= 0.75 else 0
 
-    
-    insert_query = """
-        INSERT INTO pronounciationresult (userPlayerID, contentID, pronunciationScore) VALUES (%s, %s, %s)
-    """
-    cursor.execute(insert_query, (userId, content_id, score))
+    # Insert pronunciation result
+    cursor.execute(
+        "INSERT INTO pronounciationresult (userPlayerID, contentID, pronunciationScore) VALUES (%s, %s, %s)",
+        (user_id, content_id, score)
+    )
 
-    if result['numberPronounced'] != None and result['numberPronounced'] >= 1:
-        update_query = """
-            UPDATE vista SET numberPronounced = numberPronounced - 1 WHERE userPlayerId = %s AND numberPronounced > 0
-        """
-        cursor.execute(update_query, (userId,))
-    
+    # Deduct credits
+    if result['numberPronounced'] is not None and result['numberPronounced'] > 0:
+        cursor.execute(
+            "UPDATE vista SET numberPronounced = numberPronounced - 1 WHERE userPlayerId = %s",
+            (user_id,)
+        )
+
     conn.commit()
 
-    
+    # Update logs and return response
     if score == 1:
-        update_event_logs(userId)
-        return jsonify({
-            'isSuccess': True,
-            'message': 'Correct',
-            'data': transcription,
-            'data2': None,
-            'totalCount': None  
-        }), 200
+        update_event_logs(user_id)
+        return jsonify({'isSuccess': True, 'message': 'Correct', 'data': transcription}), 200
     else:
-        return jsonify({
-            'isSuccess': False,
-            'message': 'Incorrect',
-            'data': transcription,
-            'data2': None,
-            'totalCount': None  
-        }), 200
+        return jsonify({'isSuccess': False, 'message': 'Incorrect', 'data': transcription}), 200
 
 def save_audio_file(audio_file):
-    
-    temp_dir = tempfile.gettempdir()  
+    temp_dir = tempfile.gettempdir()
     temp_audio_path = os.path.join(temp_dir, audio_file.filename)
-    
-    
     audio_file.save(temp_audio_path)
     return temp_audio_path
 
-def convert_to_flac(audio_file):
-    # Load the audio file using librosa
-    audio_data, sample_rate = librosa.load(audio_file, sr=None, mono=False)
-    channels = 1 if audio_data.ndim == 1 else 2
-    
-    # Save as FLAC using soundfile
-    flac_file = os.path.splitext(audio_file)[0] + ".flac"
-    sf.write(flac_file, audio_data.T, sample_rate, format='FLAC')
-    return flac_file, channels
+def transcribe_audio(audio_file):
+    try:
+        credentials_info = json.loads(os.getenv("GOOGLE_CLOUD_CREDENTIALS"))
+        credentials = service_account.Credentials.from_service_account_info(credentials_info)
+        client = speech.SpeechClient(credentials=credentials)
 
-def pronounciate(audio_file):
-    credentials_info = json.loads(os.getenv("GOOGLE_CLOUD_CREDENTIALS"))
-    credentials = service_account.Credentials.from_service_account_info(credentials_info)
-    client = speech.SpeechClient(credentials=credentials)
-    
-    languageCode = "fil-PH"
+        # Load audio file with librosa
+        audio_data, sample_rate = librosa.load(audio_file, sr=None, mono=True)
 
-    if not audio_file.lower().endswith('.flac'):
-        audio_file, channels = convert_to_flac(audio_file)
-    else:
-        audio_data, sample_rate = librosa.load(audio_file, sr=None, mono=False)
-        channels = 1 if audio_data.ndim == 1 else 2
+        # Save as temporary FLAC file for Google Speech-to-Text API
+        temp_flac_path = f"{audio_file}.flac"
+        sf.write(temp_flac_path, audio_data, sample_rate, format='FLAC')
 
-    audio_data, sample_rate = librosa.load(audio_file, sr=None, mono=False)
-    
-    
-    with io.open(audio_file, 'rb') as f:
-        content = f.read()
-    audio = speech.RecognitionAudio(content=content)
-    
-    encoding = speech.RecognitionConfig.AudioEncoding.FLAC  
-    
-    
-    config = speech.RecognitionConfig(
-        encoding=encoding,  
-        sample_rate_hertz=sample_rate,  
-        language_code=languageCode,  
-        audio_channel_count=channels,  
-        model="default"  
-    )
-    
-    
-    response = client.recognize(config=config, audio=audio)
-    print(response)
-    
-    if not response.results:
-        print("No transcription results. Check audio configuration and language support.")
-        return None
-    else:
-        transcription = ""
-        confidences = []  
+        with io.open(temp_flac_path, 'rb') as f:
+            content = f.read()
+        audio = speech.RecognitionAudio(content=content)
 
-        for result in response.results:
-            alternative = result.alternatives[0]
-            transcription += alternative.transcript + " "
-            confidences.append(alternative.confidence)
+        config = speech.RecognitionConfig(
+            encoding=speech.RecognitionConfig.AudioEncoding.FLAC,
+            sample_rate_hertz=sample_rate,
+            language_code="fil-PH",
+        )
 
-        
+        response = client.recognize(config=config, audio=audio)
+        os.remove(temp_flac_path)  # Clean up temporary file
+
+        if not response.results:
+            return None, 0
+
+        transcription = " ".join(result.alternatives[0].transcript for result in response.results)
+        confidences = [result.alternatives[0].confidence for result in response.results]
         average_confidence = sum(confidences) / len(confidences) if confidences else 0
 
         return transcription.strip(), average_confidence
-
+    except Exception as e:
+        print(f"Error transcribing audio: {e}")
+        return None, 0
 
 def getPronunciationProgress():
     conn = get_db_connection()
