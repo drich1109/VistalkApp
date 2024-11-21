@@ -22,7 +22,7 @@ def checkPronunciation():
     
     cursor.execute("SELECT numberPronounced FROM vista WHERE userPlayerId = %s", (userId,))
     result = cursor.fetchone()
-    if result['numberPronounced'] != None and result['numberPronounced'] <= 0:
+    if result[0] != None and result[0] <= 0:
         return jsonify({
             'isSuccess': False,
             'message': 'No credits remaining. Please subscribe or try again tomorrow.',
