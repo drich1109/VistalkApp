@@ -10,6 +10,84 @@ import re
 from datetime import datetime,date, timedelta
 import audioread
 
+def checkPronunciation():
+    data = request.form
+    content_id = int(data.get('contentId', 0))
+    userId = int(data.get('userId', 0))
+    audio_file = request.files.get('audioFile')
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    
+    cursor.execute("SELECT numberPronounced FROM vista WHERE userPlayerId = %s", (userId,))
+    result = cursor.fetchone()
+    if result['numberPronounced'] != None and result['numberPronounced'] <= 0:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'No credits remaining. Please subscribe or try again tomorrow.',
+            'data': None
+        }), 403  
+
+    
+    cursor.execute("SELECT contenttext FROM content WHERE contentID = %s", (content_id,))
+    ctext_row = cursor.fetchone()
+    if ctext_row:
+        ctext = re.sub(r'[^a-zA-Z0-9]', '', ctext_row['contentText']).lower()
+
+    
+    if not audio_file:
+        return jsonify({'error': 'No audio file provided'}), 400
+
+    
+    temp_audio_path = save_audio_file(audio_file)
+    transcription, average_confidence = pronounciate(temp_audio_path)
+    transcription = re.sub(r'[^a-zA-Z0-9]', '', transcription).lower()
+
+    score = 1 if transcription == ctext and average_confidence >= 0.75 else 0
+
+    
+    insert_query = """
+        INSERT INTO pronounciationresult (userPlayerID, contentID, pronunciationScore) VALUES (%s, %s, %s)
+    """
+    cursor.execute(insert_query, (userId, content_id, score))
+
+    if result['numberPronounced'] != None and result['numberPronounced'] >= 1:
+        update_query = """
+            UPDATE vista SET numberPronounced = numberPronounced - 1 WHERE userPlayerId = %s AND numberPronounced > 0
+        """
+        cursor.execute(update_query, (userId,))
+    
+    conn.commit()
+
+    
+    if score == 1:
+        update_event_logs(userId)
+        return jsonify({
+            'isSuccess': True,
+            'message': 'Correct',
+            'data': transcription,
+            'data2': None,
+            'totalCount': None  
+        }), 200
+    else:
+        return jsonify({
+            'isSuccess': False,
+            'message': 'Incorrect',
+            'data': transcription,
+            'data2': None,
+            'totalCount': None  
+        }), 200
+
+
+def save_audio_file(audio_file):
+    
+    temp_dir = tempfile.gettempdir()  
+    temp_audio_path = os.path.join(temp_dir, audio_file.filename)
+    
+    
+    audio_file.save(temp_audio_path)
+    return temp_audio_path
+
 def pronounciate(audio_file):
     client_file = "sa_vistalk.json"
     credentials = service_account.Credentials.from_service_account_file(client_file)
@@ -66,64 +144,6 @@ def pronounciate(audio_file):
         print(f"Error processing audio file {audio_file}: {e}")
         return None
 
-
-def save_audio_file(audio_file):
-    
-    temp_dir = tempfile.gettempdir()  
-    temp_audio_path = os.path.join(temp_dir, audio_file.filename)
-    
-    
-    audio_file.save(temp_audio_path)
-    return temp_audio_path
-
-def pronounciate(audio_file):
-    client_file = "sa_vistalk.json"
-    credentials = service_account.Credentials.from_service_account_file(client_file)
-    client = speech.SpeechClient(credentials=credentials)
-
-    languageId = 1
-    languageCode = ""
-    if languageId == 1:
-        languageCode = "fil-PH"
-    elif languageId == 2:
-        languageCode = "es-ES"
-
-    # Use librosa to load the audio and get the sample rate
-    audio_data, sample_rate = librosa.load(audio_file, sr=None, mono=False)
-    channels = 1 if audio_data.ndim == 1 else 2
-
-    with io.open(audio_file, 'rb') as f:
-        content = f.read()
-        audio = speech.RecognitionAudio(content=content)
-
-    encoding = speech.RecognitionConfig.AudioEncoding.LINEAR16
-
-    config = speech.RecognitionConfig(
-        encoding=encoding,
-        sample_rate_hertz=sample_rate,
-        language_code=languageCode,
-        audio_channel_count=channels,
-        model="default"
-    )
-
-    response = client.recognize(config=config, audio=audio)
-    print(response)
-    
-    if not response.results:
-        print("No transcription results. Check audio configuration and language support.")
-        return None
-    else:
-        transcription = ""
-        confidences = []
-
-        for result in response.results:
-            alternative = result.alternatives[0]
-            transcription += alternative.transcript + " "
-            confidences.append(alternative.confidence)
-
-        average_confidence = sum(confidences) / len(confidences) if confidences else 0
-
-        return transcription.strip(), average_confidence
 
 def getPronunciationProgress():
     conn = get_db_connection()
