@@ -1,15 +1,15 @@
 from flask import request, jsonify
 import io
-import librosa
-from google.oauth2 import service_account
-from google.cloud import speech
 import os
-from db import get_db_connection
-import re
-from datetime import date
-import soundfile as sf
 import tempfile
 import json
+import re
+from google.oauth2 import service_account
+from google.cloud import speech
+from db import get_db_connection
+from datetime import date
+import simpleaudio as sa
+from pydub import AudioSegment
 
 def checkPronunciation():
     data = request.form
@@ -83,35 +83,30 @@ def transcribe_audio(audio_file):
         credentials_info = json.loads(os.getenv("GOOGLE_CLOUD_CREDENTIALS"))
         credentials = service_account.Credentials.from_service_account_info(credentials_info)
         client = speech.SpeechClient(credentials=credentials)
-        print('here1')
 
-        # Load audio file with librosa
-        audio_data, sample_rate = librosa.load(audio_file, sr=None, mono=True)
-        print('here2')
+        # Load audio file with pydub
+        audio = AudioSegment.from_file(audio_file)
 
-        # Save as temporary FLAC file for Google Speech-to-Text API
-        temp_flac_path = f"{audio_file}.flac"
-        sf.write(temp_flac_path, audio_data, sample_rate, format='FLAC')
+        # Export audio as WAV to memory
+        wav_io = io.BytesIO()
+        audio.export(wav_io, format="wav")
+        wav_io.seek(0)
 
-        with io.open(temp_flac_path, 'rb') as f:
-            content = f.read()
-        audio = speech.RecognitionAudio(content=content)
-        print('here3')
+        audio_content = wav_io.read()
+        audio = speech.RecognitionAudio(content=audio_content)
 
         config = speech.RecognitionConfig(
-            encoding=speech.RecognitionConfig.AudioEncoding.FLAC,
-            sample_rate_hertz=sample_rate,
+            encoding=speech.RecognitionConfig.AudioEncoding.LINEAR16,
+            sample_rate_hertz=audio.frame_rate,
             language_code="fil-PH",
         )
-        print('here4')
 
         response = client.recognize(config=config, audio=audio)
-        os.remove(temp_flac_path)  # Clean up temporary file
 
         if not response.results:
             return None, 0
 
-        transcription = " ".join(result.alternatives[0].transcript for result in response.results)
+        transcription = " ".join(result.alternatives[0].trans cript for result in response.results)
         confidences = [result.alternatives[0].confidence for result in response.results]
         average_confidence = sum(confidences) / len(confidences) if confidences else 0
 
@@ -161,7 +156,6 @@ def getPronunciationProgress():
         'totalCount': None 
     }), 200
 
-    
 def getPronunciationList():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
@@ -170,7 +164,7 @@ def getPronunciationList():
     
     query = """
         SELECT resultId, pr.contentId, c.contentText, pronunciationScore FROM pronounciationresult pr
-        inner join content c on c.contentId =  pr.contentId
+        INNER JOIN content c ON c.contentId = pr.contentId
         WHERE 
         userPlayerID = %s
     """
@@ -180,7 +174,7 @@ def getPronunciationList():
         query += " AND pr.contentID = %s"
         values.append(contentId)
         
-    query += """ORDER BY resultId desc
+    query += """ORDER BY resultId DESC
             """
             
     cursor.execute(query, tuple(values))  
@@ -202,7 +196,6 @@ def getPronunciationList():
         'data2': None,
         'totalCount': len(vistas)  
     }), 200
-
 
 def getPronunciationCount():
     conn = get_db_connection()
@@ -239,42 +232,37 @@ def getPronunciationCount():
         'totalCount': None 
     }), 200
 
-
 def update_event_logs(userId):
     today = date.today()
     
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    
     query_fetch_event_logs = """
         SELECT dt.powerUpId, dt.taskTypeId, dt.taskId, el.currentValue
         FROM eventlogs el
         INNER JOIN dailytask dt ON el.dailyTaskId = dt.taskId
-        inner join playerdailytask pdt on pdt.taskID = dt.taskId
-        WHERE el.eventDate = %s AND el.userPlayerId = %s and pdt.isCompleted = 0
+        INNER JOIN playerdailytask pdt ON pdt.taskID = dt.taskId
+        WHERE el.eventDate = %s AND el.userPlayerId = %s AND pdt.isCompleted = 0
     """
     cursor.execute(query_fetch_event_logs, (today, userId))
     event_logs = cursor.fetchall()
 
-    
     query_fetch_daily_tasks = """
-        SELECT pdt.taskId, dt.quantity as requiredQuantity 
+        SELECT pdt.taskId, dt.quantity AS requiredQuantity 
         FROM playerdailytask pdt
         INNER JOIN dailytask dt ON pdt.taskId = dt.taskId
         WHERE pdt.userPlayerId = %s AND dt.taskDate = %s
     """
     cursor.execute(query_fetch_daily_tasks, (userId, today))
-    daily_tasks = cursor.fetchall()  
+    daily _tasks = cursor.fetchall()  
 
-    
     for event_log in event_logs:
         taskTypeId = event_log[1]
         taskId = event_log[2]
         currentValue = event_log[3]
 
         if taskTypeId == 3:
-            
             query_update_task_type_1 = """
                 UPDATE eventlogs
                 SET currentValue = currentValue + 1
@@ -282,37 +270,31 @@ def update_event_logs(userId):
             """
             cursor.execute(query_update_task_type_1, (userId, taskId, today))
 
-        
             query_refetch_current_value = """
                 SELECT currentValue FROM eventlogs
                 WHERE userPlayerId = %s AND dailyTaskId = %s AND eventDate = %s
             """
-            
             cursor.execute(query_refetch_current_value, (userId, taskId, today))
             updated_current_value = cursor.fetchone()
             if updated_current_value is not None:
                 currentValue = updated_current_value[0]
 
-            
     for daily_task in daily_tasks:
         daily_task_id = daily_task[0]
         required_quantity = daily_task[1]
 
-                
         if taskId == daily_task_id and currentValue >= required_quantity:
-            print('loop',daily_task)
-
             query_update_daily_task = """
-                        UPDATE playerdailytask
-                        SET isCompleted = 1
-                        WHERE userPlayerId = %s AND taskId = %s
-                    """
+                UPDATE playerdailytask
+                SET isCompleted = 1
+                WHERE userPlayerId = %s AND taskId = %s
+            """
             cursor.execute(query_update_daily_task, (userId, daily_task_id))
 
             query_insert_message = """
-                        INSERT INTO notifications (userPlayerId, message, isOpened)
-                        VALUES (%s, %s, %s)
-                    """
+                INSERT INTO notifications (userPlayerId, message, isOpened)
+                VALUES (%s, %s, %s)
+            """
             notification_message = f"Task {daily_task_id} completed!"
             cursor.execute(query_insert_message, (userId, notification_message, 0))
 
