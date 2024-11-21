@@ -81,6 +81,7 @@ def save_audio_file(audio_file):
 def transcribe_audio(audio_file):
     try:
         credentials_info = json.loads(os.getenv("GOOGLE_CLOUD_CREDENTIALS"))
+        print(credentials_info)
         credentials = service_account.Credentials.from_service_account_info(credentials_info)
         client = speech.SpeechClient(credentials=credentials)
 
