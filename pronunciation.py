@@ -81,12 +81,13 @@ def save_audio_file(audio_file):
 def transcribe_audio(audio_file):
     try:
         credentials_info = json.loads(os.getenv("GOOGLE_CLOUD_CREDENTIALS"))
-        print(credentials_info)
         credentials = service_account.Credentials.from_service_account_info(credentials_info)
         client = speech.SpeechClient(credentials=credentials)
+        print('here1')
 
         # Load audio file with librosa
         audio_data, sample_rate = librosa.load(audio_file, sr=None, mono=True)
+        print('here2')
 
         # Save as temporary FLAC file for Google Speech-to-Text API
         temp_flac_path = f"{audio_file}.flac"
@@ -95,12 +96,14 @@ def transcribe_audio(audio_file):
         with io.open(temp_flac_path, 'rb') as f:
             content = f.read()
         audio = speech.RecognitionAudio(content=content)
+        print('here3')
 
         config = speech.RecognitionConfig(
             encoding=speech.RecognitionConfig.AudioEncoding.FLAC,
             sample_rate_hertz=sample_rate,
             language_code="fil-PH",
         )
+        print('here4')
 
         response = client.recognize(config=config, audio=audio)
         os.remove(temp_flac_path)  # Clean up temporary file
