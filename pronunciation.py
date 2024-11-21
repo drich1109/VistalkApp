@@ -92,44 +92,32 @@ def pronounciate(audio_file):
     client_file = "sa_vistalk.json"
     credentials = service_account.Credentials.from_service_account_file(client_file)
     client = speech.SpeechClient(credentials=credentials)
-    
-    
+
     languageId = 1
     languageCode = ""
-    if(languageId == 1):
+    if languageId == 1:
         languageCode = "fil-PH"
-    elif(languageId == 2):
+    elif languageId == 2:
         languageCode = "es-ES"
 
-    
-    if not audio_file.lower().endswith('.flac'):
-        audio_file, channels = convert_to_flac(audio_file)
-    else:
-        audio_data, sample_rate = librosa.load(audio_file, sr=None, mono=False)
-        channels = 1 if audio_data.ndim == 1 else 2
-
+    # Use librosa to load the audio and get the sample rate
     audio_data, sample_rate = librosa.load(audio_file, sr=None, mono=False)
-    
-    
+    channels = 1 if audio_data.ndim == 1 else 2
+
     with io.open(audio_file, 'rb') as f:
         content = f.read()
         audio = speech.RecognitionAudio(content=content)
-    
-    
-    encoding = speech.RecognitionConfig.AudioEncoding.LINEAR16  
-    if audio_file.lower().endswith('.flac'):
-        encoding = speech.RecognitionConfig.AudioEncoding.FLAC  
-    
-    
+
+    encoding = speech.RecognitionConfig.AudioEncoding.LINEAR16
+
     config = speech.RecognitionConfig(
-        encoding=encoding,  
-        sample_rate_hertz=sample_rate,  
-        language_code=languageCode,  
-        audio_channel_count=channels,  
-        model="default"  
+        encoding=encoding,
+        sample_rate_hertz=sample_rate,
+        language_code=languageCode,
+        audio_channel_count=channels,
+        model="default"
     )
-    
-    
+
     response = client.recognize(config=config, audio=audio)
     print(response)
     
@@ -138,25 +126,16 @@ def pronounciate(audio_file):
         return None
     else:
         transcription = ""
-        confidences = []  
+        confidences = []
 
         for result in response.results:
             alternative = result.alternatives[0]
             transcription += alternative.transcript + " "
             confidences.append(alternative.confidence)
 
-        
         average_confidence = sum(confidences) / len(confidences) if confidences else 0
 
         return transcription.strip(), average_confidence
-
-def convert_to_flac(audio_file):
-    
-    audio = AudioSegment.from_file(audio_file)
-    flac_file = "converted_audio.flac"
-    audio.export(flac_file, format="flac")
-    return flac_file, audio.channels
-
 
 def getPronunciationProgress():
     conn = get_db_connection()
