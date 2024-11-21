@@ -45,9 +45,9 @@ def checkPronunciation():
     if result is None:
         return jsonify({
             'isSuccess': False,
-            'message': 'Error processing audio file or no transcription available.',
+            'message': 'Recording is too noisy. Please try again in a quieter place.',
             'data': None
-        }), 400
+        }), 200
     
     # Unpack the transcription and average confidence
     transcription, average_confidence = result
