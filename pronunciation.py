@@ -40,8 +40,10 @@ def checkPronunciation():
 
     
     temp_audio_path = save_audio_file(audio_file)
+    print(temp_audio_path)
     result = pronounciate(temp_audio_path)
-    
+    print(result)
+
     if result is None:
         return jsonify({
             'isSuccess': False,
