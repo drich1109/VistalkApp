@@ -32,7 +32,7 @@ def checkPronunciation():
     cursor.execute("SELECT contenttext FROM content WHERE contentID = %s", (content_id,))
     ctext_row = cursor.fetchone()
     if ctext_row:
-        ctext = re.sub(r'[^a-zA-Z0-9]', '', ctext_row['contentText']).lower()
+        ctext = re.sub(r'[^a-zA-Z0-9]', '', ctext_row['contenttext']).lower()
 
     
     if not audio_file:
@@ -275,7 +275,7 @@ def update_event_logs(userId):
     query_fetch_event_logs = """
         SELECT dt.powerUpId, dt.taskTypeId, dt.taskId, el.currentValue
         FROM eventlogs el
-        INNER JOIN dailyTask dt ON el.dailyTaskId = dt.taskId
+        INNER JOIN dailytask dt ON el.dailyTaskId = dt.taskId
         inner join playerdailytask pdt on pdt.taskID = dt.taskId
         WHERE el.eventDate = %s AND el.userPlayerId = %s and pdt.isCompleted = 0
     """
@@ -286,7 +286,7 @@ def update_event_logs(userId):
     query_fetch_daily_tasks = """
         SELECT pdt.taskId, dt.quantity as requiredQuantity 
         FROM playerdailytask pdt
-        INNER JOIN dailyTask dt ON pdt.taskId = dt.taskId
+        INNER JOIN dailytask dt ON pdt.taskId = dt.taskId
         WHERE pdt.userPlayerId = %s AND dt.taskDate = %s
     """
     cursor.execute(query_fetch_daily_tasks, (userId, today))
