@@ -1,11 +1,23 @@
 from flask import Flask, request, jsonify
 import db
 from flask_cors import CORS
-from Services import language, pronunciation, user, content, shop, payment,section
+import language, dailyTask, user, content, shop, payment,section, pronunciation
+from apscheduler.schedulers.background import BackgroundScheduler
+import time
 
 app = Flask(__name__)
 CORS(app)
 
+def start_background_service():
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(user.check_all_users_subscriptions, 'interval', hours=1)
+    scheduler.start()
+    try: 
+          while True:
+            time.sleep(3600)  
+    except (KeyboardInterrupt, SystemExit):
+        scheduler.shutdown()
+        
 @app.route('/getLanguages', methods=['GET'])
 def getLanguages():
     return language.get_Language()
@@ -34,6 +46,10 @@ def addfeedback():
 def getContent():
     return content.get_Content()
 
+@app.route('/getContentPronunciation', methods=['GET'])
+def get_ContentPronunciation():
+    return content.get_ContentPronunciation()
+
 @app.route('/getContentByID', methods=['GET'])
 def getContentByID():
     return content.getContentByID()
@@ -50,7 +66,7 @@ def getContentExampleByID():
 def getContentSyllableByID():
     return content.getContentSyllableByID()
 
-@app.route('/getContentPronunciation', methods=['GET'])
+@app.route('/getSoundContentPronunciation', methods=['GET'])
 def getContentPronunciation():
     return content.getContentPronunciation()
 
@@ -143,13 +159,58 @@ def getLeaderBoards():
 def updateDailyScore():
     return user.updateDailyScore()
 
+@app.route('/claimReward', methods=['PUT'])
+def claimReward():
+    return user.claim_reward()
+
+
 @app.route('/getSelfRank', methods=['GET'])
 def getSelfRank():
     return user.getSelfRank()
+
+@app.route('/getSelfRankAllTime', methods=['GET'])
+def getSelfRankAllTime():
+    return user.getSelfRankAllTime()
+
+@app.route('/getLeaderBoardsAllTime', methods=['GET'])
+def getLeaderBoardsAllTime():
+    return user.getLeaderBoardsAllTime()
 
 @app.route('/addRating', methods=['POST'])
 def addRating():
     return user.addRating()
 
+@app.route('/getDailyTasks', methods=['GET'])
+def getDailyTasks():
+    return dailyTask.getDailyTasks()
+
+@app.route('/getNotifications', methods=['GET'])
+def getNotifications():
+    return user.get_notifications()
+
+@app.route('/updateNotifications', methods=['PUT'])
+def updateNotifications():
+    return user.updateNotifications()
+
+@app.route('/checkPronunciation', methods=['PUT'])
+def checkPronunciation():
+    return pronunciation.checkPronunciation()
+
+@app.route('/getPronunciationProgress', methods=['GET'])
+def getPronunciationProgress():
+    return pronunciation.getPronunciationProgress()
+
+@app.route('/getPronunciationList', methods=['GET'])
+def getPronunciationList():
+    return pronunciation.getPronunciationList()
+
+@app.route('/getPronunciationCount', methods=['GET'])
+def getPronunciationCount():
+    return pronunciation.getPronunciationCount()
+
 if __name__ == "__main__":
-    app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
+    from threading import Thread
+    thread = Thread(target=start_background_service)
+    thread.daemon = True  
+    thread.start()
+    app.run(debug=True, host="0.0.0.0", port=5001)
