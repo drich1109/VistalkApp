@@ -4,11 +4,11 @@ import librosa
 from google.oauth2 import service_account
 from google.cloud import speech
 import os
-import tempfile
 from db import get_db_connection
 import re
-from datetime import datetime,date, timedelta
-import audioread
+from datetime import date
+import soundfile as sf
+import tempfile
 
 def checkPronunciation():
     data = request.form
@@ -40,20 +40,7 @@ def checkPronunciation():
 
     
     temp_audio_path = save_audio_file(audio_file)
-    print(temp_audio_path)
-    result = pronounciate(temp_audio_path)
-    print(result)
-
-    if result is None:
-        return jsonify({
-            'isSuccess': False,
-            'message': 'Recording is too noisy. Please try again in a quieter place.',
-            'data': None
-        }), 200
-    
-    # Unpack the transcription and average confidence
-    transcription, average_confidence = result
-        
+    transcription, average_confidence = pronounciate(temp_audio_path)
     transcription = re.sub(r'[^a-zA-Z0-9]', '', transcription).lower()
 
     score = 1 if transcription == ctext and average_confidence >= 0.75 else 0
@@ -91,7 +78,6 @@ def checkPronunciation():
             'totalCount': None  
         }), 200
 
-
 def save_audio_file(audio_file):
     
     temp_dir = tempfile.gettempdir()  
@@ -101,65 +87,67 @@ def save_audio_file(audio_file):
     audio_file.save(temp_audio_path)
     return temp_audio_path
 
+def convert_to_flac(audio_file):
+    # Load the audio file using librosa
+    audio_data, sample_rate = librosa.load(audio_file, sr=None, mono=False)
+    channels = 1 if audio_data.ndim == 1 else 2
+    
+    # Save as FLAC using soundfile
+    flac_file = os.path.splitext(audio_file)[0] + ".flac"
+    sf.write(flac_file, audio_data.T, sample_rate, format='FLAC')
+    return flac_file, channels
+
 def pronounciate(audio_file):
     client_file = "sa_vistalk.json"
     credentials = service_account.Credentials.from_service_account_file(client_file)
     client = speech.SpeechClient(credentials=credentials)
     
-    # Check if the file is in a supported format
-    if not audio_file.lower().endswith(('.wav', '.flac', '.m4a')):
-        raise ValueError(f"Unsupported file format: {audio_file}")
+    languageCode = "fil-PH"
+
+    if not audio_file.lower().endswith('.flac'):
+        file_path, channels = convert_to_flac(file_path)
+    else:
+        audio_data, sample_rate = librosa.load(audio_file, sr=None, mono=False)
+        channels = 1 if audio_data.ndim == 1 else 2
+
+    audio_data, sample_rate = librosa.load(audio_file, sr=None, mono=False)
     
-    try:
-        # Attempt to open with audioread to handle m4a
-        with audioread.audio_open(audio_file) as audio_file_obj:
-            sample_rate = audio_file_obj.samplerate
-            channels = audio_file_obj.channels
-            duration = audio_file_obj.duration
-
-            # Now use librosa to load the audio data
-            audio_data, _ = librosa.load(audio_file, sr=sample_rate, mono=(channels == 1))
-
-        # Process the transcription
-        with open(audio_file, 'rb') as f:
-            content = f.read()
-            audio = speech.RecognitionAudio(content=content)
-        
-        encoding = speech.RecognitionConfig.AudioEncoding.LINEAR16  # For .wav
-        config = speech.RecognitionConfig(
-            encoding=encoding,
-            sample_rate_hertz=sample_rate,
-            language_code="fil-PH",  # Change based on your language ID
-            audio_channel_count=1,
-            model="default"
-        )
-        
-        response = client.recognize(config=config, audio=audio)
-        
-        # Process transcription
-        if not response.results:
-            print("No transcription results.")
-            return None
-        else:
-            transcription = ""
-            confidences = []
-
-            for result in response.results:
-                alternative = result.alternatives[0]
-                transcription += alternative.transcript + " "
-                confidences.append(alternative.confidence)
-
-            average_confidence = sum(confidences) / len(confidences) if confidences else 0
-
-            return transcription.strip(), average_confidence
     
-    except ValueError as ve:
-        print(f"Error: Invalid file format for {audio_file}. {ve}")
+    with io.open(audio_file, 'rb') as f:
+        content = f.read()
+    audio = speech.RecognitionAudio(content=content)
+    
+    encoding = speech.RecognitionConfig.AudioEncoding.FLAC  
+    
+    
+    config = speech.RecognitionConfig(
+        encoding=encoding,  
+        sample_rate_hertz=sample_rate,  
+        language_code=languageCode,  
+        audio_channel_count=channels,  
+        model="default"  
+    )
+    
+    
+    response = client.recognize(config=config, audio=audio)
+    print(response)
+    
+    if not response.results:
+        print("No transcription results. Check audio configuration and language support.")
         return None
-    except Exception as e:
-        print(f"Error processing audio file {audio_file}: {e}")
-        return None
+    else:
+        transcription = ""
+        confidences = []  
 
+        for result in response.results:
+            alternative = result.alternatives[0]
+            transcription += alternative.transcript + " "
+            confidences.append(alternative.confidence)
+
+        
+        average_confidence = sum(confidences) / len(confidences) if confidences else 0
+
+        return transcription.strip(), average_confidence
 
 
 def getPronunciationProgress():
