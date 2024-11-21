@@ -32,7 +32,7 @@ def checkPronunciation():
     cursor.execute("SELECT contenttext FROM content WHERE contentID = %s", (content_id,))
     ctext_row = cursor.fetchone()
     if ctext_row:
-        ctext = re.sub(r'[^a-zA-Z0-9]', '', ctext_row['contentText']).lower()
+        ctext = re.sub(r'[^a-zA-Z0-9]', '', ctext_row['contenttext']).lower()
 
     
     if not audio_file:
