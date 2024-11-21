@@ -98,8 +98,8 @@ def convert_to_flac(audio_file):
     return flac_file, channels
 
 def pronounciate(audio_file):
-    client_file = "sa_vistalk.json"
-    credentials = service_account.Credentials.from_service_account_file(client_file)
+    credentials_info = json.loads(os.getenv("GOOGLE_CLOUD_CREDENTIALS"))
+    credentials = service_account.Credentials.from_service_account_info(credentials_info)
     client = speech.SpeechClient(credentials=credentials)
     
     languageCode = "fil-PH"
