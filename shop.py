@@ -1,14 +1,6 @@
 from flask import request, jsonify
-from db import UserImages, get_db_connection
+from db import get_db_connection
 from datetime import datetime, timedelta
-
-def getItemImage():
-    fileName = request.args.get('fileName')
-    timestamp = request.args.get('t')
-    try:
-        return send_from_directory(ItemImage, fileName)
-    except FileNotFoundError:
-        return None
 
 def getPowerUps():
     conn = get_db_connection()
