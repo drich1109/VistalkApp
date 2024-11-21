@@ -1,2 +1,2 @@
-[build]
-aptPkgs = ["ffmpeg"]
+[phases.setup]
+nixPkgs = ["...", "ffmpeg"] 
