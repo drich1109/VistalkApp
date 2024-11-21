@@ -98,7 +98,7 @@ def getUserPowerUp():
     userID = request.args.get('userID')
 
     query = """
-            Select p.* from powerUp p inner join item i on i.itemID = p.itemID where p.isImplemented = 1 and i.isActive = 1"""
+            Select p.* from powerup p inner join item i on i.itemID = p.itemID where p.isImplemented = 1 and i.isActive = 1"""
     cursor.execute(query)
     powerUps = cursor.fetchall()
 
