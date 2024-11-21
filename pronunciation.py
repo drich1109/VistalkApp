@@ -106,7 +106,7 @@ def pronounciate(audio_file):
     languageCode = "fil-PH"
 
     if not audio_file.lower().endswith('.flac'):
-        file_path, channels = convert_to_flac(file_path)
+        file_path, channels = convert_to_flac(audio_file)
     else:
         audio_data, sample_rate = librosa.load(audio_file, sr=None, mono=False)
         channels = 1 if audio_data.ndim == 1 else 2
