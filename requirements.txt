@@ -20,6 +20,7 @@ dtaidistance==2.3.12
 eventlet==0.37.0
 falcon==4.0.2
 fastdtw==0.3.4
+ffmpeg-python==4.4.0
 Flask==3.0.3
 Flask-Cors==4.0.1
 Flask-SocketIO==5.4.1
