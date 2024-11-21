@@ -106,7 +106,7 @@ def transcribe_audio(audio_file):
         if not response.results:
             return None, 0
 
-        transcription = " ".join(result.alternatives[0].trans cript for result in response.results)
+        transcription = " ".join(result.alternatives[0].transcript for result in response.results)
         confidences = [result.alternatives[0].confidence for result in response.results]
         average_confidence = sum(confidences) / len(confidences) if confidences else 0
 
@@ -255,7 +255,7 @@ def update_event_logs(userId):
         WHERE pdt.userPlayerId = %s AND dt.taskDate = %s
     """
     cursor.execute(query_fetch_daily_tasks, (userId, today))
-    daily _tasks = cursor.fetchall()  
+    daily_tasks = cursor.fetchall()  
 
     for event_log in event_logs:
         taskTypeId = event_log[1]
