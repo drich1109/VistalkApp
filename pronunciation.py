@@ -119,7 +119,7 @@ def pronounciate(audio_file):
 
             # Now use librosa to load the audio data
             audio_data, _ = librosa.load(audio_file, sr=sample_rate, mono=(channels == 1))
-        
+
         # Process the transcription
         with open(audio_file, 'rb') as f:
             content = f.read()
@@ -153,9 +153,13 @@ def pronounciate(audio_file):
 
             return transcription.strip(), average_confidence
     
+    except ValueError as ve:
+        print(f"Error: Invalid file format for {audio_file}. {ve}")
+        return None
     except Exception as e:
         print(f"Error processing audio file {audio_file}: {e}")
         return None
+
 
 
 def getPronunciationProgress():
