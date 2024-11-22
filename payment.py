@@ -1,5 +1,7 @@
 import requests
 from flask import request, jsonify
+import hmac
+import hashlib
 
 def paymongoredirect():
     try:
@@ -37,12 +39,40 @@ def paymongoredirect():
         print(f"Error: {str(e)}")
         return jsonify({"error": "An error occurred"}), 500
     
-""" def paymongo_webhook():
-    data = request.json
-    if data.get('status') == 'paid':
-        payment_id = data.get('id')
+def handle_webhook():
+    try:
+        payload = request.get_data(as_text=True)
+        received_signature = request.headers.get('PayMongo-Signature', '')
 
-        SocketIO.emit('paymentStatus', {'status': 'paid'}, room=payment_id)
+        secret_key = "whsk_4PSib83vzDep1kqV64UcvMxM"
+        print('here')
+        computed_signature = hmac.new(
+            secret_key.encode(),
+            payload.encode(),
+            hashlib.sha256
+        ).hexdigest()
+        print('here2')
 
-        return jsonify({'message': 'Payment received and notified'}), 200
-    return jsonify({'message': 'Payment not completed'}), 400 """
+        if not hmac.compare_digest(computed_signature, received_signature):
+            return jsonify({"error": "Invalid signature"}), 400
+        print('here3')
+
+        data = request.json
+        event_type = data['data']['attributes']['event_type']
+        attributes = data['data']['attributes']['data']['attributes']
+        print('here4')
+
+        if event_type == "payment.paid":
+            transaction_id = attributes['id']
+            amount = attributes['amount']
+            description = attributes.get('description', '')
+
+            print("Payment successful", f"Amount: {amount / 100} Description: {description}")
+
+            return jsonify({"message": "Webhook handled successfully"}), 200
+        else:
+            return jsonify({"message": "Event not handled"}), 200
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        return jsonify({"error": "An error occurred"}), 500
