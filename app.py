@@ -201,6 +201,10 @@ def getPronunciationList():
 def getPronunciationCount():
     return pronunciation.getPronunciationCount()
 
+@app.route('/updateUserLanguage', methods=['PUT'])
+def updateUserLanguage():
+    return user.updateUserLanguage()
+    
 if __name__ == "__main__":
     from threading import Thread
     def start_services():
