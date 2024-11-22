@@ -838,3 +838,46 @@ def check_all_users_subscriptions():
     for user in users:
         userId = user['userPlayerId']
         check_subscription_and_update(userId)
+
+def updateUserLanguage():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    userId = request.args.get('userId')
+    languageId = request.args.get('languageId')
+    
+    query = """
+        Update vista set languageId  = %s where userPlayerId = %s
+    """
+    cursor.execute(query, (languageId, userId))
+    
+    sectionQuery = """
+        SELECT u.unitId, u.unitNumber
+        FROM unit u 
+        INNER JOIN section s ON s.sectionId = u.sectionID 
+        WHERE s.languageID = %s and u.isActive = 1
+        """
+    cursor.execute(sectionQuery, (languageId,))
+    unitIds = cursor.fetchall()
+
+    userUnitQuery = """
+        SELECT unitID from userunit where userPlayerID = %s
+        """
+    cursor.execute(userUnitQuery, (userId,))
+    userUnits = cursor.fetchall()
+        
+    for unit in unitIds:
+        if unit['unitId'] not in userUnits['unitID']:
+            isLocked = 0 if unit['unitNumber'] == 1 else 1
+            userUnitQuery = """
+            INSERT INTO userunit (userPlayerId, unitId, totalCorrectAnswers, totalScore, isLocked) 
+            VALUES (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(userUnitQuery, (userId, unit['unitId'], 0, 0, isLocked))
+
+    return jsonify({
+        'isSuccess': True,
+        'message': 'Successfully Retrieved',
+        'data': None,
+        'data2': None,
+        'totalCount': None 
+    }), 200
