@@ -61,11 +61,12 @@ def handle_webhook():
         if event_type == "payment.paid":
             print(f"Payment status: Success")
             user_email = data['data']['attributes']['data']['attributes']['billing']['email']
+            print(user_email)
 
             socketio.emit('payment_status_update', {
                 'status': 'paid',
             }, room=user_email)
-            
+            print('socket success')
             return jsonify({"message": "Webhook handled successfully"}), 200
         else:
             return jsonify({"message": "Event not handled"}), 200
