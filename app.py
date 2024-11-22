@@ -98,7 +98,7 @@ def getSubscriptions():
 def paymentSubscription():
     return payment.paymongoredirect()
 
-@app.route('/paymongowebhooks', methods=['POST'])
+@app.route('/webhook', methods=['POST'])
 def paymongo_webhook():
     return payment.handle_webhook()
 
