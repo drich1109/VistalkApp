@@ -22,7 +22,8 @@ def checkPronunciation():
     
     cursor.execute("SELECT numberPronounced FROM vista WHERE userPlayerId = %s", (userId,))
     result = cursor.fetchone()
-    if result[0] != None and result[0] <= 0:
+    print(result['numberPronounced'])
+    if result['numberPronounced'] != None and result['numberPronounced'] <= 0:
         return jsonify({
             'isSuccess': False,
             'message': 'No credits remaining. Please subscribe or try again tomorrow.',
@@ -66,6 +67,7 @@ def checkPronunciation():
     cursor.execute(insert_query, (userId, content_id, score))
 
     if result['numberPronounced'] != None and result['numberPronounced'] >= 1:
+        print(result['numberPronounced'])
         update_query = """
             UPDATE vista SET numberPronounced = numberPronounced - 1 WHERE userPlayerId = %s AND numberPronounced > 0
         """
