@@ -17,30 +17,42 @@ def checkPronunciation():
     userId = int(data.get('userId', 0))
     audio_file = request.files.get('audioFile')
     conn = get_db_connection()
+    
+    # Ensure cursor supports dictionary results
     cursor = conn.cursor(dictionary=True)
     
-    
+    # Fetch numberPronounced
     cursor.execute("SELECT numberPronounced FROM vista WHERE userPlayerId = %s", (userId,))
     result = cursor.fetchone()
-    print(result['numberPronounced'])
-    if result['numberPronounced'] != None and result['numberPronounced'] <= 0:
+    
+    # Debug: Check the type of result
+    print(f"Result type: {type(result)}")
+    print(f"Result content: {result}")
+    
+    # Handle when dictionary=False
+    if not isinstance(result, dict):
+        result = {k: v for k, v in zip(cursor.column_names, result)}
+    
+    # Safely access numberPronounced
+    number_pronounced = result.get('numberPronounced', 0)
+    if number_pronounced <= 0:
         return jsonify({
             'isSuccess': False,
             'message': 'No credits remaining. Please subscribe or try again tomorrow.',
             'data': None
         }), 403  
-
     
+    # Fetch content text
     cursor.execute("SELECT contenttext FROM content WHERE contentID = %s", (content_id,))
     ctext_row = cursor.fetchone()
     if ctext_row:
-        ctext = re.sub(r'[^a-zA-Z0-9]', '', ctext_row['contenttext']).lower()
+        ctext = re.sub(r'[^a-zA-Z0-9]', '', ctext_row.get('contenttext', '')).lower()
 
-    
+    # Validate audio file
     if not audio_file:
         return jsonify({'error': 'No audio file provided'}), 400
 
-    
+    # Process audio
     temp_audio_path = save_audio_file(audio_file)
     result = pronounciate(temp_audio_path)
     if result is None:
@@ -51,23 +63,21 @@ def checkPronunciation():
             'data2': None,
             'totalCount': None  
         }), 200
-        
+
     transcription, average_confidence = result
     transcription = re.sub(r'[^a-zA-Z0-9]', '', transcription).lower()
 
-    score = 1 if transcription == ctext and average_confidence >= 0.60 else 0
-    transcription = re.sub(r'[^a-zA-Z0-9]', '', transcription).lower()
-
+    # Compute score
     score = 1 if transcription == ctext and average_confidence >= 0.75 else 0
 
-    
+    # Insert pronunciation result
     insert_query = """
         INSERT INTO pronounciationresult (userPlayerID, contentID, pronunciationScore) VALUES (%s, %s, %s)
     """
     cursor.execute(insert_query, (userId, content_id, score))
 
-    if result.get('numberPronounced', 0) >= 1:
-        print(result['numberPronounced'])
+    # Update numberPronounced
+    if number_pronounced >= 1:
         update_query = """
             UPDATE vista SET numberPronounced = numberPronounced - 1 WHERE userPlayerId = %s AND numberPronounced > 0
         """
@@ -75,7 +85,6 @@ def checkPronunciation():
     
     conn.commit()
 
-    
     if score == 1:
         update_event_logs(userId)
         return jsonify({
@@ -93,7 +102,6 @@ def checkPronunciation():
             'data2': None,
             'totalCount': None  
         }), 200
-
 
 def save_audio_file(audio_file):
     
