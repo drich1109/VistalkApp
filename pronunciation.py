@@ -66,7 +66,7 @@ def checkPronunciation():
     """
     cursor.execute(insert_query, (userId, content_id, score))
 
-    if result['numberPronounced'] != None and result['numberPronounced'] >= 1:
+    if result.get('numberPronounced', 0) >= 1:
         print(result['numberPronounced'])
         update_query = """
             UPDATE vista SET numberPronounced = numberPronounced - 1 WHERE userPlayerId = %s AND numberPronounced > 0
