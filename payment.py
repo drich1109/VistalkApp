@@ -56,7 +56,8 @@ def handle_webhook():
         data = request.json
         print(data)
         events = data.get('data', {}).get('attributes', {}).get('events', [])
-        
+        print(events)
+
         # Check for specific events, such as 'payment.paid'
         if "payment.paid" in events:
             # Assuming you are handling the specific payment logic here
