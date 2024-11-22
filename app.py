@@ -102,10 +102,9 @@ def getSubscriptions():
 def paymentSubscription():
     return payment.paymongoredirect()
 
-""" @app.route('/paymongowebhooks', methods=['POST'])
+@app.route('/paymongowebhooks', methods=['POST'])
 def paymongo_webhook():
-    return payment.paymongo_webhook()
- """
+    return payment.handle_webhook()
 
 @app.route('/buySubscription', methods=['POST'])
 def buySubscription():
