@@ -43,36 +43,25 @@ def paymongoredirect():
 
 def handle_webhook():
     try:
-        payload = request.get_data(as_text=True)
-        received_signature = request.headers.get('PayMongo-Signature', '')
-
-        secret_key = "whsk_4PSib83vzDep1kqV64UcvMxM"
-        print('here')
-        computed_signature = hmac.new(
-            secret_key.encode(),
-            payload.encode(),
-            hashlib.sha256
-        ).hexdigest()
-        print('here2')
 
         data = request.json
-        print(data)
         event_type = data['data']['attributes']['type']
         
         if event_type == "payment.paid":
-            print(f"Payment status: Success")
             user_email = data['data']['attributes']['data']['attributes']['billing']['email']
             
             connection = get_db_connection()
             cursor = connection.cursor()
-            
+            print(user_email)
+
             sql_query = """SELECT userID FROM user WHERE email = %s"""
             cursor.execute(sql_query, (user_email,))
             user_id = cursor.fetchone()
-
+            print(user_id)
             if user_id:
                 user_id = user_id[0]  
-                
+                print(user_id)
+
                 update_query = """
                     UPDATE vista
                     SET isPremium = 1, premiumDate = %s
