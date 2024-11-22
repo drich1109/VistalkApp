@@ -87,8 +87,7 @@ def poolSubscription():
 
         
     result = cursor.fetchone()
-
-        
+    print(result)     
     if result:
         is_premium, premium_date = result
 
