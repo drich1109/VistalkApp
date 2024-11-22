@@ -202,6 +202,10 @@ def getPronunciationCount():
 @app.route('/updateUserLanguage', methods=['PUT'])
 def updateUserLanguage():
     return user.updateUserLanguage()
+
+@app.route('/poolSubscription', methods=['GET'])
+def poolSubscription():
+    return payment.poolSubscription()
     
 if __name__ == "__main__":
     from threading import Thread
