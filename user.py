@@ -846,7 +846,7 @@ def updateUserLanguage():
     languageId = request.args.get('languageId')
     
     query = """
-        Update vista set languageId  = %s where userPlayerId = %s
+        Update vista set currentLanguageId  = %s where userPlayerId = %s
     """
     cursor.execute(query, (languageId, userId))
     
