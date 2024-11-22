@@ -8,7 +8,7 @@ from socket_manager import socketio
 
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app, cors_allowed_origins="*")
+socketio.init_app(app, cors_allowed_origins="*") 
 
 def start_background_service():
     scheduler = BackgroundScheduler()
