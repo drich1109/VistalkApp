@@ -103,7 +103,7 @@ def getUserPowerUp():
     powerUps = cursor.fetchall()
 
     query2 = """
-            Select ui.*, p.name, p.description, i.filePath from userItem ui 
+            Select ui.*, p.name, p.description, i.filePath from useritem ui 
             inner join item i on i.itemId = ui.itemId 
             inner join powerup p on p.itemId = i.itemId 
             Where isActive = 1 and p.IsImplemented = 1 and i.itemTypeId = 1 and userPlayerId = %s"""
