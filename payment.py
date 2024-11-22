@@ -2,7 +2,8 @@ import requests
 from flask import request, jsonify
 import hmac
 import hashlib
-from socket_manager import socketio
+from datetime import datetime
+from db import get_db_connection
 
 def paymongoredirect():
     try:
@@ -39,7 +40,7 @@ def paymongoredirect():
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({"error": "An error occurred"}), 500
-    
+
 def handle_webhook():
     try:
         payload = request.get_data(as_text=True)
@@ -61,12 +62,25 @@ def handle_webhook():
         if event_type == "payment.paid":
             print(f"Payment status: Success")
             user_email = data['data']['attributes']['data']['attributes']['billing']['email']
-            print(user_email)
+            
+            connection = get_db_connection()
+            cursor = connection.cursor()
+            
+            sql_query = """SELECT userID FROM user WHERE email = %s"""
+            cursor.execute(sql_query, (user_email,))
+            user_id = cursor.fetchone()
 
-            socketio.emit('payment_status_update', {
-                'status': 'paid',
-            }, room=user_email)
-            print('socket success')
+            if user_id:
+                user_id = user_id[0]  
+                
+                update_query = """
+                    UPDATE vista
+                    SET isPremium = 1, premiumDate = %s
+                    WHERE userPlayerId = %s
+                """
+                cursor.execute(update_query, (datetime.now(), user_id))
+                connection.commit()
+            
             return jsonify({"message": "Webhook handled successfully"}), 200
         else:
             return jsonify({"message": "Event not handled"}), 200
@@ -74,3 +88,35 @@ def handle_webhook():
     except Exception as e:
         print(f"Error: {str(e)}")
         return jsonify({"error": "An error occurred"}), 500
+    
+def poolSubscription():
+    userId = request.args.get('userId')
+    connection = get_db_connection()
+    cursor = connection.cursor()
+    sql_query = """SELECT isPremium, premiumDate FROM vista WHERE userPlayerId = %s"""
+    cursor.execute(sql_query, (userId,))
+
+        
+    result = cursor.fetchone()
+
+        
+    if result:
+        is_premium, premium_date = result
+
+            
+        if is_premium and premium_date and premium_date >= datetime.now():
+            return jsonify({
+            'isSuccess': True,
+            'message': 'Subscribed',
+            'data': True,
+            'data2': None,
+            'totalCount': 0
+        }), 200
+        else:
+            return jsonify({
+            'isSuccess': True,
+            'message': 'Not Subscribed',
+            'data': False,
+            'data2': None,
+            'totalCount': 0
+        }), 200   
