@@ -92,7 +92,7 @@ def get_Units():
         FROM 
             unit u
         INNER JOIN 
-            userUnit uu ON uu.unitID = u.unitID
+            userunit uu ON uu.unitID = u.unitID
         WHERE 
             u.sectionID = %s 
             AND u.isActive = true 
@@ -136,14 +136,14 @@ def update_user_unit(mainUnits, userId):
         unitId = unit['unitID']
 
         query_check = """
-            SELECT COUNT(*) FROM userUnit 
+            SELECT COUNT(*) FROM userunit 
             WHERE userPlayerID = %s AND unitID = %s
         """
         cursor.execute(query_check, (userId, unitId))
         exists = cursor.fetchone()[0]
         if exists == 0:
             query_insert = """
-                INSERT INTO userUnit (userPlayerID, unitID, totalCorrectAnswers, totalScore, isLocked) 
+                INSERT INTO userunit (userPlayerID, unitID, totalCorrectAnswers, totalScore, isLocked) 
                 VALUES (%s, %s, %s, %s, %s)
             """
             cursor.execute(query_insert, (userId, unitId, 0, 0, True))  
