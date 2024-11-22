@@ -53,10 +53,6 @@ def handle_webhook():
         ).hexdigest()
         print('here2')
 
-        if not hmac.compare_digest(computed_signature, received_signature):
-            return jsonify({"error": "Invalid signature"}), 400
-        print('here3')
-
         data = request.json
         event_type = data['data']['attributes']['event_type']
         attributes = data['data']['attributes']['data']['attributes']
