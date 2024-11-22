@@ -4,11 +4,9 @@ from flask_cors import CORS
 import language, dailyTask, user, content, shop, payment,section, pronunciation
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
-from socket_manager import socketio
 
 app = Flask(__name__)
 CORS(app)
-socketio.init_app(app, cors_allowed_origins="*") 
 
 def start_background_service():
     scheduler = BackgroundScheduler()
@@ -207,9 +205,7 @@ def updateUserLanguage():
     
 if __name__ == "__main__":
     from threading import Thread
-    def start_services():
-        thread = Thread(target=start_background_service)
-        thread.daemon = True  
-        thread.start()
-    start_services()
-    socketio.run(app, debug=db.DEBUG, host=db.HOST, port=db.PORT)
+    thread = Thread(target=start_background_service)
+    thread.daemon = True  
+    thread.start()
+    app.run(debug=db.DEBUG, host=db.HOST, port=db.PORT)
