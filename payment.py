@@ -55,17 +55,24 @@ def handle_webhook():
 
         data = request.json
         print(data)
-        events = data.get('data', {}).get('attributes', {}).get('events', [])
-        print(events)
-
-        # Check for specific events, such as 'payment.paid'
-        if "payment.paid" in events:
-            # Assuming you are handling the specific payment logic here
-            print("Payment successfully processed.")
-
-            # You can also extract more details from the payload, like transaction ID, amount, etc.
-            transaction_id = data['data']['id']  # Or use other attributes that you need
+        event_type = data['data']['attributes']['type']
+        
+        # Check if the event type is 'payment.paid'
+        if event_type == "payment.paid":
+            # Extract payment details
+            payment_data = data['data']['attributes']['data']['attributes']
+            transaction_id = payment_data['id']
+            amount = payment_data['amount']
+            description = payment_data.get('description', 'No description')
+            status = payment_data['status']
+            currency = payment_data['currency']
+            user_email = payment_data['billing']['email']
+            
+            print(f"Payment successful for {user_email}")
             print(f"Transaction ID: {transaction_id}")
+            print(f"Amount: {amount / 100} {currency}")
+            print(f"Description: {description}")
+            print(f"Payment status: {status}")
 
             return jsonify({"message": "Webhook handled successfully"}), 200
         else:
