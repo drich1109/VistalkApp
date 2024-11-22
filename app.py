@@ -66,10 +66,6 @@ def getContentExampleByID():
 def getContentSyllableByID():
     return content.getContentSyllableByID()
 
-@app.route('/getSoundContentPronunciation', methods=['GET'])
-def getContentPronunciation():
-    return content.getContentPronunciation()
-
 @app.route('/getSyllablePronunciation', methods=['GET'])
 def getSyllablePronunciation():
     return content.getSyllablePronunciation()
@@ -137,10 +133,6 @@ def getUnits():
 @app.route('/getUnitQuestions', methods=['GET'])
 def get_UnitQuestions():
     return section.getUnitQuestions()
-
-@app.route('/getQuestionFiles', methods=['GET'])
-def get_QuestionFiles():
-    return section.getQuestionFiles()
 
 @app.route('/addreport', methods=['POST'])
 def addreport():
