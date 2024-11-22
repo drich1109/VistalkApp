@@ -4,11 +4,11 @@ from flask_cors import CORS
 import language, dailyTask, user, content, shop, payment,section, pronunciation
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
-from flask_socketio import SocketIO, emit
+from socket_manager import socketio
 
 app = Flask(__name__)
 CORS(app)
-socketio = SocketIO(app)
+socketio.init_app(app)
 
 def start_background_service():
     scheduler = BackgroundScheduler()
