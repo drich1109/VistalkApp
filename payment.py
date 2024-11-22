@@ -2,7 +2,7 @@ import requests
 from flask import request, jsonify
 import hmac
 import hashlib
-from app import socketio
+from socket_manager import socketio
 
 def paymongoredirect():
     try:
