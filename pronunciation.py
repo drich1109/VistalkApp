@@ -35,12 +35,13 @@ def checkPronunciation():
     
     # Safely access numberPronounced
     number_pronounced = result.get('numberPronounced', 0)
-    if number_pronounced <= 0 and number_pronounced is not None:
-        return jsonify({
-            'isSuccess': False,
-            'message': 'No credits remaining. Please subscribe or try again tomorrow.',
-            'data': None
-        }), 403  
+    if number_pronounced is not None:
+        if number_pronounced <= 0:
+            return jsonify({
+                'isSuccess': False,
+                'message': 'No credits remaining. Please subscribe or try again tomorrow.',
+                'data': None
+            }), 403  
     
     # Fetch content text
     cursor.execute("SELECT contenttext FROM content WHERE contentID = %s", (content_id,))
@@ -75,14 +76,14 @@ def checkPronunciation():
         INSERT INTO pronounciationresult (userPlayerID, contentID, pronunciationScore) VALUES (%s, %s, %s)
     """
     cursor.execute(insert_query, (userId, content_id, score))
-
-    # Update numberPronounced
-    if number_pronounced >= 1 and number_pronounced is not None:
-        update_query = """
-            UPDATE vista SET numberPronounced = numberPronounced - 1 WHERE userPlayerId = %s AND numberPronounced > 0
-        """
-        cursor.execute(update_query, (userId,))
     
+    if number_pronounced is not None:
+        if number_pronounced >= 1:
+            update_query = """
+                UPDATE vista SET numberPronounced = numberPronounced - 1 WHERE userPlayerId = %s AND numberPronounced > 0
+            """
+            cursor.execute(update_query, (userId,))
+        
     conn.commit()
 
     if score == 1:
