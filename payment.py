@@ -93,6 +93,7 @@ def poolSubscription():
         today_date = datetime.now().date()
             
         if is_premium and premium_date and premium_date == today_date:
+            print(True)
             return jsonify({
             'isSuccess': True,
             'message': 'Subscribed',
@@ -101,6 +102,7 @@ def poolSubscription():
             'totalCount': 0
         }), 200
         else:
+            print(False)
             return jsonify({
             'isSuccess': True,
             'message': 'Not Subscribed',
