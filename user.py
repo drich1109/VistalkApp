@@ -844,12 +844,12 @@ def updateUserLanguage():
     cursor = conn.cursor(dictionary=True)
     userId = request.args.get('userId')
     languageId = request.args.get('languageId')
-    
+    print(languageId)
     query = """
         Update vista set currentLanguageId  = %s where userPlayerId = %s
     """
     cursor.execute(query, (languageId, userId))
-    
+    conn.commit()
     sectionQuery = """
         SELECT u.unitId, u.unitNumber
         FROM unit u 
@@ -864,7 +864,8 @@ def updateUserLanguage():
         """
     cursor.execute(userUnitQuery, (userId,))
     userUnits = cursor.fetchall()
-        
+    print(userUnits)
+
     for unit in unitIds:
         if unit['unitId'] not in userUnits['unitID']:
             isLocked = 0 if unit['unitNumber'] == 1 else 1
@@ -873,7 +874,7 @@ def updateUserLanguage():
             VALUES (%s, %s, %s, %s, %s)
             """
             cursor.execute(userUnitQuery, (userId, unit['unitId'], 0, 0, isLocked))
-
+    conn.commit()
     return jsonify({
         'isSuccess': True,
         'message': 'Successfully Retrieved',
