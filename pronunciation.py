@@ -35,7 +35,7 @@ def checkPronunciation():
     
     # Safely access numberPronounced
     number_pronounced = result.get('numberPronounced', 0)
-    if number_pronounced <= 0:
+    if number_pronounced <= 0 and number_pronounced is not None:
         return jsonify({
             'isSuccess': False,
             'message': 'No credits remaining. Please subscribe or try again tomorrow.',
@@ -77,7 +77,7 @@ def checkPronunciation():
     cursor.execute(insert_query, (userId, content_id, score))
 
     # Update numberPronounced
-    if number_pronounced >= 1:
+    if number_pronounced >= 1 and number_pronounced is not None:
         update_query = """
             UPDATE vista SET numberPronounced = numberPronounced - 1 WHERE userPlayerId = %s AND numberPronounced > 0
         """
