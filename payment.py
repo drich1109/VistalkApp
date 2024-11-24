@@ -113,7 +113,7 @@ def poolSubscription():
         is_premium, premium_date = result
 
             
-        if is_premium and premium_date and premium_date >= datetime.now():
+        if is_premium and premium_date and premium_date >= datetime.now().date():
             return jsonify({
             'isSuccess': True,
             'message': 'Subscribed',
