@@ -369,7 +369,7 @@ def update_event_logs(userId):
                         INSERT INTO notifications (userPlayerId, message, isOpened)
                         VALUES (%s, %s, %s)
                     """
-            notification_message = f"Task {daily_task_id} completed!"
+            notification_message = f"You completed a task! You may now claim your price in the daily task board."
             cursor.execute(query_insert_message, (userId, notification_message, 0))
 
     conn.commit()
