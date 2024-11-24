@@ -69,7 +69,37 @@ def checkPronunciation():
     transcription = re.sub(r'[^a-zA-Z0-9]', '', transcription).lower()
 
     # Compute score
-    score = 1 if transcription == ctext and average_confidence >= 0.75 else 0
+    valid_numbers = {
+        'usa': '1', 'duha': '2', 'tulo': '3', 'upat': '4', 'lima': '5',
+        'unom': '6', 'pito': '7', 'walo': '8', 'siyam': '9', 'napolo': '10',
+        'piso': '1', 'dos': '2', 'tres': '3', 'cuatro': '4', 'singko': '5',
+        'seis': '6', 'siete': '7', 'ocho': '8', 'nueve': '9', 'diez': '10',
+        'onse': '11', 'dose': '12', 'trece': '13', 'katorse': '14', 'quince': '15',
+        'kinse': '15', 'dieceseis': '16', 'desisays': '16', 'diecisiete': '17', 'desisiyete': '17',
+        'dieciocho': '18', 'desiotso': '18', 'diecinueve': '19', 'desinoybe': '19', 
+        'veinte': '20', 'baynte': '20', 'baynte uno': '21', 'baynte dos': '22', 'baynte tres': '23',
+        'baynte kwatro': '24', 'baynte singko': '25', 'baynte sais': '26', 'baynte syete': '27',
+        'baynte otso': '28', 'baynte noybe': '29', 'traynta': '30', 'kwarenta': '40', 'singkwenta': '50',
+        'saisenta': '60', 'setenta': '70', 'otchenta': '80', 'nobenta': '90', 'usa ka gatos': '100',
+        'cien': '100', 'syento': '100', 'syento uno': '101', 'syento dos': '102', 'syento tres': '103',
+        'syento kwatro': '104', 'syento singco': '105', 'syento sais': '106', 'syento syete': '107',
+        'syento otso': '108', 'syento noybe': '109', 'syento dies': '110', 'dos syentos': '200',
+        'tres syentos': '300', 'kwatro syentos': '400', 'kinnyentos': '500', 'sais syentos': '600',
+        'syete syentos': '700', 'otso syentos': '800', 'noybe syentos': '900', 'usa ka libo': '1000',
+        'mil': '1000', 'dos mil': '2000', 'tres mil': '3000', 'kwatro mil': '4000', 'singko mil': '5000',
+        'sais mil': '6000', 'syete mil': '7000', 'otso mil': '8000', 'noybe mil': '9000', 'dies mil': '10000'
+    }
+
+    # Optional numeric validation
+    if ctext in valid_numbers:
+        print('number')
+        ctext_numeric = valid_numbers[ctext]  # Get numeric representation
+        transcription_numeric = valid_numbers.get(transcription, transcription)  # Map transcription to number if exists
+        score = 1 if (transcription == ctext or transcription_numeric == ctext_numeric) and average_confidence >= 0.50 else 0
+        print('number1')
+    else:
+        score = 1 if transcription == ctext and average_confidence >= 0.50 else 0
+        print('number2')
 
     # Insert pronunciation result
     insert_query = """
