@@ -45,6 +45,7 @@ def handle_webhook():
     try:
 
         data = request.json
+        print(data)
         event_type = data['data']['attributes']['type']
         
         if event_type == "payment.paid":
