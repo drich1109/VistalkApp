@@ -840,45 +840,54 @@ def check_all_users_subscriptions():
         check_subscription_and_update(userId)
 
 def updateUserLanguage():
+    data = request.get_json()
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    userId = request.args.get('userId')
-    languageId = request.args.get('languageId')
-    print(languageId)
+    userId = data.get('userId')
+    languageId = data.get('languageId')
+
+    # Update the user's current language
     query = """
-        Update vista set currentLanguageId  = %s where userPlayerId = %s
+        UPDATE vista SET currentLanguageId = %s WHERE userPlayerId = %s
     """
     cursor.execute(query, (languageId, userId))
     conn.commit()
+
+    # Fetch all units associated with the selected language
     sectionQuery = """
         SELECT u.unitId, u.unitNumber
         FROM unit u 
         INNER JOIN section s ON s.sectionId = u.sectionID 
-        WHERE s.languageID = %s and u.isActive = 1
-        """
+        WHERE s.languageID = %s AND u.isActive = 1
+    """
     cursor.execute(sectionQuery, (languageId,))
     unitIds = cursor.fetchall()
 
+    # Fetch all units already assigned to the user
     userUnitQuery = """
-        SELECT unitID from userunit where userPlayerID = %s
-        """
+        SELECT unitID FROM userunit WHERE userPlayerID = %s
+    """
     cursor.execute(userUnitQuery, (userId,))
     userUnits = cursor.fetchall()
-    print(userUnits)
 
+    # Extract unit IDs already assigned to the user
+    assignedUnitIds = {unit['unitID'] for unit in userUnits}
+
+    # Insert units into userunit if not already assigned
     for unit in unitIds:
-        if unit['unitId'] not in userUnits['unitID']:
+        if unit['unitId'] not in assignedUnitIds:
             isLocked = 0 if unit['unitNumber'] == 1 else 1
-            userUnitQuery = """
-            INSERT INTO userunit (userPlayerId, unitId, totalCorrectAnswers, totalScore, isLocked) 
-            VALUES (%s, %s, %s, %s, %s)
+            insertQuery = """
+                INSERT INTO userunit (userPlayerId, unitId, totalCorrectAnswers, totalScore, isLocked) 
+                VALUES (%s, %s, %s, %s, %s)
             """
-            cursor.execute(userUnitQuery, (userId, unit['unitId'], 0, 0, isLocked))
+            cursor.execute(insertQuery, (userId, unit['unitId'], 0, 0, isLocked))
     conn.commit()
+
     return jsonify({
         'isSuccess': True,
         'message': 'Successfully Retrieved',
         'data': None,
         'data2': None,
-        'totalCount': None 
+        'totalCount': None
     }), 200
