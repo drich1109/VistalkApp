@@ -496,17 +496,19 @@ def getSelfRankAllTime():
     cursor = conn.cursor(dictionary=True)
     userId = request.args.get('userId')
     
-    query = """
-        SELECT RANK() OVER (ORDER BY totalScoreWeekly DESC) AS userRank,
-               v.userPlayerId AS id,
-               u.name,
-               u.imagePath,
-               totalScoreWeekly
-        FROM vista v 
-        INNER JOIN user u ON u.UserID = v.userPlayerId 
+    query = """   
+        SELECT 
+            RANK() OVER (ORDER BY COALESCE(totalScoreWeekly, 0) DESC) AS userRank,
+            v.userPlayerId AS id,
+            u.name,
+            u.imagePath,
+            COALESCE(totalScoreWeekly, 0) AS totalScoreWeekly
+        FROM vista v
+        INNER JOIN user u ON u.UserID = v.userPlayerId
         LEFT JOIN (
-            SELECT userPlayerId,
-                   SUM(score) AS totalScoreWeekly
+            SELECT 
+                userPlayerId,
+                SUM(score) AS totalScoreWeekly
             FROM dailyscore
             GROUP BY userPlayerId
         ) ds ON ds.userPlayerId = v.userPlayerId
