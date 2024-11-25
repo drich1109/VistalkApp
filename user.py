@@ -392,7 +392,7 @@ def getSelfRank():
     start_of_week = today - timedelta(days=today.weekday())
     end_of_week = start_of_week + timedelta(days=6)
     
-    query = """   
+    query = """
         SELECT 
             RANK() OVER (ORDER BY COALESCE(totalScoreWeekly, 0) DESC) AS userRank,
             v.userPlayerId AS id,
@@ -406,6 +406,7 @@ def getSelfRank():
                 userPlayerId,
                 SUM(score) AS totalScoreWeekly
             FROM dailyscore
+            WHERE dateDaily BETWEEN %s AND %s
             GROUP BY userPlayerId
         ) ds ON ds.userPlayerId = v.userPlayerId
         WHERE u.userId = %s;
