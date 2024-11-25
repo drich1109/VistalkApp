@@ -36,7 +36,8 @@ def get_Sections():
                     s.languageID = %s
                     AND s.isActive = true
                 GROUP BY 
-                    s.sectionId"""
+                    s.sectionId
+                    ORDER BY s.sectionNumber"""
     values = (userID, langID)
     cursor.execute(query, values)
     sections = cursor.fetchall()
