@@ -393,23 +393,26 @@ def getSelfRank():
     end_of_week = start_of_week + timedelta(days=6)
     
     query = """
-        SELECT 
-            RANK() OVER (ORDER BY COALESCE(totalScoreWeekly, 0) DESC) AS userRank,
-            v.userPlayerId AS id,
-            u.name,
-            u.imagePath,
-            COALESCE(totalScoreWeekly, 0) AS totalScoreWeekly
-        FROM vista v
-        INNER JOIN user u ON u.UserID = v.userPlayerId
-        LEFT JOIN (
+        SELECT *
+        FROM (
             SELECT 
-                userPlayerId,
-                SUM(score) AS totalScoreWeekly
-            FROM dailyscore
-            WHERE dateDaily BETWEEN %s AND %s
-            GROUP BY userPlayerId
-        ) ds ON ds.userPlayerId = v.userPlayerId
-        WHERE u.userId = %s;
+                RANK() OVER (ORDER BY COALESCE(totalScoreWeekly, 0) DESC) AS userRank,
+                v.userPlayerId AS id,
+                u.name,
+                u.imagePath,
+                COALESCE(totalScoreWeekly, 0) AS totalScoreWeekly
+            FROM vista v
+            INNER JOIN user u ON u.UserID = v.userPlayerId
+            LEFT JOIN (
+                SELECT 
+                    userPlayerId,
+                    SUM(score) AS totalScoreWeekly
+                FROM dailyscore
+                WHERE dateDaily BETWEEN %s AND %s
+                GROUP BY userPlayerId
+            ) ds ON ds.userPlayerId = v.userPlayerId
+        ) ranked_vistas
+        WHERE id = %s
     """
     
     cursor.execute(query, (start_of_week, end_of_week, userId))
@@ -496,23 +499,26 @@ def getSelfRankAllTime():
     cursor = conn.cursor(dictionary=True)
     userId = request.args.get('userId')
     
-    query = """   
-        SELECT 
-            RANK() OVER (ORDER BY COALESCE(totalScoreWeekly, 0) DESC) AS userRank,
-            v.userPlayerId AS id,
-            u.name,
-            u.imagePath,
-            COALESCE(totalScoreWeekly, 0) AS totalScoreWeekly
-        FROM vista v
-        INNER JOIN user u ON u.UserID = v.userPlayerId
-        LEFT JOIN (
+    query = """
+        SELECT *
+        FROM (
             SELECT 
-                userPlayerId,
-                SUM(score) AS totalScoreWeekly
-            FROM dailyscore
-            GROUP BY userPlayerId
-        ) ds ON ds.userPlayerId = v.userPlayerId
-        WHERE u.userId = %s;
+                RANK() OVER (ORDER BY COALESCE(totalScoreWeekly, 0) DESC) AS userRank,
+                v.userPlayerId AS id,
+                u.name,
+                u.imagePath,
+                COALESCE(totalScoreWeekly, 0) AS totalScoreWeekly
+            FROM vista v
+            INNER JOIN user u ON u.UserID = v.userPlayerId
+            LEFT JOIN (
+                SELECT 
+                    userPlayerId,
+                    SUM(score) AS totalScoreWeekly
+                FROM dailyscore
+                GROUP BY userPlayerId
+            ) ds ON ds.userPlayerId = v.userPlayerId
+        ) ranked_vistas
+        WHERE id = %s
     """
     
     cursor.execute(query, (userId,))
